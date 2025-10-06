@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบคิวเกม & การชนะ</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f0ff;
+  --card:#ffffff;
+  --primary:#7b5fff;
+  --accent:#bb86fc;
+  --accent2:#9f7cff;
+  --muted:#6b6b6b;
+  --hover-row:#ede7ff;
+  --drag-row:#d6bcff;
+  --danger:#ff6b6b;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Prompt',sans-serif;}
+body{background:var(--bg);display:flex;flex-direction:column;align-items:center;min-height:100vh;color:#2c2c2c;}
+h2{margin-bottom:16px;font-weight:500;text-align:center;}
+button{cursor:pointer;border:none;border-radius:8px;padding:8px 12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-weight:500;transition:0.2s;}
+button:hover{opacity:0.9;}
+button.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary);}
+button.danger{background:var(--danger);}
+input, select{padding:8px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;min-width:120px;}
+.card{background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08);padding:16px;width:90%;max-width:1000px;margin-bottom:16px;}
+.table-wrapper{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:10px;text-align:center;border-bottom:1px solid #e0e0e0;}
+thead th{background:var(--accent2);color:white;font-weight:500;}
+tbody tr:hover{background:var(--hover-row);}
+tbody tr.dragging{opacity:0.5;transform:scale(0.98);background:var(--drag-row);}
+#hamburger{position:fixed;top:16px;right:16px;width:40px;height:40px;background:var(--primary);border-radius:8px;display:flex;flex-direction:column;justify-content:space-around;padding:8px;cursor:pointer;z-index:1000;}
+#hamburger div{height:4px;background:white;border-radius:2px;}
+#menu{position:fixed;top:0;right:-250px;width:250px;height:100%;background:var(--card);box-shadow:-4px 0 20px rgba(0,0,0,0.1);transition:0.3s;display:flex;flex-direction:column;padding:16px;z-index:999;}
+#menu.open{right:0;}
+#menu button{margin-bottom:12px;width:100%;text-align:left;background:var(--primary);color:white;}
+.hidden{display:none;}
+.win-panel{background:#f3e5ff;padding:12px;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,0.08);margin-bottom:16px;}
+.win-panel h3{color:var(--primary);text-align:center;margin-bottom:8px;}
+.flex-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.history-item,.win-item{border:1px solid #d3bfff;background:#f7f0ff;padding:8px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.flex-col{display:flex;flex-direction:column;}
+.help{font-size:13px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div id="hamburger">
+  <div></div><div></div><div></div>
+</div>
+
+<div id="menu">
+  <button onclick="showPage('data')">หน้าข้อมูล</button>
+  <button onclick="showPage('playing')">หน้ากำลังเล่น</button>
+  <button onclick="showPage('win')">หน้าการชนะ</button>
+  <button onclick="showPage('history')">หน้าประวัติ</button>
+</div>
+
+<h2>🎮 จัดคิวโดเนท</h2>
+
+<!-- หน้าข้อมูล -->
+<div id="page-data" class="card page">
+  <div class="flex-row" style="margin-bottom:12px;">
+    <input id="gameName" type="text" placeholder="ชื่อในเกม">
+    <input id="gameId" type="text" placeholder="ID เกม">
+    <input id="tiktokName" type="text" placeholder="ชื่อ TikTok">
+    <input id="donateAmount" type="number" placeholder="ยอดโดเนท">
+    <button onclick="addPlayer()">เพิ่มคิว</button>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>อันดับ</th><th>ชื่อเกม</th><th>ID</th><th>TikTok</th><th>โดเนท</th><th>เวลา</th><th>เข้าเล่น</th><th>แก้ไข</th><th>ลบ</th></tr>
+      </thead>
+      <tbody id="playerTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- หน้ากำลังเล่น -->
+<div id="page-playing" class="card page hidden">
+  <div class="flex-between" style="margin-bottom:12px;">
+    <button onclick="startGame()">เริ่มเกม</button>
+  </div>
+  <div class="flex-row" style="gap:20px;">
+    <div id="player1Box" class="card" style="flex:1;text-align:center;">คนซ้าย</div>
+    <div id="player2Box" class="card" style="flex:1;text-align:center;">คนขวา</div>
+  </div>
+  <div style="margin-top:12px;" class="flex-between">
+    <button onclick="playerWin(1)">ซ้ายชนะ</button>
+    <button onclick="playerWin(2)">ขวาชนะ</button>
+    <button onclick="playerLose(1)">ซ้ายแพ้</button>
+    <button onclick="playerLose(2)">ขวาแพ้</button>
+  </div>
+  <div id="currentWin" class="help" style="text-align:right;margin-top:8px;"></div>
+</div>
+
+<!-- หน้าการชนะ -->
+<div id="page-win" class="card page hidden">
+  <div class="win-panel">
+    <h3>🏆 การชนะ</h3>
+    <div id="winList"></div>
+  </div>
+</div>
+
+<!-- หน้าประวัติ -->
+<div id="page-history" class="card page hidden">
+  <input type="text" id="searchHistory" placeholder="ค้นหาชื่อ..." oninput="renderHistory()">
+  <div id="historyList" style="margin-top:12px;"></div>
+</div>
+
+<script>
+let players = []; // {id,name,gameId,tiktok,donate,time}
+let history = [];
+let wins = []; // {id,playerId,count}
+let playing = [];
+
+const playerTable = document.getElementById('playerTable');
+const winList = document.getElementById('winList');
+const historyList = document.getElementById('historyList');
+const currentWin = document.getElementById('currentWin');
+
+function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('page-'+page).classList.remove('hidden');
+  document.getElementById('menu').classList.remove('open');
+}
+
+document.getElementById('hamburger').onclick = ()=>{
+  document.getElementById('menu').classList.toggle('open');
+}
+
+// เพิ่มผู้เล่น
+function addPlayer(){
+  const name = document.getElementById('gameName').value.trim();
+  const gameId = document.getElementById('gameId').value.trim();
+  const tiktok = document.getElementById('tiktokName').value.trim();
+  const donate = Number(document.getElementById('donateAmount').value.trim());
+  if(!name || !gameId || !tiktok || !donate) return alert("กรอกข้อมูลให้ครบ");
+  const time = new Date().toLocaleTimeString();
+  players.push({id:uid(),name,gameId,tiktok,donate,time});
+  document.getElementById('gameName').value='';
+  document.getElementById('gameId').value='';
+  document.getElementById('tiktokName').value='';
+  document.getElementById('donateAmount').value='';
+  sortPlayers();
+  renderPlayers();
+}
+
+function sortPlayers(){
+  players.sort((a,b)=>b.donate - a.donate || players.indexOf(a)-players.indexOf(b));
+}
+
+function renderPlayers(){
+  playerTable.innerHTML='';
+  players.forEach((p,idx)=>{
+    const tr = document.createElement('tr');
+    tr.draggable = true;
+    tr.dataset.id = p.id;
+
+    tr.innerHTML=`
+      <td>${idx+1}</td>
+      <td>${p.name}</td>
+      <td>${p.gameId}</td>
+      <td>${p.tiktok}</td>
+      <td>${p.donate}</td>
+      <td>${p.time}</td>
+      <td><button onclick="startPlaying('${p.id}')">เข้าเล่น</button></td>
+      <td><button onclick="editPlayer('${p.id}')">แก้ไข</button></td>
+      <td><button onclick="deletePlayer('${p.id}')" class="danger">ลบ</button></td>
+    `;
+    playerTable.appendChild(tr);
+
+    tr.addEventListener('dragstart',onDragStart);
+    tr.addEventListener('dragover',e=>e.preventDefault());
+    tr.addEventListener('drop',onDrop);
+    tr.addEventListener('dragend',()=>tr.classList.remove('dragging'));
+  });
+}
+
+let dragId=null;
+function onDragStart(e){ dragId=this.dataset.id; this.classList.add('dragging'); try{e.dataTransfer.setData('text/plain',dragId);}catch(e){} }
+function onDrop(e){
+  const targetId=this.dataset.id;
+  if(!dragId || dragId===targetId) return;
+  const fromIdx = players.findIndex(p=>p.id===dragId);
+  const toIdx = players.findIndex(p=>p.id===targetId);
+  const [moved]=players.splice(fromIdx,1);
+  players.splice(toIdx,0,moved);
+  dragId=null; renderPlayers();
+}
+
+function editPlayer(id){
+  const p = players.find(x=>x.id===id);
+  const name = prompt("แก้ชื่อ",p.name);
+  const gameId = prompt("แก้ ID",p.gameId);
+  const tiktok = prompt("แก้ TikTok",p.tiktok);
+  const donate = prompt("แก้ยอดโดเนท",p.donate);
+  if(name && gameId && tiktok && donate){ p.name=name; p.gameId=gameId; p.tiktok=tiktok; p.donate=Number(donate); sortPlayers(); renderPlayers();}
+}
+
+function deletePlayer(id){
+  if(!confirm("ลบผู้เล่นนี้?")) return;
+  players=players.filter(x=>x.id!==id);
+  renderPlayers();
+  history.push(players.find(p=>p.id===id));
+}
+
+// กำลังเล่น
+function startPlaying(id){
+  if(playing.length>=2) return alert("มีผู้เล่นกำลังเล่นเต็มแล้ว");
+  const p = players.find(x=>x.id===id);
+  if(!p) return;
+  playing.push(p);
+  players = players.filter(x=>x.id!==id);
+  renderPlayers();
+  renderPlaying();
+}
+
+function renderPlaying(){
+  const box1=document.getElementById('player1Box');
+  const box2=document.getElementById('player2Box');
+  box1.innerHTML = playing[0]?`${playing[0].name}<br>วิน: ${getWin(playing[0].id)}`:'คนซ้าย';
+  box2.innerHTML = playing[1]?`${playing[1].name}<br>วิน: ${getWin(playing[1].id)}`:'คนขวา';
+  currentWin.textContent='';
+}
+
+function startGame(){ if(playing.length<2) return alert("รอผู้เล่นครบ 2 คน"); showPage('playing'); currentWin.textContent='รอผลผู้ชนะ'; }
+
+function playerWin(side){
+  const winner = playing[side-1];
+  if(!winner) return;
+  if(!wins.find(w=>w.playerId===winner.id)) wins.push({id:uid(),playerId:winner.id,count:1});
+  else wins.find(w=>w.playerId===winner.id).count+=1;
+  currentWin.textContent=`${winner.name} ชนะ +1 วิน`;
+}
+
+function playerLose(side){
+  const loser = playing[side-1];
+  if(!loser) return;
+  history.push(loser);
+  playing = playing.filter((x,i)=>i!==side-1);
+  renderPlaying();
+  renderHistory();
+}
+
+function getWin(id){ const w=wins.find(x=>x.playerId===id); return w?w.count:0; }
+
+function renderWins(){
+  winList.innerHTML='';
+  wins.forEach(w=>{
+    const p = players.find(x=>x.id===w.playerId)||history.find(x=>x.id===w.playerId);
+    if(!p) return;
+    const div=document.createElement('div');
+    div.className='win-item';
+    div.innerHTML=`<div>${p.name} • ${p.donate} บาท • วิน: ${w.count}</div>
+      <div>
+      <button onclick="editWin('${w.id}')">แก้ไข</button>
+      <button onclick="deleteWin('${w.id}')" class="danger">ลบ</button>
+      </div>`;
+    winList.appendChild(div);
+  });
+}
+
+function editWin(id){
+  const w=wins.find(x=>x.id===id);
+  const newCount=prompt("แก้จำนวนวิน",w.count);
+  if(newCount) {w.count=Number(newCount); renderWins();}
+}
+
+function deleteWin(id){
+  wins=wins.filter(x=>x.id!==id);
+  renderWins();
+}
+
+// ประวัติ
+function renderHistory(){
+  const filter = document.getElementById('searchHistory').value.toLowerCase();
+  historyList.innerHTML='';
+  history.forEach(p=>{
+    if(p.name.toLowerCase().includes(filter)){
+      const div = document.createElement('div');
+      div.className='history-item';
+      div.innerHTML=`<div>${p.name} • ${p.donate}</div><div><button onclick="restorePlayer('${p.id}')">ดึงกลับ</button></div>`;
+      historyList.appendChild(div);
+    }
+  });
+}
+
+function restorePlayer(id){
+  const p = history.find(x=>x.id===id);
+  if(!p) return;
+  players.push(p);
+  history = history.filter(x=>x.id!==id);
+  sortPlayers(); renderPlayers(); renderHistory();
+}
+
+// อัพเดตหน้าการชนะทุกครั้ง
+setInterval(renderWins,500);
+</script>
+
+</body>
+</html>
