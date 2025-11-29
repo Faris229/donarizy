@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บันทึกยอดเงินเกมเศรษฐี | V4</title>
+    <title>บันทึกยอดเงินเกมเศรษฐี | V6</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap');
@@ -23,6 +23,7 @@
             --quick-btn-color: #607d8b; /* สีเทาน้ำเงินสำหรับปุ่มลัด */
             --dice-color: #fbc02d; /* สีเหลืองทองสำหรับลูกเต๋า */
             --rent-btn-color: #ff9800; /* สีส้มสำหรับปุ่มรับค่าเช่า */
+            --limit-color: #ff5722; /* สีส้มแดงสำหรับแจ้งเตือนขีดจำกัด */
         }
 
         body {
@@ -173,7 +174,7 @@
         
         .cooldown-status {
             text-align: center;
-            color: var(--special-color); 
+            color: #26a69a; 
             font-weight: 500;
             margin-top: 5px;
         }
@@ -275,6 +276,18 @@
         /* ---------------------------------- */
         /* การควบคุมบ้านและปุ่มรับค่าเช่า */
         /* ---------------------------------- */
+        .house-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #house-count {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+        
         .house-input button {
             background-color: var(--house-btn-color); /* สีเขียวน้ำทะเล/ฟ้าอ่อน */
             width: 100%;
@@ -346,7 +359,7 @@
         #history-list .type-subtract { color: var(--danger-color); font-weight: 700; }
         #history-list .type-house-buy { color: #5cb85c; } 
         #history-list .type-house-sell { color: #f0ad4e; } 
-        #history-list .type-rent-in { color: var(--rent-btn-color); font-weight: 700; } /* NEW */
+        #history-list .type-rent-in { color: var(--rent-btn-color); font-weight: 700; } 
         #history-list .type-turn-add { color: #26a69a; } 
         #history-list .type-turn-skip { color: var(--danger-color); } 
         #history-list .type-penalty-physical { color: #d32f2f; font-weight: 700; }
@@ -411,6 +424,7 @@
         #custom-alert.warning { border-left-color: #ffc107; }
         #custom-alert.money { border-left-color: #2196f3; }
         #custom-alert.dice { border-left-color: var(--dice-color); }
+        #custom-alert.limit { border-left-color: var(--limit-color); }
     </style>
 </head>
 <body>
@@ -420,7 +434,7 @@
         <div id="start-area" class="section-card">
             <h3>เริ่มต้นเกมและตั้งเวลาเริ่ม</h3>
             <input type="text" id="playerName" placeholder="ชื่อผู้เล่น">
-            <input type="number" id="startMoney" placeholder="เงินเริ่มต้น" value="1500" min="0">
+            <input type="number" id="startMoney" placeholder="เงินเริ่มต้น" value="1500" min="0" inputmode="numeric">
             <label for="startTimeInput">ตั้งเวลาเริ่มเกม (HH:MM):</label>
             <input type="text" id="startTimeInput" placeholder="เช่น 14:30" value="14:30" maxlength="5">
             <button onclick="startGame()">ตั้งค่าและเริ่มรอ</button>
@@ -464,7 +478,7 @@
                         </div>
                         
                         <div class="input-group">
-                            <input type="number" id="moneyAmount" placeholder="จำนวนเงิน" min="1" value="100">
+                            <input type="number" id="moneyAmount" placeholder="จำนวนเงิน" min="1" value="100" inputmode="numeric">
                             <input type="text" id="moneyDescription" placeholder="หมายเหตุ: เช่น ค่าเช่า, เก็บโบนัส">
                             <button class="add-btn" onclick="addMoney()">+ เพิ่มเงิน</button>
                             <button class="subtract-btn" onclick="subtractMoney()">- ลบเงิน</button>
@@ -480,13 +494,19 @@
                 
                 <div class="section-card">
                     <h3>🏡 บันทึกการซื้อ/ขายบ้าน (หักเงินอัตโนมัติ)</h3>
+                    
+                    <div class="house-info">
+                        <h4 style="border-bottom: none; margin-top: 0; padding-bottom: 0;">รายการที่ดินที่ถือครอง:</h4>
+                        <span id="house-count">บ้าน: 0/7</span>
+                    </div>
+
                     <div class="house-input">
                         <input type="text" id="houseNumber" placeholder="หมายเลขบ้าน/ชื่อที่ดิน">
-                        <input type="number" id="housePrice" placeholder="ราคา" min="1" value="200">
-                        <button onclick="addHouse()">บันทึกการซื้อ</button> 
+                        <input type="number" id="housePrice" placeholder="ราคา" min="1" value="200" inputmode="numeric">
+                        <button id="addHouseBtn" onclick="addHouse()">บันทึกการซื้อ</button> 
                     </div>
                     
-                    <h4>รายการที่ดินที่ถือครอง:</h4>
+                    
                     <table id="house-list">
                         <thead>
                             <tr>
@@ -538,6 +558,7 @@
         let alertTimeout;
 
         const COOLDOWN_TIME = 180000; // 3 นาที
+        const HOUSE_LIMIT = 7; // จำกัดจำนวนบ้านสูงสุด
 
         const randomEvents = [
             // เงินรางวัล (Monetary Rewards)
@@ -579,6 +600,8 @@
         const customAlert = document.getElementById('custom-alert');
         const customAlertIcon = customAlert.querySelector('.icon');
         const customAlertMessage = customAlert.querySelector('.message');
+        const houseCountDisplay = document.getElementById('house-count');
+        const addHouseBtn = document.getElementById('addHouseBtn');
         
         // Dice Elements
         const diceOneValue = document.getElementById('dice-one-value');
@@ -591,7 +614,7 @@
         function showAlert(message, type = 'info', icon = '') {
             clearTimeout(alertTimeout); 
 
-            customAlert.classList.remove('show', 'success', 'error', 'info', 'warning', 'money', 'dice');
+            customAlert.classList.remove('show', 'success', 'error', 'info', 'warning', 'money', 'dice', 'limit');
             
             customAlertMessage.textContent = message;
             customAlert.classList.add(type);
@@ -602,6 +625,7 @@
                 else if (type === 'warning') icon = '⚠️';
                 else if (type === 'money') icon = '💰';
                 else if (type === 'dice') icon = '🎲';
+                else if (type === 'limit') icon = '🛑';
                 else icon = 'ℹ️'; 
             }
             customAlertIcon.textContent = icon;
@@ -707,12 +731,10 @@
                 const amountClass = record.type;
                 let amountDisplay = '';
 
-                if (record.type.includes('add') || record.type.includes('rent-in')) {
+                if (record.type.includes('add') || record.type.includes('rent-in') || record.type.includes('house-sell')) {
                     amountDisplay = `+${record.amount.toLocaleString('th-TH')}`;
                 } else if (record.type.includes('subtract') || record.type.includes('house-buy')) {
                     amountDisplay = `-${record.amount.toLocaleString('th-TH')}`; // แสดงยอดลบ
-                } else if (record.type.includes('house-sell')) {
-                    amountDisplay = `ขาย ${record.amount.toLocaleString('th-TH')}`;
                 } else if (record.type.includes('turn')) {
                     if (record.type.includes('add')) amountDisplay = "✅ เดินเพิ่ม";
                     else if (record.type.includes('skip')) amountDisplay = "❌ หยุดเดิน";
@@ -764,7 +786,7 @@
             showAlert(`ตั้งค่าเกมสำเร็จ! เริ่มเล่นในเวลา ${gameStartTime} น.`, 'info', '⏰');
         }
         
-        // --- NEW: ฟังก์ชันทอยลูกเต๋า พร้อมเอฟเฟกต์ ---
+        // --- ฟังก์ชันทอยลูกเต๋า พร้อมเอฟเฟกต์ ---
         function rollDice() {
             rollDiceBtn.disabled = true;
             
@@ -852,15 +874,23 @@
                 showAlert('กรุณาใส่ชื่อที่ดินและราคาให้ถูกต้อง!', 'error', '❌'); 
                 return; 
             }
+            
+            // ตรวจสอบขีดจำกัดบ้าน
+            if (houses.length >= HOUSE_LIMIT) {
+                showAlert(`ไม่สามารถซื้อบ้านได้อีก! จำกัดสูงสุด ${HOUSE_LIMIT} หลัง`, 'limit', '🛑');
+                return;
+            }
 
             // หักเงินอัตโนมัติ
             balance -= price; 
 
             const newHouse = { id: Date.now(), number: number, price: price };
             houses.push(newHouse); 
-            renderHouses();
+            
             recordTransaction('house-buy', `ซื้อ ${number} (ราคา)`, price);
+            
             updateBalanceDisplay();
+            renderHouses(); // เรียก renderHouses เพื่ออัปเดตทั้งตารางและจำนวนบ้าน
 
             houseNumberInput.value = ''; 
             housePriceInput.value = '200'; 
@@ -876,10 +906,11 @@
                 showAlert(`บันทึกการขาย ${houseToRemove.number} ราคา ${houseToRemove.price.toLocaleString('th-TH')} บาทแล้ว! (กรุณาเพิ่มเงินด้วยตนเอง)`, 'warning', '🏠');
             }
             houses = houses.filter(house => house.id !== id);
-            renderHouses(); saveData();
+            renderHouses(); 
+            saveData();
         }
         
-        // NEW: ฟังก์ชันรับค่าเช่า
+        // ฟังก์ชันรับค่าเช่า
         function collectRent(id) {
             const house = houses.find(h => h.id === id);
             if (!house) return;
@@ -925,6 +956,18 @@
                 actionDiv.appendChild(removeButton);
                 cellAction.appendChild(actionDiv);
             });
+            
+            // อัปเดตการแสดงจำนวนบ้านและปุ่มซื้อ
+            houseCountDisplay.textContent = `บ้าน: ${houses.length}/${HOUSE_LIMIT}`;
+            if (houses.length >= HOUSE_LIMIT) {
+                addHouseBtn.disabled = true;
+                addHouseBtn.textContent = `เต็ม ${HOUSE_LIMIT} หลัง`;
+                houseCountDisplay.style.color = 'var(--limit-color)';
+            } else {
+                addHouseBtn.disabled = false;
+                addHouseBtn.textContent = 'บันทึกการซื้อ';
+                houseCountDisplay.style.color = 'var(--primary-color)';
+            }
         }
         
         // --- ฟังก์ชันสำหรับหีบสมบัติ (Random Event) (ไม่เปลี่ยนแปลง) ---
