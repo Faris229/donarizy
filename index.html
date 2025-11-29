@@ -88,6 +88,7 @@
             background: rgba(255, 255, 255, 0.98);
             z-index: 10;
             display: flex;
+            flex-direction: column; /* จัดให้เนื้อหาเรียงเป็นแนวตั้ง */
             justify-content: center;
             align-items: center;
             font-size: 1.4em;
@@ -98,8 +99,16 @@
             border-radius: 12px;
             transition: opacity 0.5s;
         }
+        
+        #lock-overlay button {
+            margin-top: 20px;
+            background-color: #ff9800; /* Orange for Cancel */
+            width: 80%;
+            max-width: 250px;
+            box-shadow: 0 2px 5px rgba(255, 152, 0, 0.5);
+        }
 
-        /* Input and Button Styles */
+        /* Input and Button Styles (Styles are consistent with previous version) */
         input[type="text"], input[type="number"] {
             padding: 12px;
             margin-bottom: 10px;
@@ -184,6 +193,19 @@
         .subtract-btn {
             background-color: var(--danger-color);
         }
+
+        /* --- เพิ่มเติม: Style สำหรับปุ่มบันทึกบ้านโดยเฉพาะ (ตามที่ต้องการ) --- */
+        .house-input button {
+            background-color: #00bcd4; /* สีเขียวน้ำทะเล/ฟ้าอ่อน */
+            width: 100%;
+            margin-top: 5px;
+            margin-right: 0;
+            box-shadow: 0 2px 5px rgba(0, 188, 212, 0.5);
+        }
+        .house-input button:hover:not(:disabled) {
+             background-color: #00a0b6; 
+        }
+        /* ----------------------------------------------------------------- */
 
         /* ตาราง */
         #house-list, #history-list {
@@ -291,7 +313,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🌳 >บันทึกยอดเงินเกมเศรษฐี 🌳</h1>
+        <h1>🌳 บันทึกยอดเงินเกมเศรษฐี 🌳</h1>
 
         <div id="start-area" class="section-card">
             <h3>เริ่มต้นเกมและตั้งเวลาเริ่ม</h3>
@@ -303,7 +325,10 @@
         </div>
 
         <div id="game-area" style="display:none;">
-            <div id="lock-overlay" style="display:none;"></div>
+            <div id="lock-overlay" style="display:none;">
+                <p id="lock-message">⏳ เกมจะเริ่มเมื่อถึงเวลาที่กำหนด</p>
+                <button onclick="cancelTimeLock()">เริ่มเกมทันที (ยกเลิกเวลารอ)</button>
+            </div>
 
             <div id="game-controls">
                 <h2>ผู้เล่น: <span id="display-name"></span></h2>
@@ -422,6 +447,7 @@
         const historyListBody = document.querySelector('#history-list tbody');
         const startTimeInput = document.getElementById('startTimeInput');
         const lockOverlay = document.getElementById('lock-overlay');
+        const lockMessage = document.getElementById('lock-message'); // เพิ่ม element ใหม่
         const gameControls = document.getElementById('game-controls');
         const customAlert = document.getElementById('custom-alert');
         const customAlertIcon = customAlert.querySelector('.icon');
@@ -492,7 +518,7 @@
                         message += `<br>เหลืออีก ${seconds} วินาที`;
                     }
                     
-                    lockOverlay.innerHTML = message;
+                    lockMessage.innerHTML = message;
                     lockOverlay.style.display = 'flex';
                     gameControls.style.opacity = '0.5';
                     gameControls.style.pointerEvents = 'none';
@@ -505,7 +531,21 @@
             startTimeInterval = setInterval(check, nextCheckTime);
         }
 
-        // --- ฟังก์ชันพื้นฐาน ---
+        function cancelTimeLock() {
+            if (startTimeInterval) clearInterval(startTimeInterval);
+            
+            gameControls.style.opacity = '1';
+            gameControls.style.pointerEvents = 'auto';
+            lockOverlay.style.display = 'none';
+            
+            // ล้างค่าเวลาเริ่มต้นใน Local Storage เพื่อไม่ให้โหลดกลับมาติด Time Lock อีก
+            gameStartTime = '';
+            saveData(); 
+            
+            showAlert('ยกเลิกเวลารอสำเร็จ! เริ่มเกมทันที 🎉', 'warning', '🚀');
+        }
+
+        // --- ฟังก์ชันพื้นฐาน (ไม่มีการเปลี่ยนแปลง) ---
 
         // ฟังก์ชันบันทึกประวัติ
         function recordTransaction(type, description, amount) {
@@ -591,7 +631,7 @@
             showAlert(`ตั้งค่าเกมสำเร็จ! เริ่มเล่นในเวลา ${gameStartTime} น.`, 'info', '⏰');
         }
         
-        // --- ฟังก์ชันควบคุมเงินและบ้าน ---
+        // --- ฟังก์ชันควบคุมเงินและบ้าน (ไม่มีการเปลี่ยนแปลง) ---
         function addMoney() { 
             const amount = parseInt(moneyAmountInput.value);
             if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
@@ -644,7 +684,7 @@
             });
         }
         
-        // --- ฟังก์ชันสำหรับหีบสมบัติ (Random Event) ---
+        // --- ฟังก์ชันสำหรับหีบสมบัติ (Random Event) (ไม่มีการเปลี่ยนแปลง) ---
         
         function startCooldown() {
             isCooldown = true;
@@ -720,7 +760,7 @@
             startCooldown();
         }
 
-        // --- ฟังก์ชันบันทึกและโหลดข้อมูล ---
+        // --- ฟังก์ชันบันทึกและโหลดข้อมูล (ปรับปรุงการโหลด gameStartTime) ---
 
         function saveData() {
             const data = { playerName, balance, houses, transactionHistory, gameStartTime };
@@ -735,7 +775,8 @@
                 balance = data.balance || 0;
                 houses = data.houses || [];
                 transactionHistory = data.transactionHistory || [];
-                gameStartTime = data.gameStartTime || '';
+                // โหลด gameStartTime แต่จะเริ่ม Time Lock ก็ต่อเมื่อมีค่าและยังไม่ถึงเวลา
+                gameStartTime = data.gameStartTime || ''; 
 
                 if (playerName) {
                     displayName.textContent = playerName;
@@ -744,7 +785,7 @@
                     renderHistory();
                     startArea.style.display = 'none';
                     gameArea.style.display = 'block';
-                    startTimeInput.value = gameStartTime;
+                    startTimeInput.value = data.gameStartTime || '14:30';
                     
                     randomEventBtn.disabled = false; 
                     randomEventBtn.textContent = 'เปิดหีบสมบัติ';
@@ -752,6 +793,11 @@
 
                     if (gameStartTime) {
                         checkStartTime();
+                    } else {
+                         // หากมีการยกเลิก Time Lock ไปแล้ว ให้แสดง Game Controls ทันที
+                        lockOverlay.style.display = 'none';
+                        gameControls.style.opacity = '1';
+                        gameControls.style.pointerEvents = 'auto';
                     }
                 }
             }
