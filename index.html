@@ -1,1181 +1,714 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บันทึกยอดเงินเกมเศรษฐี | V12 QR Code Fix</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Science Pro: คลังความรู้วิทย์ ม.ต้น ฉบับสมบูรณ์</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        /* Color Palette */
+        --bio-color: #059669;    /* เขียวชีวะ */
+        --chem-color: #0284c7;   /* ฟ้าเคมี */
+        --phy-color: #dc2626;    /* แดงฟิสิกส์ */
+        --earth-color: #d97706;  /* ส้มดาราศาสตร์ */
+        
+        --bg-main: #f8fafc;
+        --bg-paper: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --border-color: #e2e8f0;
+
+        /* Highlighter Colors */
+        --hl-yellow: #fef08a;
+        --hl-green: #bbf7d0;
+        --hl-blue: #bfdbfe;
+        --hl-pink: #fbcfe8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Sarabun', sans-serif;
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        margin: 0;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        line-height: 1.8;
+    }
+
+    h1, h2, h3, h4, .font-heading { font-family: 'Prompt', sans-serif; }
+
+    /* --- Sidebar Navigation --- */
+    aside {
+        width: 280px;
+        background: #fff;
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        overflow-y: auto;
+    }
+
+    .brand {
+        padding: 25px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        border-bottom: 1px solid var(--border-color);
+        background: #f1f5f9;
+    }
+
+    .nav-group {
+        padding: 15px 0;
+    }
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> 
+    .nav-header {
+        font-family: 'Prompt';
+        font-size: 13px;
+        font-weight: 600;
+        color: #94a3b8;
+        padding: 0 20px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+        display: block;
+        padding: 10px 20px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 14px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover { background: #f1f5f9; color: var(--text-primary); }
+    .nav-item.active { background: #eff6ff; color: var(--chem-color); border-left-color: var(--chem-color); font-weight: 600; }
+
+    /* --- Main Reading Area --- */
+    main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 40px 60px; /* ขอบกว้างเหมือนอ่านหนังสือ */
+        scroll-behavior: smooth;
+        position: relative;
+    }
+
+    /* Article Styling */
+    article {
+        max-width: 900px;
+        margin: 0 auto 60px auto;
+        background: var(--bg-paper);
+        padding: 50px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
+    }
+
+    .subject-tag {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: white;
+    }
+    .tag-bio { background: var(--bio-color); }
+    .tag-chem { background: var(--chem-color); }
+    .tag-phy { background: var(--phy-color); }
+    .tag-earth { background: var(--earth-color); }
+
+    article h2 { font-size: 28px; margin-bottom: 10px; color: #111827; }
+    article .subtitle { color: #64748b; margin-bottom: 30px; font-size: 16px; }
+
+    article h3 { 
+        font-size: 20px; 
+        margin-top: 40px; 
+        margin-bottom: 20px; 
+        color: #334155; 
+        border-left: 5px solid #cbd5e1; 
+        padding-left: 15px; 
+    }
+
+    p { margin-bottom: 20px; text-align: justify; }
+
+    /* Detailed List */
+    ul.detail-list { padding-left: 20px; }
+    ul.detail-list li { margin-bottom: 12px; }
     
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap');
+    /* Comparison Table */
+    .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 15px;
+    }
+    .compare-table th, .compare-table td {
+        border: 1px solid #e2e8f0;
+        padding: 12px 15px;
+        text-align: left;
+    }
+    .compare-table th { background: #f8fafc; font-family: 'Prompt'; }
+    .compare-table tr:nth-child(even) { background: #fcfcfc; }
 
-        :root {
-            --bg-color: #f7fff7; 
-            --container-bg: #ffffff; 
-            --text-color: #333333; 
-            --primary-color: #4CAF50; 
-            --secondary-color: #81c784; 
-            --success-color: #4CAF50; 
-            --danger-color: #f44336; 
-            --border-color: #e0e0e0; 
-            --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --house-btn-color: #00bcd4; 
-            --quick-btn-color: #607d8b; 
-            --dice-color: #fbc02d; 
-            --rent-btn-color: #ff9800; 
-            --limit-color: #ff5722; 
-            --chest-color: #ffc107; 
-            --scan-btn-color: #2196F3; 
-        }
+    /* Knowledge Box (สาระเน้นๆ) */
+    .knowledge-box {
+        background: #f0fdf4;
+        border-left: 4px solid var(--bio-color);
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 0 8px 8px 0;
+    }
+    .knowledge-box.chem { background: #f0f9ff; border-left-color: var(--chem-color); }
+    .knowledge-box.phy { background: #fef2f2; border-left-color: var(--phy-color); }
+    
+    .box-title { display: block; font-weight: 700; font-family: 'Prompt'; margin-bottom: 8px; }
 
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            line-height: 1.6;
-            touch-action: manipulation;
-        }
+    /* Formula Block */
+    .formula-block {
+        background: #1e293b;
+        color: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        margin: 30px 0;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .formula-eq { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #4ade80; }
+    .formula-desc { font-size: 14px; color: #94a3b8; font-family: 'Sarabun'; }
 
-        .container {
-            background: var(--container-bg);
-            border-radius: 12px;
-            padding: 35px;
-            box-shadow: var(--shadow);
-            max-width: 650px; 
-            width: 100%;
-            position: relative; 
-        }
+    /* Note Taking Area */
+    .sticky-note {
+        margin-top: 40px;
+        background: #fffbeb;
+        padding: 20px;
+        border: 1px solid #fcd34d;
+        border-radius: 8px;
+    }
+    .note-label { font-size: 13px; font-weight: bold; color: #92400e; margin-bottom: 10px; display:block;}
+    textarea {
+        width: 100%;
+        min-height: 100px;
+        border: none;
+        background: transparent;
+        resize: vertical;
+        font-family: 'Sarabun';
+        outline: none;
+        font-size: 15px;
+        color: #451a03;
+    }
 
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+    /* Highlighter Menu */
+    #highlighter-menu {
+        position: absolute;
+        display: none;
+        background: #0f172a;
+        padding: 8px;
+        border-radius: 50px;
+        gap: 8px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+    .pen-color {
+        width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; transition: transform 0.1s;
+    }
+    .pen-color:hover { transform: scale(1.2); }
+    .bg-y { background: var(--hl-yellow); }
+    .bg-g { background: var(--hl-green); }
+    .bg-b { background: var(--hl-blue); }
+    .bg-p { background: var(--hl-pink); }
+    
+    /* Highlight Classes */
+    span.hl-y { background: var(--hl-yellow); }
+    span.hl-g { background: var(--hl-green); }
+    span.hl-b { background: var(--hl-blue); }
+    span.hl-p { background: var(--hl-pink); }
 
-        h2 {
-            color: var(--text-color);
-            font-weight: 500;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        h3, h4 {
-            color: var(--text-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-            margin-top: 25px;
-            font-weight: 500;
-        }
-        
-        .section-card {
-            background-color: #ffffff;
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f0f0f0;
-        }
-        
-        .card-balance {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--house-btn-color) 100%);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0 30px 0;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            position: relative;
-            min-height: 120px;
-        }
-        .card-chip {
-            width: 40px;
-            height: 30px;
-            background-color: var(--dice-color); 
-            border-radius: 5px;
-            margin-bottom: 15px;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-        }
-        .card-logo {
-            font-family: Arial, sans-serif;
-            font-size: 1.2em;
-            font-weight: 700;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            opacity: 0.8;
-            letter-spacing: 1px;
-        }
-        .card-label {
-            font-size: 0.8em;
-            opacity: 0.7;
-            margin-bottom: 5px;
-        }
-        #current-balance {
-            font-size: 2.5em; 
-            font-weight: 700;
-            display: block;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        .card-player-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 15px;
-        }
-        .card-player-info span {
-            font-size: 1em;
-            font-weight: 400;
-        }
+    /* Floating Action Button */
+    .fab-wrapper {
+        position: fixed; bottom: 30px; right: 40px; display: flex; flex-direction: column; gap: 15px;
+    }
+    .fab {
+        width: 55px; height: 55px; border-radius: 50%; background: #2563eb; color: white;
+        border: none; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); font-size: 20px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: transform 0.2s;
+    }
+    .fab:hover { transform: translateY(-3px); }
+    .fab.danger { background: #fff; color: #ef4444; }
 
-
-        input[type="text"], input[type="number"], textarea {
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            width: 100%; 
-            box-sizing: border-box;
-            font-size: 16px;
-            background-color: #ffffff;
-            color: var(--text-color);
-            resize: vertical;
-        }
-        input:focus, textarea:focus {
-            box-shadow: 0 0 0 2px var(--secondary-color);
-            outline: none;
-            border-color: var(--secondary-color);
-        }
-
-        button {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-            transition: background-color 0.3s, transform 0.1s;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        button:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-        }
-        
-        button:active:not(:disabled) {
-            transform: scale(0.98);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        button:disabled {
-            opacity: 1 !important; 
-            background-color: #cccccc !important;
-            color: #666666 !important; 
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none !important;
-        }
-        
-        .quick-amounts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px; 
-            margin-bottom: 15px;
-            justify-content: flex-start;
-        }
-        .quick-amounts button {
-            background-color: var(--quick-btn-color);
-            color: white;
-            padding: 8px 10px;
-            font-size: 14px;
-            font-weight: 500;
-            margin: 0;
-            width: auto;
-            min-width: 60px;
-        }
-
-        .add-btn {
-            background-color: var(--success-color);
-            width: calc(50% - 5px); 
-            margin-right: 10px;
-        }
-
-        .subtract-btn {
-            background-color: var(--danger-color);
-            width: calc(50% - 5px);
-            margin-right: 0;
-        }
-
-        .transfer-btn {
-            background-color: #3f51b5; 
-            width: 100%;
-            margin-top: 5px;
-        }
-        .scan-btn {
-            background-color: var(--scan-btn-color); 
-            width: 100%;
-            margin-top: 5px;
-        }
-        .qr-button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        .qr-button-group button {
-            width: 50%;
-            margin: 0;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .close-btn {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close-btn:hover,
-        .close-btn:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .qr-display {
-            padding: 20px;
-            background-color: var(--border-color);
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        
-        #qrcodeCanvas {
-            margin: 15px auto;
-            width: 180px; 
-            height: 180px;
-            background-color: white;
-            border: 2px solid var(--text-color);
-            padding: 10px;
-        }
-        
-        #custom-alert {
-            position: fixed;
-            bottom: 20px; 
-            left: 50%; 
-            transform: translate(-50%, 20px); 
-            background-color: #333;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            max-width: 90%; 
-            pointer-events: none; 
-        }
-        #custom-alert.show {
-            opacity: 1;
-            transform: translate(-50%, 0); 
-            pointer-events: auto; 
-        }
-        #custom-alert .icon {
-            font-size: 1.2em;
-            margin-right: 10px;
-        }
-        #custom-alert.success { background-color: var(--success-color); }
-        #custom-alert.error { background-color: var(--danger-color); }
-        #custom-alert.warning { background-color: #ffc107; color: var(--text-color); }
-        #custom-alert.money { background-color: #26a69a; }
-        #custom-alert.dice { background-color: #795548; }
-        #custom-alert.limit { background-color: var(--limit-color); }
-        
-        .dice-area { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        #rollDiceBtn { background-color: var(--dice-color); color: #333; width: 100%; box-shadow: 0 2px 5px rgba(251, 192, 45, 0.5); font-size: 1.1em; }
-        .dice-result { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 10px; min-height: 40px; }
-        .dice-value { font-size: 2em; font-weight: 700; color: var(--text-color); display: inline-block; transition: transform 0.1s; }
-        @keyframes roll-effect { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-3px) rotate(5deg); } 75% { transform: translateY(3px) rotate(-5deg); } 100% { transform: translateY(0) rotate(0deg); } }
-        .dice-rolling { animation: roll-effect 0.1s infinite; }
-        #total-roll { font-size: 2.5em; color: var(--primary-color); font-weight: 700; }
-        .house-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        #house-count { font-weight: 700; color: var(--primary-color); font-size: 1.1em; }
-        .house-input button { background-color: var(--house-btn-color); width: 100%; margin-top: 5px; margin-right: 0; box-shadow: 0 2px 5px rgba(0, 188, 212, 0.5); }
-        #house-list .action-btns { display: flex; gap: 5px; flex-wrap: nowrap; }
-        #house-list .rent-btn { background-color: var(--rent-btn-color); padding: 5px 8px; font-size: 13px; margin: 0; box-shadow: none; white-space: nowrap; }
-        #house-list .remove-btn { background-color: #bdbdbd; padding: 5px 8px; font-size: 13px; margin: 0; color: var(--text-color); box-shadow: none; }
-        #house-list, #history-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        #house-list th, #history-list th { background-color: #f0f0f0; color: var(--primary-color); font-weight: 700; }
-        #house-list th, #house-list td, #history-list th, #history-list td { border-bottom: 1px solid var(--border-color); padding: 10px; text-align: left; font-size: 0.9em; border-top: none;}
-        #history-list .type-add, #history-list .type-rent-in, #history-list .type-transfer-in { color: var(--success-color); font-weight: 700; }
-        #history-list .type-subtract, #history-list .type-house-buy, #history-list .type-transfer-out { color: var(--danger-color); font-weight: 700; }
-        hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
-        .reset-btn { background-color: var(--danger-color); width: 100%; margin-top: 30px; }
-        .cooldown-status { text-align: center; color: #26a69a; font-weight: 500; margin-top: 5px; }
-        
-        #lock-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            z-index: 50;
-            border-radius: 12px;
-            padding: 30px;
-            box-sizing: border-box;
-        }
-        #lock-message {
-            font-size: 1.5em;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        #lock-overlay button {
-            background-color: var(--dice-color);
-            color: var(--text-color);
-            margin-top: 10px;
-            width: 80%;
-            max-width: 300px;
-        }
-    </style>
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌳 บันทึกยอดเงินเกมเศรษฐี 🌳</h1>
 
-        <div id="start-area" class="section-card">
-            <h3>เริ่มต้นเกมและตั้งเวลาเริ่ม</h3>
-            <input type="text" id="playerName" placeholder="ชื่อผู้เล่น">
-            <input type="number" id="startMoney" placeholder="เงินเริ่มต้น" value="1500" min="0" inputmode="numeric">
-            <label for="startTimeInput">ตั้งเวลาเริ่มเกม (HH:MM):</label>
-            <input type="text" id="startTimeInput" placeholder="เช่น 14:30" value="14:30" maxlength="5">
-            <button onclick="startGame()">ตั้งค่าและเริ่มรอ</button>
-        </div>
-
-        <div id="game-area" style="display:none;">
-            <div id="lock-overlay" style="display:none;">
-                <p id="lock-message">⏳ เกมจะเริ่มเมื่อถึงเวลาที่กำหนด</p>
-                <button onclick="cancelTimeLock()">เริ่มเกมทันที (ยกเลิกเวลารอ)</button>
-            </div>
-
-            <div id="game-controls">
-                
-                <h2>ผู้เล่น: <span id="display-name"></span></h2>
-
-                <div class="card-balance">
-                    <div class="card-logo">MONOPOLY</div>
-                    <div class="card-chip"></div>
-                    <div class="card-label">ยอดเงินปัจจุบัน</div>
-                    <span id="current-balance">0</span>
-                    <div class="card-player-info">
-                        <span id="display-name-card">PLAYER NAME</span>
-                        <span>CHIP: X409</span>
-                    </div>
-                </div>
-                
-                <hr>
-                
-                <div class="section-card">
-                    <h3>💵 ควบคุมยอดเงิน</h3>
-                    <div class="money-control-layout">
-                        
-                        <div class="money-input-area">
-                            
-                            <div class="quick-amounts">
-                                <button onclick="setMoneyAmount(100)">100</button>
-                                <button onclick="setMoneyAmount(500)">500</button>
-                                <button onclick="setMoneyAmount(1000)">1K</button>
-                                <button onclick="setMoneyAmount(5000)">5K</button>
-                                <button onclick="setMoneyAmount(10000)">10K</button>
-                            </div>
-                            
-                            <div class="input-group">
-                                <input type="number" id="moneyAmount" placeholder="จำนวนเงินที่ต้องการเพิ่ม/ลบ" min="1" value="100" inputmode="numeric">
-                                <input type="text" id="moneyDescription" placeholder="หมายเหตุ: เช่น ค่าเช่า, เก็บโบนัส">
-                                <button class="add-btn" onclick="addMoney()">+ เพิ่มเงิน</button>
-                                <button class="subtract-btn" onclick="subtractMoney()">- ลบเงิน</button>
-                            </div>
-                        </div>
-
-                    </div> 
-                </div>
-
-                <div class="section-card">
-                    <h3>📲 โอนเงิน (QR Code)</h3>
-                    <p style="font-size: 0.9em; margin-bottom: 10px;">*ยอดเงินจะถูกหักทันทีที่คุณสร้าง QR Code</p>
-                    <input type="number" id="transferAmount" placeholder="จำนวนเงินที่ต้องการโอน" min="1" value="100" inputmode="numeric">
-                    <input type="text" id="transferRecipient" placeholder="ชื่อผู้รับ (เช่น นาย A)">
-                    
-                    <div class="qr-button-group">
-                        <button class="transfer-btn" onclick="initiateTransfer()">สร้าง QR Code เพื่อโอนเงิน (หักยอดทันที)</button>
-                        <button class="scan-btn" onclick="receiveTransfer()">รับเงินจากการสแกน QR Code (จำลอง)</button>
-                    </div>
-                    
-                </div>
-                
-                <div class="section-card">
-                    <h3>🎲 ทอยลูกเต๋า (2 ลูก)</h3>
-                    <div class="dice-area">
-                        <button id="rollDiceBtn" onclick="rollDice()">ทอยลูกเต๋า</button>
-                        <div class="dice-result">
-                            <span class="dice-value" id="dice-one-value">?</span>
-                            <span class="dice-value">+</span>
-                            <span class="dice-value" id="dice-two-value">?</span>
-                            <span class="dice-value">=</span>
-                            <span id="total-roll">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-card">
-                    <h3>🎁 หีบสมบัติ (สุ่มรางวัล)</h3>
-                    <button id="randomEventBtn" onclick="triggerRandomEvent()">เปิดหีบสมบัติ</button>
-                    <p id="cooldown-status" class="cooldown-status">พร้อมแล้ว! เปิดหีบสมบัติได้เลย</p>
-                </div>
-                
-                <div class="section-card">
-                    <h3>🏡 บันทึกการซื้อ/ขายบ้าน (จำกัด 7 หลัง)</h3>
-                    
-                    <div class="house-info">
-                        <h4 style="border-bottom: none; margin-top: 0; padding-bottom: 0;">รายการที่ดินที่ถือครอง:</h4>
-                        <span id="house-count">บ้าน: 0/7</span>
-                    </div>
-
-                    <div class="house-input">
-                        <input type="text" id="houseNumber" placeholder="หมายเลขบ้าน/ชื่อที่ดิน">
-                        <input type="number" id="housePrice" placeholder="ราคา" min="1" value="200" inputmode="numeric">
-                        <button id="addHouseBtn" onclick="addHouse()">บันทึกการซื้อ</button> 
-                    </div>
-                    
-                    <table id="house-list">
-                        <thead>
-                            <tr>
-                                <th>ชื่อที่ดิน/บ้าน</th>
-                                <th>ราคา</th>
-                                <th>จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
-                
-                <hr>
-
-                <div class="section-card">
-                    <h3>📜 ประวัติการทำรายการ</h3>
-                    <table id="history-list">
-                        <thead>
-                            <tr>
-                                <th style="width: 20%;">เวลา</th>
-                                <th>รายการ</th>
-                                <th style="width: 25%;">สถานะ/ยอดเงิน</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
-
-                <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (ล้างข้อมูลทั้งหมด)</button>
-            </div>
-        </div>
+<aside>
+    <div class="brand">
+        <i class="fa-solid fa-book-open"></i> Science<span style="color:#2563eb">Pro</span>
+    </div>
+    
+    <div class="nav-group">
+        <div class="nav-header">มัธยมศึกษาปีที่ 1</div>
+        <a href="#m1-cell" class="nav-item"><i class="fa-solid fa-microscope" style="width:20px"></i> เซลล์และกล้องจุลทรรศน์</a>
+        <a href="#m1-transport" class="nav-item"><i class="fa-solid fa-arrows-left-right-to-line" style="width:20px"></i> การลำเลียงสาร</a>
+        <a href="#m1-matter" class="nav-item"><i class="fa-solid fa-flask" style="width:20px"></i> สารและสมบัติของสาร</a>
+        <a href="#m1-heat" class="nav-item"><i class="fa-solid fa-fire" style="width:20px"></i> พลังงานความร้อน</a>
     </div>
 
-    <div id="custom-alert" class="hidden" onclick="this.classList.remove('show');">
-        <span class="icon"></span>
-        <span class="message"></span>
+    <div class="nav-group">
+        <div class="nav-header">มัธยมศึกษาปีที่ 2</div>
+        <a href="#m2-body" class="nav-item"><i class="fa-solid fa-heart-pulse" style="width:20px"></i> ระบบร่างกายมนุษย์</a>
+        <a href="#m2-force" class="nav-item"><i class="fa-solid fa-weight-hanging" style="width:20px"></i> แรงและการเคลื่อนที่</a>
+        <a href="#m2-earth" class="nav-item"><i class="fa-solid fa-mountain" style="width:20px"></i> โลกและทรัพยากร</a>
     </div>
 
-    <div id="transferModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeTransferModal()">&times;</span>
-            <h3>✅ โอนเงินสำเร็จ!</h3>
-            <p>กรุณาให้ผู้รับสแกนโค้ดนี้เพื่อรับเงิน</p>
-            
-            <div class="qr-display">
-                <div id="qrcodeCanvas"></div> 
-                
-                <p><strong>ผู้โอน (คุณ):</strong> <span id="transferSender"></span></p>
-                <p><strong>จำนวน:</strong> <span id="transferAmountDisplay"></span> บาท</p>
-                <p><strong>ผู้รับ:</strong> <span id="transferRecipientDisplay"></span></p>
-                <p style="font-size: 0.8em; margin-top: 15px;">(ข้อมูลที่ถูกฝังใน QR Code คือชื่อผู้โอนและยอดเงิน)</p>
-            </div>
-            
-            <button class="transfer-btn" onclick="closeTransferModal()" style="width: 100%;">ปิด</button>
-        </div>
+    <div class="nav-group">
+        <div class="nav-header">มัธยมศึกษาปีที่ 3</div>
+        <a href="#m3-gene" class="nav-item"><i class="fa-solid fa-dna" style="width:20px"></i> พันธุศาสตร์</a>
+        <a href="#m3-elec" class="nav-item"><i class="fa-solid fa-bolt" style="width:20px"></i> ไฟฟ้าและอิเล็กทรอนิกส์</a>
+        <a href="#m3-space" class="nav-item"><i class="fa-solid fa-satellite" style="width:20px"></i> ดาราศาสตร์</a>
     </div>
+</aside>
 
+<main id="content-container">
 
-    <script>
-        // *** Global State ***
-        let playerName = '';
-        let balance = 0;
-        let houses = [];
-        let transactionHistory = [];
-        let gameStartTime = ''; 
-        let alertTimeout;
+    <article id="m1-cell">
+        <span class="subject-tag tag-bio">ชีววิทยา ม.1</span>
+        <h2>เซลล์: หน่วยพื้นฐานของสิ่งมีชีวิต (The Cell)</h2>
+        <p class="subtitle">เจาะลึกโครงสร้าง หน้าที่ และความแตกต่างระหว่างเซลล์พืชและเซลล์สัตว์</p>
         
-        let cooldownEndTime = 0; 
-        let cooldownInterval; 
+        <p>เซลล์ (Cell) คือหน่วยที่เล็กที่สุดของสิ่งมีชีวิตที่สามารถแสดงคุณสมบัติของชีวิตได้ครบถ้วน ได้แก่ การกินอาหาร หายใจ ขับถ่าย เจริญเติบโต และสืบพันธุ์ โดยทฤษฎีเซลล์ (Cell Theory) กล่าวว่า "สิ่งมีชีวิตทุกชนิดประกอบด้วยเซลล์ และเซลล์ใหม่เกิดจากการแบ่งตัวของเซลล์เดิม"</p>
 
-        // *** Constants ***
-        const COOLDOWN_TIME = 180000; 
-        const HOUSE_LIMIT = 7; 
-        const randomEvents = [
-            { title: "เก็บขยะรีไซเคิลได้", amount: 500, type: "add", source: "สุ่ม" },
-            { title: "ได้รับโบนัสประจำปี", amount: 1800, type: "add", source: "สุ่ม" },
-            { title: "ได้รับมรดกจากญาติที่ไม่เคยรู้จัก", amount: 2000, type: "add", source: "สุ่ม" },
-            { title: "โดนค่าปรับจอดรถผิดที่", amount: 300, type: "subtract", source: "สุ่ม" },
-            { title: "ต้องจ่ายค่ารักษาพยาบาลฉุกเฉิน", amount: 1200, type: "subtract", source: "สุ่ม" },
-            { title: "โดนเก็บภาษีย้อนหลัง", amount: 1000, type: "subtract", source: "สุ่ม" },
-            { title: "บัตรโอกาส: เดินต่อได้อีก 1 ตา", amount: 0, type: "turn-add", source: "สุ่ม" },
-            { title: "บัตรโอกาส: หยุดเดิน 1 ตา", amount: 0, type: "turn-skip", source: "สุ่ม" },
-            { title: "บทลงโทษ: โดนตบ 10 ครั้ง", amount: 0, type: "penalty-physical", source: "สุ่ม" }, 
-        ];
+        <h3>1. โครงสร้างหลักของเซลล์ (Cell Structure)</h3>
+        <ul class="detail-list">
+            <li><b>ผนังเซลล์ (Cell Wall):</b> พบเฉพาะในพืช แบคทีเรีย และเชื้อรา ประกอบด้วยสาร<i>เซลลูโลส</i>เป็นหลัก ทำหน้าที่เพิ่มความแข็งแรงและคงรูปร่างให้เซลล์ (เปรียบเสมือนกำแพงเมือง)</li>
+            <li><b>เยื่อหุ้มเซลล์ (Cell Membrane):</b> เป็นเยื่อเลือกผ่าน (Semi-permeable membrane) ประกอบด้วยฟอสโฟลิพิดและโปรตีน ทำหน้าที่คัดกรองสารที่จะผ่านเข้า-ออกเซลล์ รักษาสมดุลภายใน</li>
+            <li><b>นิวเคลียส (Nucleus):</b> เป็นศูนย์กลางควบคุมการทำงานทั้งหมด บรรจุสารพันธุกรรม (DNA/RNA) ภายในมีนิวคลีโอลัส (Nucleolus) ที่ทำหน้าที่สร้างไรโบโซม</li>
+            <li><b>ไซโทพลาซึม (Cytoplasm):</b> ของเหลวภายในเซลล์ เป็นที่อยู่ของออร์แกเนลล์ต่างๆ และเป็นบริเวณที่เกิดปฏิกิริยาเคมีส่วนใหญ่</li>
+        </ul>
 
-        // *** Element References ***
-        const startArea = document.getElementById('start-area');
-        const gameArea = document.getElementById('game-area');
-        const displayName = document.getElementById('display-name');
-        const currentBalance = document.getElementById('current-balance');
-        const moneyAmountInput = document.getElementById('moneyAmount');
-        const moneyDescriptionInput = document.getElementById('moneyDescription'); 
-        const houseNumberInput = document.getElementById('houseNumber');
-        const housePriceInput = document.getElementById('housePrice');
-        const houseListBody = document.querySelector('#house-list tbody');
-        const randomEventBtn = document.getElementById('randomEventBtn');
-        const cooldownStatus = document.getElementById('cooldown-status');
-        const historyListBody = document.querySelector('#history-list tbody');
-        const startTimeInput = document.getElementById('startTimeInput');
-        const lockOverlay = document.getElementById('lock-overlay');
-        const lockMessage = document.getElementById('lock-message'); 
-        const gameControls = document.getElementById('game-controls');
-        const customAlert = document.getElementById('custom-alert');
-        const customAlertIcon = customAlert.querySelector('.icon');
-        const customAlertMessage = customAlert.querySelector('.message');
-        const houseCountDisplay = document.getElementById('house-count');
-        const addHouseBtn = document.getElementById('addHouseBtn');
-        const diceOneValue = document.getElementById('dice-one-value');
-        const diceTwoValue = document.getElementById('dice-two-value');
-        const totalRoll = document.getElementById('total-roll');
-        const rollDiceBtn = document.getElementById('rollDiceBtn');
-        const displayNameCard = document.getElementById('display-name-card');
+        <h3>2. เจาะลึกออร์แกเนลล์ (Organelles)</h3>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>ออร์แกเนลล์</th>
+                    <th>หน้าที่หลัก</th>
+                    <th>ข้อควรจำพิเศษ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>Mitochondria</b></td>
+                    <td>แหล่งสร้างพลังงาน (ATP) ผ่านกระบวนการหายใจระดับเซลล์</td>
+                    <td>พบมากในเซลล์ที่ใช้พลังงานสูง เช่น กล้ามเนื้อหัวใจ, อสุจิ</td>
+                </tr>
+                <tr>
+                    <td><b>Chloroplast</b></td>
+                    <td>สังเคราะห์ด้วยแสง (Photosynthesis) สร้างอาหาร (น้ำตาล)</td>
+                    <td>ภายในมีสารสีเขียวชื่อ "คลอโรฟิลล์" พบเฉพาะในพืช</td>
+                </tr>
+                <tr>
+                    <td><b>Ribosome</b></td>
+                    <td>สังเคราะห์โปรตีน</td>
+                    <td>มีขนาดเล็กที่สุด ไม่มีเยื่อหุ้ม</td>
+                </tr>
+                <tr>
+                    <td><b>Vacuole</b></td>
+                    <td>ถุงเก็บสาร (น้ำ, อาหาร, ของเสีย)</td>
+                    <td>ในพืชจะมี Central Vacuole ขนาดใหญ่มาก</td>
+                </tr>
+                <tr>
+                    <td><b>Lysosome</b></td>
+                    <td>ย่อยสลายสิ่งแปลกปลอมและออร์แกเนลล์ที่หมดอายุ</td>
+                    <td>ฉายา "ถุงฆ่าตัวตาย" (Suicide bag)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำเรื่องเซลล์</span>
+            <textarea id="note-m1-cell" placeholder="จดสิ่งที่มักลืม หรือ เทคนิคการจำที่นี่..."></textarea>
+        </div>
+    </article>
+
+    <article id="m1-transport">
+        <span class="subject-tag tag-bio">ชีววิทยา ม.1</span>
+        <h2>การลำเลียงสารผ่านเซลล์ (Cell Transport)</h2>
+        <p>กลไกการเคลื่อนที่ของสารเข้าและออกจากเซลล์เพื่อรักษาสมดุล (Homeostasis)</p>
+
+        <div class="knowledge-box">
+            <span class="box-title">กฎทองของการลำเลียง</span>
+            ธรรมชาติต้องการความสมดุล สารจะพยายามกระจายตัวจากที่ที่ "แออัด" ไปยังที่ที่ "ว่าง" เสมอ ยกเว้นกรณีที่เซลล์ต้องการสะสมสารนั้นจริงๆ จึงต้องใช้พลังงานฝืนธรรมชาติ
+        </div>
+
+        <h3>1. การลำเลียงแบบไม่ใช้พลังงาน (Passive Transport)</h3>
+        <ul class="detail-list">
+            <li>
+                <b>การแพร่ (Diffusion):</b> การเคลื่อนที่ของโมเลกุลสารจากบริเวณที่มี <u>ความเข้มข้นสูง</u> ไปยัง <u>ความเข้มข้นต่ำ</u> จนกว่าจะสมดุล
+                <br><i>ตัวอย่าง:</i> การได้กลิ่นน้ำหอม, การแลกเปลี่ยนแก๊ส O₂ และ CO₂ ที่ถุงลมปอด
+            </li>
+            <li>
+                <b>ออสโมซิส (Osmosis):</b> การเคลื่อนที่ของ <u>น้ำ</u> ผ่านเยื่อเลือกผ่าน จากบริเวณที่มี <u>น้ำมาก (สารเจือจาง)</u> ไปยัง <u>น้ำน้อย (สารเข้มข้น)</u>
+                <br><i>ตัวอย่าง:</i> รากพืชดูดน้ำ, มือเหี่ยวเมื่อแช่น้ำนานๆ
+            </li>
+            <li>
+                <b>การแพร่แบบฟาซิลิเทต (Facilitated Diffusion):</b> การแพร่ของสารขนาดใหญ่ (เช่น กลูโคส) ผ่านช่องโปรตีนตัวพา (Carrier Protein) บนเยื่อหุ้มเซลล์ ไม่ใช้พลังงาน แต่เร็วกว่าการแพร่ธรรมดา
+            </li>
+        </ul>
+
+        <h3>2. การลำเลียงแบบใช้พลังงาน (Active Transport)</h3>
+        <p>การเคลื่อนที่ของสารจาก <u>ความเข้มข้นต่ำ</u> ไปยัง <u>ความเข้มข้นสูง</u> (ฝืนธรรมชาติ) จึงต้องใช้พลังงาน (ATP) เข้าช่วย เช่น การดูดแร่ธาตุของรากพืช, โซเดียม-โพแทสเซียมปั๊มในเซลล์ประสาท</p>
+
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำการลำเลียง</span>
+            <textarea id="note-m1-transport"></textarea>
+        </div>
+    </article>
+
+    <article id="m1-heat">
+        <span class="subject-tag tag-phy">ฟิสิกส์ ม.1</span>
+        <h2>พลังงานความร้อน (Thermal Energy)</h2>
+        <p class="subtitle">การถ่ายโอนความร้อน การขยายตัวของสสาร และการคำนวณปริมาณความร้อน</p>
+
+        <h3>สูตรคำนวณปริมาณความร้อน (Calorimetry)</h3>
+        <p>เมื่อสสารได้รับความร้อน จะเกิดการเปลี่ยนแปลง 2 แบบ คือ 1. อุณหภูมิเปลี่ยน 2. สถานะเปลี่ยน</p>
         
-        // QR Transfer Elements
-        const transferAmountInput = document.getElementById('transferAmount');
-        const transferRecipientInput = document.getElementById('transferRecipient');
-        const transferModal = document.getElementById('transferModal');
-        const transferSenderDisplay = document.getElementById('transferSender');
-        const transferAmountDisplay = document.getElementById('transferAmountDisplay');
-        const transferRecipientDisplay = document.getElementById('transferRecipientDisplay');
-        const qrcodeCanvas = document.getElementById('qrcodeCanvas');
+        <div class="formula-block">
+            <div class="formula-eq">Q = mcΔt</div>
+            <div class="formula-desc">ใช้เมื่อ "อุณหภูมิเปลี่ยน" แต่สถานะเดิม</div>
+            <div style="margin-top:10px; font-size:13px; text-align:left; display:inline-block;">
+                Q = ปริมาณความร้อน (Cal หรือ Joule)<br>
+                m = มวลของสาร (g หรือ kg)<br>
+                c = ความจุความร้อนจำเพาะ (Specific Heat Capacity)<br>
+                Δt = อุณหภูมิที่เปลี่ยนแปลง (t<sub>ปลาย</sub> - t<sub>ต้น</sub>)
+            </div>
+        </div>
 
+        <div class="formula-block">
+            <div class="formula-eq">Q = mL</div>
+            <div class="formula-desc">ใช้เมื่อ "เปลี่ยนสถานะ" แต่อุณหภูมิคงที่</div>
+            <div style="margin-top:10px; font-size:13px; text-align:left; display:inline-block;">
+                L = ความร้อนแฝงจำเพาะ (Latent Heat)<br>
+                - ความร้อนแฝงของการหลอมเหลว (น้ำแข็ง→น้ำ)<br>
+                - ความร้อนแฝงของการกลายเป็นไอ (น้ำ→ไอน้ำ)
+            </div>
+        </div>
 
-        // --- Custom Alert ---
-        function showAlert(message, type = 'info', icon = '') {
-            clearTimeout(alertTimeout); 
-            customAlert.classList.remove('show', 'success', 'error', 'info', 'warning', 'money', 'dice', 'limit', 'transfer');
-            customAlertMessage.textContent = message;
-            customAlert.classList.add(type);
-            if (!icon) {
-                if (type === 'success') icon = '✅';
-                else if (type === 'error') icon = '❌';
-                else if (type === 'warning') icon = '⚠️';
-                else if (type === 'money') icon = '💰';
-                else if (type === 'dice') icon = '🎲';
-                else if (type === 'limit') icon = '🛑';
-                else if (type === 'transfer') icon = '📲';
-                else icon = 'ℹ️'; 
-            }
-            customAlertIcon.textContent = icon;
-            customAlert.classList.add('show');
-            alertTimeout = setTimeout(() => {
-                customAlert.classList.remove('show');
-            }, 3000); 
-        }
+        <h3>การถ่ายโอนความร้อน 3 วิธี</h3>
+        <ul class="detail-list">
+            <li><b>การนำ (Conduction):</b> อาศัยตัวกลาง ตัวกลาง<i>ไม่เคลื่อนที่</i> (เกิดดีสุดในของแข็ง/โลหะ) -> โมเลกุลสั่นส่งต่อพลังงาน</li>
+            <li><b>การพา (Convection):</b> อาศัยตัวกลาง ตัวกลาง<i>เคลื่อนที่ไปด้วย</i> (เกิดในของเหลวและแก๊ส) -> อากาศร้อนลอยตัวขึ้น อากาศเย็นไหลเข้ามาแทนที่ (ลมบก/ลมทะเล)</li>
+            <li><b>การแผ่รังสี (Radiation):</b> <i>ไม่อาศัยตัวกลาง</i> มาในรูปคลื่นแม่เหล็กไฟฟ้า (Infrared) -> ความร้อนจากดวงอาทิตย์มายังโลก</li>
+        </ul>
 
-        // --- Core Game Functions (Omitted for brevity, assumed functional) ---
-        function updateBalanceDisplay() {
-            currentBalance.textContent = balance.toLocaleString('th-TH');
-            displayName.textContent = playerName; 
-            displayNameCard.textContent = playerName.toUpperCase(); 
-        }
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำสูตรคำนวณ</span>
+            <textarea id="note-m1-heat"></textarea>
+        </div>
+    </article>
 
-        function recordTransaction(type, description, amount) {
-            const now = new Date();
-            const timeString = `${now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'})}`;
+    <article id="m2-body">
+        <span class="subject-tag tag-bio">ชีววิทยา ม.2</span>
+        <h2>ระบบร่างกายมนุษย์ (Human Body Systems)</h2>
+        <p class="subtitle">ความซับซ้อนของการทำงานร่วมกันระหว่างระบบอวัยวะต่างๆ</p>
+
+        <h3>1. ระบบหมุนเวียนเลือด (Circulatory System)</h3>
+        <p>ทำหน้าที่ขนส่งสารอาหาร แก๊ส และของเสีย หัวใจมนุษย์มี 4 ห้อง ทำงานประสานกันดังนี้:</p>
+        <div class="knowledge-box">
+            <span class="box-title">เส้นทางเดินเลือด (ท่องจำ!)</span>
+            1. ร่างกายส่งเลือดดำ → <b>บนขวา (Right Atrium)</b><br>
+            2. ลงสู่ → <b>ล่างขวา (Right Ventricle)</b><br>
+            3. ส่งไปฟอกที่ → <b>ปอด (Lungs)</b> (เปลี่ยนเลือดดำเป็นเลือดแดง)<br>
+            4. กลับเข้าสู่ → <b>บนซ้าย (Left Atrium)</b><br>
+            5. ลงสู่ → <b>ล่างซ้าย (Left Ventricle)</b> *ผนังหนาสุด*<br>
+            6. บีบตัวส่งไปเลี้ยง → <b>ทั่วร่างกาย</b> ผ่านหลอดเลือด Aorta
+        </div>
+
+        <h3>2. ระบบหายใจ (Respiratory System)</h3>
+        <p>กลไกการหายใจเข้า-ออก เกิดจากการทำงานของ <b>กะบังลม</b> และ <b>กระดูกซี่โครง</b> ในสภาวะตรงกันข้าม (Antagonism)</p>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>สภาวะ</th>
+                    <th>กะบังลม (Diaphragm)</th>
+                    <th>กระดูกซี่โครง (Ribs)</th>
+                    <th>ผลลัพธ์ในปอด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>หายใจเข้า</b></td>
+                    <td>หดตัว (เลื่อนต่ำลง)</td>
+                    <td>ยกตัวขึ้น</td>
+                    <td>ปริมาตรเพิ่ม / ความดันลด (อากาศไหลเข้า)</td>
+                </tr>
+                <tr>
+                    <td><b>หายใจออก</b></td>
+                    <td>คลายตัว (เลื่อนสูงขึ้น)</td>
+                    <td>ลดต่ำลง</td>
+                    <td>ปริมาตรลด / ความดันเพิ่ม (อากาศไหลออก)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3. ระบบขับถ่าย (Excretory System) - ไต</h3>
+        <p>หน่วยไต (Nephron) นับล้านหน่วยทำหน้าที่กรองของเสียออกจากเลือด
+        <br><b>ขั้นตอนการทำงาน:</b>
+        <br>1. <b>การกรอง (Filtration):</b> ที่โกลเมอรูลัส สารขนาดเล็ก (น้ำ, น้ำตาล, ยูเรีย) ผ่านได้ โปรตีนและเม็ดเลือดผ่านไม่ได้
+        <br>2. <b>การดูดกลับ (Reabsorption):</b> ที่ท่อหน่วยไต ดูดน้ำและน้ำตาลกลูโคสกลับคืนสู่เลือดจนหมด (ถ้าพบน้ำตาลในปัสสาวะ = เสี่ยงเบาหวาน)
+        <br>3. <b>การหลั่ง (Secretion):</b> ขับสารพิษและยาบางชนิดทิ้งมากับปัสสาวะ</p>
+
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำระบบร่างกาย</span>
+            <textarea id="note-m2-body"></textarea>
+        </div>
+    </article>
+
+    <article id="m2-force">
+        <span class="subject-tag tag-phy">ฟิสิกส์ ม.2</span>
+        <h2>แรงและการเคลื่อนที่ (Force and Motion)</h2>
+        
+        <h3>กฎการเคลื่อนที่ของนิวตัน 3 ข้อ</h3>
+        <ul class="detail-list">
+            <li><b>ข้อที่ 1 (กฎของความเฉื่อย):</b> $\Sigma F = 0$ วัตถุจะคงสภาพการเคลื่อนที่เดิม (หยุดนิ่งก็หยุดต่อไป, เคลื่อนที่ก็เคลื่อนด้วย v คงที่) หากไม่มีแรงลัพธ์มากระทำ</li>
+            <li><b>ข้อที่ 2 (กฎของความเร่ง):</b> $\Sigma F = ma$ หากมีแรงลัพธ์มากระทำ วัตถุจะมีความเร่ง (a) ในทิศเดียวกับแรง และแปรผกผันกับมวล</li>
+            <li><b>ข้อที่ 3 (กฎของแรงกิริยา-ปฏิกิริยา):</b> Action = Reaction แรงกระทำเท่ากับแรงถูกกระทำเสมอ (ขนาดเท่ากัน ทิศตรงข้าม เกิดขึ้นบนวัตถุคนละก้อน)</li>
+        </ul>
+
+        <h3>แรงเสียดทาน (Friction - f)</h3>
+        <p>แรงต้านการเคลื่อนที่ เกิดขึ้นบริเวณผิวสัมผัส แบ่งเป็น 2 ชนิด:
+        <br>1. <b>แรงเสียดทานสถิต ($f_s$):</b> เกิดขณะวัตถุ <u>ยังไม่เคลื่อนที่</u> (ค่าสูงสุดคือตอนที่กำลังจะเริ่มเคลื่อนที่)
+        <br>2. <b>แรงเสียดทานจลน์ ($f_k$):</b> เกิดขณะวัตถุ <u>กำลังเคลื่อนที่</u> ($f_k$ จะน้อยกว่า $f_s$ สูงสุดเสมอ)</p>
+        <div class="formula-block">
+            <div class="formula-eq">f = μN</div>
+            <div class="formula-desc">สูตรคำนวณแรงเสียดทาน</div>
+            <div style="margin-top:10px; font-size:13px; text-align:left; display:inline-block;">
+                μ (มิว) = สัมประสิทธิ์ความเสียดทาน (ขึ้นกับชนิดผิวสัมผัส)<br>
+                N = แรงปฏิกิริยาตั้งฉาก (ปกติบนพื้นราบ N = mg)
+            </div>
+        </div>
+
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำเรื่องแรง</span>
+            <textarea id="note-m2-force"></textarea>
+        </div>
+    </article>
+
+    <article id="m3-elec">
+        <span class="subject-tag tag-phy">ฟิสิกส์ ม.3</span>
+        <h2>ไฟฟ้า (Electricity)</h2>
+        <p class="subtitle">วงจรไฟฟ้า กฎของโอห์ม และพลังงานไฟฟ้า</p>
+
+        <h3>กฎของโอห์ม (Ohm's Law)</h3>
+        <p>หัวใจสำคัญของการคำนวณวงจรไฟฟ้า: "กระแสไฟฟ้า (I) แปรผันตรงกับความต่างศักย์ (V) และแปรผกผันกับความต้านทาน (R)"</p>
+        <div class="formula-block">
+            <div class="formula-eq">V = IR</div>
+            <div class="formula-eq" style="font-size:20px; color:#cbd5e1; margin-top:10px;">P = IV = I²R = V²/R</div>
+            <div class="formula-desc">สูตรกฎของโอห์ม และ กำลังไฟฟ้า (Power)</div>
+        </div>
+
+        <h3>การต่อตัวต้านทาน (Resistors)</h3>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>แบบอนุกรม (Series)</th>
+                    <th>แบบขนาน (Parallel)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ต่อเรียงกันเป็นเส้นเดียว</td>
+                    <td>ต่อคร่อมจุดเดียวกัน (แยกไหล)</td>
+                </tr>
+                <tr>
+                    <td><b>I เท่ากัน</b> (กระแสไหลทางเดียว)</td>
+                    <td><b>V เท่ากัน</b> (ความต่างศักย์เท่าแหล่งกำเนิด)</td>
+                </tr>
+                <tr>
+                    <td>V แบ่งกัน ($V_{total} = V_1 + V_2$)</td>
+                    <td>I แบ่งกัน ($I_{total} = I_1 + I_2$)</td>
+                </tr>
+                <tr>
+                    <td>$R_{รวม} = R_1 + R_2 + ...$ (ความต้านทานเพิ่มขึ้น)</td>
+                    <td>$1/R_{รวม} = 1/R_1 + 1/R_2 + ...$ (ความต้านทานลดลง)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>การคิดค่าไฟ (Electrical Energy Calculation)</h3>
+        <p>ค่าไฟคิดเป็น "หน่วย" (Unit) หรือ กิโลวัตต์-ชั่วโมง (kWh)</p>
+        <div class="knowledge-box chem">
+            <span class="box-title">สูตรคำนวณหน่วยค่าไฟ</span>
+            <b>จำนวนหน่วย (Unit) = (กำลังไฟฟ้า(วัตต์) ÷ 1000) × จำนวนชั่วโมงที่ใช้</b>
+            <br><br><i>ตัวอย่าง:</i> เปิดแอร์ 2000 วัตต์ นาน 5 ชั่วโมง
+            <br>Unit = (2000/1000) × 5 = 2 × 5 = 10 หน่วย
+        </div>
+
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำไฟฟ้า</span>
+            <textarea id="note-m3-elec"></textarea>
+        </div>
+    </article>
+
+    <article id="m3-gene">
+        <span class="subject-tag tag-bio">ชีววิทยา ม.3</span>
+        <h2>พันธุศาสตร์ (Genetics)</h2>
+        <p class="subtitle">การถ่ายทอดลักษณะทางพันธุกรรม DNA และโครโมโซม</p>
+
+        <h3>ลำดับขนาด (จากเล็กไปใหญ่)</h3>
+        <p style="text-align: center; font-weight: bold; font-size: 18px; color: #059669;">
+            Base Pair → Gene → DNA → Chromosome → Nucleus → Cell
+        </p>
+        <ul class="detail-list">
+            <li><b>โครโมโซม (Chromosome):</b> ร่างกายมนุษย์ปกติมี 46 แท่ง (23 คู่) แบ่งเป็น ออโตโซม (คู่ที่ 1-22) และ โครโมโซมเพศ (คู่ที่ 23 - XX หญิง, XY ชาย)</li>
+            <li><b>ยีน (Gene):</b> ช่วงหนึ่งของสาย DNA ที่กำหนดลักษณะทางพันธุกรรม</li>
+            <li><b>อัลลีล (Allele):</b> รูปแบบของยีนที่เข้าคู่กัน (เช่น T คู่กับ t)</li>
+        </ul>
+
+        <h3>กฎของเมนเดล (Mendel's Laws)</h3>
+        <p>บิดาแห่งพันธุศาสตร์ ผู้ค้นพบว่าลักษณะต่างๆ ถูกควบคุมโดยยีนที่เป็นคู่ๆ
+        <br>- <b>Genotype (จีโนไทป์):</b> รูปแบบคู่ยีน เช่น TT (เด่นแท้), Tt (พันทาง/พาหะ), tt (ด้อยแท้)
+        <br>- <b>Phenotype (ฟีโนไทป์):</b> ลักษณะที่แสดงออกมาให้เห็น เช่น สูง, เตี้ย, ผมหยิก</p>
+
+        <div class="knowledge-box phy">
+            <span class="box-title">โรคทางพันธุกรรมที่ควรรู้</span>
+            <ul>
+                <li><b>ตาบอดสี / ฮีโมฟีเลีย / G6PD:</b> ยีนด้อยบนโครโมโซม X (ผู้ชายเป็นโรคง่ายกว่าผู้หญิง เพราะมี X ตัวเดียว)</li>
+                <li><b>ธาลัสซีเมีย / ผิวเผือก:</b> ยีนด้อยบนออโตโซม (ชายหญิงโอกาสเป็นเท่ากัน)</li>
+                <li><b>ดาวน์ซินโดรม:</b> โครโมโซมคู่ที่ 21 เกินมา 1 แท่ง (Trisomy 21)</li>
+            </ul>
+        </div>
+
+        <div class="sticky-note">
+            <span class="note-label">📝 บันทึกช่วยจำพันธุศาสตร์</span>
+            <textarea id="note-m3-gene"></textarea>
+        </div>
+    </article>
+
+    <div style="height: 100px;"></div>
+</main>
+
+<div id="highlighter-menu">
+    <div class="pen-color bg-y" onclick="applyHighlight('hl-y')" title="สีเหลือง (ข้อควรจำ)"></div>
+    <div class="pen-color bg-g" onclick="applyHighlight('hl-g')" title="สีเขียว (นิยาม)"></div>
+    <div class="pen-color bg-b" onclick="applyHighlight('hl-b')" title="สีฟ้า (ตัวอย่าง)"></div>
+    <div class="pen-color bg-p" onclick="applyHighlight('hl-p')" title="สีชมพู (ออกสอบ)"></div>
+    <div style="color:white; cursor:pointer; padding:0 5px; font-size:14px; display:flex; align-items:center;" onclick="removeHighlight()">
+        <i class="fa-solid fa-eraser"></i>
+    </div>
+</div>
+
+<div class="fab-wrapper">
+    <button class="fab danger" onclick="resetData()" title="ล้างข้อมูล"><i class="fa-solid fa-rotate-right"></i></button>
+    <button class="fab" onclick="exportData()" title="บันทึกไฟล์"><i class="fa-solid fa-save"></i></button>
+</div>
+
+<script>
+    // --- 1. Highlighter System ---
+    const contentArea = document.getElementById('content-container');
+    const menu = document.getElementById('highlighter-menu');
+    let currentRange = null;
+
+    document.addEventListener('mouseup', (e) => {
+        const sel = window.getSelection();
+        if (sel.toString().length > 0 && contentArea.contains(sel.anchorNode)) {
+            const range = sel.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
             
-            const record = {
-                time: timeString,
-                type: type, 
-                description: description,
-                amount: amount
-            };
-            transactionHistory.unshift(record);
-            renderHistory();
+            // Show menu above selection
+            menu.style.display = 'flex';
+            menu.style.top = (rect.top + window.scrollY - 45) + 'px';
+            menu.style.left = (rect.left + rect.width/2 - 50) + 'px';
+            currentRange = range;
+        } else if (!menu.contains(e.target)) {
+            menu.style.display = 'none';
         }
+    });
 
-        function renderHistory() {
-            historyListBody.innerHTML = '';
-            const recentHistory = transactionHistory.slice(0, 15);
+    function applyHighlight(colorClass) {
+        if (!currentRange) return;
+        try {
+            const span = document.createElement('span');
+            span.className = colorClass;
+            currentRange.surroundContents(span);
+            window.getSelection().removeAllRanges();
+            menu.style.display = 'none';
+            saveContent();
+        } catch (err) {
+            alert('ไม่สามารถไฮไลท์ข้ามย่อหน้าหรือบล็อกได้ กรุณาเลือกทีละส่วน');
+        }
+    }
 
-            recentHistory.forEach(record => {
-                const row = historyListBody.insertRow();
-                const cellTime = row.insertCell(0);
-                const cellDesc = row.insertCell(1);
-                const cellAmount = row.insertCell(2);
+    function removeHighlight() {
+        // Simple removal: Need user to select the highlighted text again
+        // Or simpler for this demo: Command exec
+        document.execCommand('removeFormat');
+        menu.style.display = 'none';
+        saveContent();
+    }
 
-                let amountClass = record.type;
-                let amountDisplay = '';
-
-                if (record.type.includes('add') || record.type.includes('rent-in') || record.type.includes('house-sell') || record.type.includes('transfer-in')) {
-                    amountDisplay = `+${record.amount.toLocaleString('th-TH')}`;
-                    amountClass = 'type-add';
-                } else if (record.type.includes('subtract') || record.type.includes('house-buy') || record.type.includes('transfer-out')) {
-                    amountDisplay = `-${record.amount.toLocaleString('th-TH')}`; 
-                    amountClass = 'type-subtract'; 
-                } else if (record.type.includes('turn')) {
-                    if (record.type.includes('add')) amountDisplay = "✅ เดินเพิ่ม";
-                    else if (record.type.includes('skip')) amountDisplay = "❌ หยุดเดิน";
-                } else if (record.type.includes('penalty')) {
-                    amountDisplay = "💀 ลงโทษ";
-                } else {
-                    amountDisplay = "-";
-                }
-                
-                cellTime.textContent = record.time;
-                cellDesc.textContent = record.description;
-                cellAmount.innerHTML = `<span class="${amountClass}">${amountDisplay}</span>`;
+    // --- 2. Note System ---
+    function initNotes() {
+        document.querySelectorAll('textarea').forEach(area => {
+            // Load
+            const saved = localStorage.getItem(area.id);
+            if(saved) area.value = saved;
+            // Save on type
+            area.addEventListener('input', () => {
+                localStorage.setItem(area.id, area.value);
             });
+        });
+    }
+
+    // --- 3. Data Persistence ---
+    function saveContent() {
+        localStorage.setItem('science_pro_html', contentArea.innerHTML);
+    }
+
+    function loadContent() {
+        const html = localStorage.getItem('science_pro_html');
+        if (html) {
+            contentArea.innerHTML = html;
+            initNotes(); // Re-bind events because HTML was replaced
         }
+    }
+
+    function resetData() {
+        if(confirm('ต้องการล้างไฮไลท์และโน้ตทั้งหมดหรือไม่? (กู้คืนไม่ได้)')) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    function exportData() {
+        alert('ข้อมูลถูกบันทึกใน Browser อัตโนมัติแล้ว! \nหากต้องการเซฟเป็นไฟล์ ให้กด Ctrl+S เพื่อบันทึกหน้าเว็บนี้เก็บไว้');
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+        loadContent();
+        initNotes();
         
-        function startGame() {
-            const nameInput = document.getElementById('playerName').value.trim();
-            const startMoneyInput = parseInt(document.getElementById('startMoney').value);
-            const timeInput = startTimeInput.value.trim();
+        // Add note listeners in case of fresh load
+        document.querySelectorAll('textarea').forEach(area => {
+            area.addEventListener('input', () => localStorage.setItem(area.id, area.value));
+        });
+    });
 
-            if (nameInput === '' || isNaN(startMoneyInput) || startMoneyInput < 0) {
-                showAlert('กรุณาใส่ชื่อและเงินเริ่มต้นที่ถูกต้อง!', 'error', '❌');
-                return;
-            }
-            if (!/^\d{1,2}:\d{2}$/.test(timeInput)) {
-                showAlert('รูปแบบเวลาไม่ถูกต้อง (HH:MM)!', 'error', '❌');
-                return;
-            }
-
-            playerName = nameInput;
-            balance = startMoneyInput;
-            gameStartTime = timeInput; 
-            transactionHistory = [];
-            
-            recordTransaction('start', `เริ่มต้นเกม (เงินตั้งต้น: ${startMoneyInput.toLocaleString('th-TH')})`, startMoneyInput);
-            
-            updateBalanceDisplay();
-
-            startArea.style.display = 'none';
-            gameArea.style.display = 'block';
-
-            saveData();
-            checkStartTime();
-            showAlert(`ตั้งค่าเกมสำเร็จ! เริ่มเล่นในเวลา ${gameStartTime} น.`, 'info', '⏰');
-        }
-
-        function setMoneyAmount(amount) {
-            moneyAmountInput.value = amount;
-            moneyDescriptionInput.value = ''; 
-        }
-
-        function addMoney() { 
-            const amount = parseInt(moneyAmountInput.value);
-            const description = moneyDescriptionInput.value.trim() || 'เพิ่มเงินด้วยตนเอง';
-
-            if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
-            balance += amount;
-            recordTransaction('add', description, amount);
-            updateBalanceDisplay(); 
-            moneyAmountInput.value = '100'; 
-            moneyDescriptionInput.value = '';
-            saveData();
-            showAlert(`เพิ่มเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬆️');
-        }
-        function subtractMoney() { 
-            const amount = parseInt(moneyAmountInput.value);
-            const description = moneyDescriptionInput.value.trim() || 'ลบเงินด้วยตนเอง';
-
-            if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
-            balance -= amount;
-            recordTransaction('subtract', description, amount);
-            updateBalanceDisplay(); 
-            moneyAmountInput.value = '100';
-            moneyDescriptionInput.value = '';
-            saveData();
-            showAlert(`ลบเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬇️');
-        }
-
-
-        // --- Transfer Money (QR Code Generation) ---
-        function initiateTransfer() {
-            const amount = parseInt(transferAmountInput.value);
-            const recipient = transferRecipientInput.value.trim();
-
-            if (isNaN(amount) || amount <= 0) { 
-                showAlert('กรุณาใส่จำนวนเงินโอนที่ถูกต้อง!', 'error', '❌'); 
-                return; 
-            }
-            if (recipient === '') {
-                 showAlert('กรุณาใส่ชื่อผู้รับ!', 'error', '❌'); 
-                return; 
-            }
-            if (balance < amount) {
-                showAlert('ยอดเงินไม่พอสำหรับการโอน!', 'error', '❌'); 
-                return;
-            }
-            
-            // 1. Deduct money and record transfer out
-            balance -= amount;
-            const transferID = Date.now();
-            recordTransaction('transfer-out', `โอนให้ ${recipient} (ID: ${transferID})`, amount);
-            updateBalanceDisplay(); 
-            saveData();
-
-            // 2. Prepare Data for QR Code
-            const qrData = `MONOPOLY_PAYMENT|${playerName}|${recipient}|${amount}`;
-            
-            // 3. Clear existing QR code aggressively (FIX: Ensures the library can draw fresh)
-            qrcodeCanvas.innerHTML = ''; 
-            while (qrcodeCanvas.firstChild) {
-                qrcodeCanvas.removeChild(qrcodeCanvas.firstChild);
-            }
-            
-            let qrCodeGenerated = false;
-            if (typeof QRCode !== 'undefined') {
-                 new QRCode(qrcodeCanvas, {
-                    text: qrData,
-                    width: 160,
-                    height: 160,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-                qrCodeGenerated = true;
-            } else {
-                qrcodeCanvas.innerHTML = '⚠️ ไลบรารี QR Code ไม่สามารถโหลดได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
-            }
-
-            // 4. Display Modal
-            transferSenderDisplay.textContent = playerName;
-            transferAmountDisplay.textContent = amount.toLocaleString('th-TH');
-            transferRecipientDisplay.textContent = recipient;
-            
-            transferModal.style.display = 'block';
-            
-            if (qrCodeGenerated) {
-                showAlert(`โอนเงิน ${amount.toLocaleString('th-TH')} บาทสำเร็จ!`, 'success', '📲');
-            } else {
-                 showAlert('การสร้าง QR Code ล้มเหลว! (ตรวจสอบอินเทอร์เน็ต)', 'error', '❌');
-            }
-            
-            transferAmountInput.value = '100';
-            transferRecipientInput.value = '';
-        }
-
-        function receiveTransfer() {
-            const amountStr = prompt("กรุณาใส่จำนวนเงินที่ได้รับ:");
-            if (!amountStr) return;
-            
-            const amount = parseInt(amountStr.trim());
-            
-            if (isNaN(amount) || amount <= 0) {
-                showAlert('จำนวนเงินที่ได้รับไม่ถูกต้อง!', 'error', '❌');
-                return;
-            }
-            
-            const sender = prompt("กรุณาใส่ชื่อผู้โอนเงิน:");
-            if (!sender) return;
-
-            balance += amount;
-            recordTransaction('transfer-in', `รับโอนจาก ${sender}`, amount);
-            updateBalanceDisplay();
-            saveData();
-            
-            showAlert(`ได้รับเงินโอน ${amount.toLocaleString('th-TH')} บาท จาก ${sender} แล้ว!`, 'success', '💸');
-        }
-
-
-        function closeTransferModal() {
-            transferModal.style.display = 'none';
-        }
-        
-        function addHouse() { 
-            const number = houseNumberInput.value.trim();
-            const price = parseInt(housePriceInput.value);
-            
-            if (number === '' || isNaN(price) || price <= 0) { 
-                showAlert('กรุณาใส่ชื่อที่ดินและราคาให้ถูกต้อง!', 'error', '❌'); 
-                return; 
-            }
-            
-            if (houses.length >= HOUSE_LIMIT) {
-                showAlert(`ไม่สามารถซื้อบ้านได้อีก! จำกัดสูงสุด ${HOUSE_LIMIT} หลัง`, 'limit', '🛑');
-                return;
-            }
-
-            balance -= price; 
-
-            const newHouse = { id: Date.now(), number: number, price: price };
-            houses.push(newHouse); 
-            
-            recordTransaction('house-buy', `ซื้อ ${number} (ราคา)`, price);
-            
-            updateBalanceDisplay();
-            renderHouses();
-
-            houseNumberInput.value = ''; 
-            housePriceInput.value = '200'; 
-            saveData();
-            showAlert(`บันทึกการซื้อ ${number} ราคา ${price.toLocaleString('th-TH')} บาทแล้ว! (หักเงินแล้ว)`, 'success', '🏠');
-        }
-        
-        function removeHouse(id) { 
-            const houseToRemove = houses.find(house => house.id === id);
-            if (houseToRemove) { 
-                recordTransaction('house-sell', `ขาย ${houseToRemove.number} (ราคาทุน)`, houseToRemove.price);
-                showAlert(`บันทึกการขาย ${houseToRemove.number} ราคา ${houseToRemove.price.toLocaleString('th-TH')} บาทแล้ว! (กรุณาเพิ่มเงินด้วยตนเอง)`, 'warning', '🏠');
-            }
-            houses = houses.filter(house => house.id !== id);
-            renderHouses(); 
-            saveData();
-        }
-        
-        function collectRent(id) {
-            const house = houses.find(h => h.id === id);
-            if (!house) return;
-            
-            balance += house.price;
-            
-            recordTransaction('rent-in', `รับค่าเช่า ${house.number}`, house.price);
-            updateBalanceDisplay();
-            saveData();
-            showAlert(`ได้รับค่าเช่า ${house.number} จำนวน ${house.price.toLocaleString('th-TH')} บาท!`, 'money', '💵');
-        }
-
-
-        function renderHouses() {
-            houseListBody.innerHTML = '';
-            houses.forEach(house => {
-                const row = houseListBody.insertRow();
-                const cellNumber = row.insertCell(0);
-                const cellPrice = row.insertCell(1);
-                const cellAction = row.insertCell(2);
-                
-                cellNumber.textContent = house.number;
-                cellPrice.textContent = house.price.toLocaleString('th-TH');
-                
-                const actionDiv = document.createElement('div');
-                actionDiv.className = 'action-btns';
-
-                const rentButton = document.createElement('button');
-                rentButton.className = 'rent-btn';
-                rentButton.textContent = '💵 เช่า';
-                rentButton.onclick = () => collectRent(house.id);
-                
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-btn';
-                removeButton.textContent = 'ขาย';
-                removeButton.onclick = () => removeHouse(house.id);
-                
-                actionDiv.appendChild(rentButton);
-                actionDiv.appendChild(removeButton);
-                cellAction.appendChild(actionDiv);
-            });
-            
-            houseCountDisplay.textContent = `บ้าน: ${houses.length}/${HOUSE_LIMIT}`;
-            if (houses.length >= HOUSE_LIMIT) {
-                addHouseBtn.disabled = true;
-                addHouseBtn.textContent = `เต็ม ${HOUSE_LIMIT} หลัง`;
-                houseCountDisplay.style.color = 'var(--limit-color)';
-            } else {
-                addHouseBtn.disabled = false;
-                addHouseBtn.textContent = 'บันทึกการซื้อ';
-                houseCountDisplay.style.color = 'var(--primary-color)';
-            }
-        }
-        
-        function rollDice() {
-            rollDiceBtn.disabled = true;
-            const rollCount = 10; 
-            let currentRoll = 0;
-            diceOneValue.classList.add('dice-rolling');
-            diceTwoValue.classList.add('dice-rolling');
-            const finalDice1 = Math.floor(Math.random() * 6) + 1;
-            const finalDice2 = Math.floor(Math.random() * 6) + 1;
-            const finalTotal = finalDice1 + finalDice2;
-
-            const rollInterval = setInterval(() => {
-                diceOneValue.textContent = Math.floor(Math.random() * 6) + 1;
-                diceTwoValue.textContent = Math.floor(Math.random() * 6) + 1;
-                totalRoll.textContent = '?';
-                currentRoll++;
-                if (currentRoll >= rollCount) {
-                    clearInterval(rollInterval);
-                    diceOneValue.textContent = finalDice1;
-                    diceTwoValue.textContent = finalDice2;
-                    totalRoll.textContent = finalTotal;
-                    diceOneValue.classList.remove('dice-rolling');
-                    diceTwoValue.classList.remove('dice-rolling');
-                    rollDiceBtn.disabled = false;
-                    let message = `ทอยลูกเต๋าได้ ${finalDice1} + ${finalDice2} = **${finalTotal}**`;
-                    if (finalDice1 === finalDice2) { message += " (เบิ้ล!)"; }
-                    showAlert(message, 'dice', '🎲');
-                }
-            }, 100); 
-        }
-        
-        function startCooldownTimer() {
-            if (cooldownInterval) clearInterval(cooldownInterval); 
-
-            randomEventBtn.disabled = true;
-
-            cooldownInterval = setInterval(() => {
-                const now = Date.now();
-                const timeLeftMs = cooldownEndTime - now;
-
-                if (timeLeftMs <= 0) {
-                    clearInterval(cooldownInterval);
-                    cooldownEndTime = 0; 
-                    saveData(); 
-                    
-                    randomEventBtn.disabled = false;
-                    randomEventBtn.textContent = 'เปิดหีบสมบัติ';
-                    cooldownStatus.textContent = '✅ พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
-                    showAlert('เปิดหีบสมบัติได้แล้ว!', 'info', '🎁');
-                    return;
-                }
-
-                const timeLeft = Math.ceil(timeLeftMs / 1000); 
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-                randomEventBtn.textContent = `⏳ รอ... (${formattedTime})`;
-                cooldownStatus.textContent = `สามารถเปิดหีบได้อีกครั้งใน ${formattedTime}`;
-
-            }, 1000);
-        }
-
-        function triggerRandomEvent() {
-            const now = Date.now();
-            
-            if (cooldownEndTime > now) { 
-                const timeLeft = Math.ceil((cooldownEndTime - now) / 1000);
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                showAlert(`ยังอยู่ในช่วง Cooldown! กรุณารอ ${formattedTime}`, 'limit', '⏳');
-                return;
-            }
-            
-            const event = randomEvents[Math.floor(Math.random() * randomEvents.length)];
-            let alertMessage = `🎁 หีบสมบัติ: ${event.title}!`;
-            let alertType = 'info';
-            let alertIcon = '🎁';
-            
-            if (event.type.includes("add")) {
-                balance += event.amount;
-                alertMessage += ` ได้รับเงินเพิ่ม ${event.amount.toLocaleString('th-TH')} บาท`;
-                alertType = 'money';
-                alertIcon = '⬆️';
-            } else if (event.type.includes("subtract")) {
-                balance -= event.amount;
-                alertMessage += ` เสียเงิน ${event.amount.toLocaleString('th-TH')} บาท`;
-                alertType = 'money';
-                alertIcon = '⬇️';
-            } else if (event.type.includes("turn-add")) {
-                alertMessage = `🎉 ${event.title}`;
-                alertType = 'success';
-                alertIcon = '🎲';
-            } else if (event.type.includes("turn-skip")) {
-                alertMessage = `🚫 ${event.title}`;
-                alertType = 'error';
-                alertIcon = '🛑';
-            } else if (event.type.includes("penalty-physical")) {
-                alertMessage = `☠️ ${event.title}`;
-                alertType = 'error';
-                alertIcon = '🚨';
-            }
-            
-            showAlert(alertMessage, alertType, alertIcon);
-            recordTransaction(event.type, `${event.title} (หีบสมบัติ)`, event.amount);
-            updateBalanceDisplay();
-            
-            cooldownEndTime = now + COOLDOWN_TIME;
-            saveData();
-            startCooldownTimer();
-        }
-        
-        function saveData() {
-            const data = { playerName, balance, houses, transactionHistory, gameStartTime, cooldownEndTime };
-            localStorage.setItem('monopolyTrackerData', JSON.stringify(data));
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem('monopolyTrackerData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                
-                playerName = data.playerName || '';
-                balance = data.balance || 0;
-                houses = data.houses || [];
-                transactionHistory = data.transactionHistory || [];
-                gameStartTime = data.gameStartTime || ''; 
-                cooldownEndTime = data.cooldownEndTime || 0; 
-
-                if (playerName) {
-                    updateBalanceDisplay();
-                    renderHouses();
-                    renderHistory();
-                    startArea.style.display = 'none';
-                    gameArea.style.display = 'block';
-                    document.getElementById('playerName').value = playerName; 
-                    document.getElementById('startMoney').value = data.balance; 
-                    startTimeInput.value = data.gameStartTime || '14:30';
-                    
-                    const now = Date.now();
-                    if (cooldownEndTime > now) {
-                        startCooldownTimer();
-                    } else {
-                        cooldownEndTime = 0;
-                        randomEventBtn.disabled = false;
-                        randomEventBtn.textContent = 'เปิดหีบสมบัติ';
-                        cooldownStatus.textContent = '✅ พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
-                    }
-
-                    if (gameStartTime) {
-                        checkStartTime();
-                    } else {
-                        lockOverlay.style.display = 'none';
-                        gameControls.style.opacity = '1';
-                        gameControls.style.pointerEvents = 'auto';
-                    }
-                }
-            }
-        }
-
-        function resetGame() {
-            if (confirm('คุณต้องการเริ่มเกมใหม่และล้างข้อมูลทั้งหมดหรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้')) {
-                localStorage.removeItem('monopolyTrackerData');
-                location.reload(); 
-            }
-        }
-        
-        let startTimeInterval;
-        function checkStartTime() {
-            if (startTimeInterval) clearInterval(startTimeInterval);
-            
-            const [startH, startM] = gameStartTime.split(':').map(Number);
-            let nextCheckTime = 1000;
-
-            const check = () => {
-                const now = new Date();
-                const currentH = now.getHours();
-                const currentM = now.getMinutes();
-                const currentS = now.getSeconds();
-                
-                const currentTimeInSeconds = currentH * 3600 + currentM * 60 + currentS;
-                const startTimeInSeconds = startH * 3600 + startM * 60;
-                
-                if (currentTimeInSeconds >= startTimeInSeconds) {
-                    clearInterval(startTimeInterval);
-                    gameControls.style.opacity = '1';
-                    gameControls.style.pointerEvents = 'auto';
-                    lockOverlay.style.display = 'none';
-                    showAlert('เกมเริ่มแล้ว! 🎉', 'success', '✅');
-                } else {
-                    const diffSeconds = startTimeInSeconds - currentTimeInSeconds;
-                    const hours = Math.floor(diffSeconds / 3600);
-                    const minutes = Math.floor((diffSeconds % 3600) / 60);
-                    const seconds = diffSeconds % 60;
-                    
-                    let message = `⏳ เกมจะเริ่มเมื่อถึงเวลา ${gameStartTime} น.`;
-                    
-                    if (hours > 0) {
-                         message += `<br>เหลืออีกประมาณ ${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`;
-                    } else if (minutes > 0) {
-                        message += `<br>เหลืออีกประมาณ ${minutes} นาที ${seconds} วินาที`;
-                    } else {
-                        message += `<br>เหลืออีก ${seconds} วินาที`;
-                    }
-                    
-                    lockMessage.innerHTML = message;
-                    lockOverlay.style.display = 'flex';
-                    gameControls.style.opacity = '0.5';
-                    gameControls.style.pointerEvents = 'none';
-
-                    nextCheckTime = 1000;
-                }
-            };
-            
-            check();
-            startTimeInterval = setInterval(check, nextCheckTime);
-        }
-
-        function cancelTimeLock() {
-            if (startTimeInterval) clearInterval(startTimeInterval);
-            
-            gameControls.style.opacity = '1';
-            gameControls.style.pointerEvents = 'auto';
-            lockOverlay.style.display = 'none';
-            
-            gameStartTime = '';
-            saveData(); 
-            
-            showAlert('ยกเลิกเวลารอสำเร็จ! เริ่มเกมทันที 🎉', 'warning', '🚀');
-        }
-
-        window.onload = loadData;
-    </script>
+</script>
 </body>
 </html>
