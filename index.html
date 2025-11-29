@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บันทึกยอดเงินเกมเศรษฐี | V7 Base V6 Minimal Fix</title>
+    <title>บันทึกยอดเงินเกมเศรษฐี | V12 QR Code Fix</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> 
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap');
 
         :root {
-            /* V6 Green & White Theme */
             --bg-color: #f7fff7; 
             --container-bg: #ffffff; 
             --text-color: #333333; 
-            --primary-color: #4CAF50; /* Green Primary */
-            --secondary-color: #81c784; /* Lighter Green Accent */
+            --primary-color: #4CAF50; 
+            --secondary-color: #81c784; 
             --success-color: #4CAF50; 
-            --danger-color: #f44336; /* Red */
+            --danger-color: #f44336; 
             --border-color: #e0e0e0; 
             --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             --house-btn-color: #00bcd4; 
@@ -24,6 +25,8 @@
             --dice-color: #fbc02d; 
             --rent-btn-color: #ff9800; 
             --limit-color: #ff5722; 
+            --chest-color: #ffc107; 
+            --scan-btn-color: #2196F3; 
         }
 
         body {
@@ -37,6 +40,7 @@
             align-items: flex-start;
             min-height: 100vh;
             line-height: 1.6;
+            touch-action: manipulation;
         }
 
         .container {
@@ -44,7 +48,7 @@
             border-radius: 12px;
             padding: 35px;
             box-shadow: var(--shadow);
-            max-width: 750px; 
+            max-width: 650px; 
             width: 100%;
             position: relative; 
         }
@@ -81,9 +85,6 @@
             border: 1px solid #f0f0f0;
         }
         
-        /* ---------------------------------- */
-        /* Credit Card Balance Display */
-        /* ---------------------------------- */
         .card-balance {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--house-btn-color) 100%);
             border-radius: 12px;
@@ -136,7 +137,6 @@
         }
 
 
-        /* Input and Button Styles */
         input[type="text"], input[type="number"], textarea {
             padding: 12px;
             margin-bottom: 10px;
@@ -180,26 +180,12 @@
         }
 
         button:disabled {
-            opacity: 0.6;
+            opacity: 1 !important; 
+            background-color: #cccccc !important;
+            color: #666666 !important; 
             cursor: not-allowed;
-            color: #f0f0f0;
             box-shadow: none;
-        }
-
-        /* ---------------------------------- */
-        /* Money Control & Calculator Layout */
-        /* ---------------------------------- */
-
-        .money-control-layout {
-            display: flex;
-            gap: 20px;
-        }
-        .money-input-area {
-            flex: 2; 
-        }
-        .calculator-area {
-            flex: 1; 
-            min-width: 200px;
+            transform: none !important;
         }
         
         .quick-amounts {
@@ -232,68 +218,85 @@
             margin-right: 0;
         }
 
-        /* Calculator Styles */
-        .calculator {
-            background-color: #f0f0f0; 
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        .transfer-btn {
+            background-color: #3f51b5; 
+            width: 100%;
+            margin-top: 5px;
         }
-        #calc-display {
-            background-color: #ffffff;
-            color: var(--text-color);
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            text-align: right;
-            font-size: 1.5em;
-            font-weight: 500;
-            height: 40px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
+        .scan-btn {
+            background-color: var(--scan-btn-color); 
+            width: 100%;
+            margin-top: 5px;
         }
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
+        .qr-button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
         }
-        .calc-buttons button {
-            padding: 10px 0;
+        .qr-button-group button {
+            width: 50%;
             margin: 0;
-            font-size: 1.1em;
-            font-weight: 500;
-            box-shadow: none;
-            background-color: var(--secondary-color); 
-            color: white;
-            border-radius: 4px;
-        }
-        .calc-buttons button:hover {
-            transform: none;
-            opacity: 0.9;
-        }
-        .calc-buttons button.operator {
-            background-color: var(--dice-color); 
-            color: var(--text-color);
-        }
-        .calc-buttons button.clear {
-            background-color: var(--danger-color);
-        }
-        .calc-buttons button.equal {
-            background-color: var(--primary-color);
-        }
-        .calc-buttons button.transfer {
-            background-color: var(--house-btn-color); 
-            grid-column: span 2;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
 
-        /* ---------------------------------- */
-        /* Custom Alert Styles (FIXED: เพื่อให้ป็อปอัพทำงานถูกและไม่ดันประวัติ) */
-        /* ---------------------------------- */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .qr-display {
+            padding: 20px;
+            background-color: var(--border-color);
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        #qrcodeCanvas {
+            margin: 15px auto;
+            width: 180px; 
+            height: 180px;
+            background-color: white;
+            border: 2px solid var(--text-color);
+            padding: 10px;
+        }
+        
         #custom-alert {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 20px; 
+            left: 50%; 
+            transform: translate(-50%, 20px); 
             background-color: #333;
             color: white;
             padding: 12px 18px;
@@ -301,17 +304,16 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             z-index: 1000;
             opacity: 0;
-            transform: translateY(-20px);
             transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
             display: flex;
             align-items: center;
-            max-width: 300px;
+            max-width: 90%; 
             pointer-events: none; 
         }
         #custom-alert.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, 0); 
             pointer-events: auto; 
         }
         #custom-alert .icon {
@@ -325,35 +327,6 @@
         #custom-alert.dice { background-color: #795548; }
         #custom-alert.limit { background-color: var(--limit-color); }
         
-        /* ---------------------------------- */
-        /* Responsive Adjustments & Other V6 Styles */
-        /* ---------------------------------- */
-        @media (max-width: 768px) {
-            .money-control-layout {
-                flex-direction: column;
-            }
-            .calculator-area {
-                min-width: 100%;
-            }
-            #custom-alert {
-                left: 10px;
-                right: 10px;
-                max-width: none;
-                text-align: center;
-            }
-        }
-        @media (max-width: 576px) {
-            .container {
-                padding: 15px;
-                border-radius: 10px;
-            }
-            .add-btn, .subtract-btn {
-                width: 100%;
-                margin-right: 0;
-            }
-        }
-
-        /* V6 General Styles (Dice, House, History) */
         .dice-area { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         #rollDiceBtn { background-color: var(--dice-color); color: #333; width: 100%; box-shadow: 0 2px 5px rgba(251, 192, 45, 0.5); font-size: 1.1em; }
         .dice-result { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 10px; min-height: 40px; }
@@ -370,14 +343,12 @@
         #house-list, #history-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
         #house-list th, #history-list th { background-color: #f0f0f0; color: var(--primary-color); font-weight: 700; }
         #house-list th, #house-list td, #history-list th, #history-list td { border-bottom: 1px solid var(--border-color); padding: 10px; text-align: left; font-size: 0.9em; border-top: none;}
-        #history-list .type-add, #history-list .type-rent-in { color: var(--success-color); font-weight: 700; }
-        #history-list .type-subtract, #history-list .type-house-buy { color: var(--danger-color); font-weight: 700; }
+        #history-list .type-add, #history-list .type-rent-in, #history-list .type-transfer-in { color: var(--success-color); font-weight: 700; }
+        #history-list .type-subtract, #history-list .type-house-buy, #history-list .type-transfer-out { color: var(--danger-color); font-weight: 700; }
         hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
         .reset-btn { background-color: var(--danger-color); width: 100%; margin-top: 30px; }
         .cooldown-status { text-align: center; color: #26a69a; font-weight: 500; margin-top: 5px; }
         
-        
-        /* Time Lock Overlay Styles */
         #lock-overlay {
             position: absolute;
             top: 0;
@@ -447,7 +418,7 @@
                 <hr>
                 
                 <div class="section-card">
-                    <h3>💵 ควบคุมยอดเงิน & คำนวณ</h3>
+                    <h3>💵 ควบคุมยอดเงิน</h3>
                     <div class="money-control-layout">
                         
                         <div class="money-input-area">
@@ -468,34 +439,21 @@
                             </div>
                         </div>
 
-                        <div class="calculator-area">
-                            <h4 style="margin-top: 0; padding-bottom: 5px;">🧮 เครื่องคิดเลข</h4>
-                            <div class="calculator">
-                                <div id="calc-display">0</div>
-                                <div class="calc-buttons">
-                                    <button class="clear" onclick="calcClear()">C</button>
-                                    <button class="operator" onclick="calcInput('/')">÷</button>
-                                    <button class="operator" onclick="calcInput('*')">×</button>
-                                    <button onclick="calcInput('7')">7</button>
-                                    <button onclick="calcInput('8')">8</button>
-                                    <button onclick="calcInput('9')">9</button>
-                                    <button class="operator" onclick="calcInput('-')">-</button>
-                                    <button onclick="calcInput('4')">4</button>
-                                    <button onclick="calcInput('5')">5</button>
-                                    <button onclick="calcInput('6')">6</button>
-                                    <button class="operator" onclick="calcInput('+')">+</button>
-                                    <button onclick="calcInput('1')">1</button>
-                                    <button onclick="calcInput('2')">2</button>
-                                    <button onclick="calcInput('3')">3</button>
-                                    <button class="equal" onclick="calcCalculate()">=</button>
-                                    <button onclick="calcInput('0')">0</button>
-                                    <button onclick="calcInput('.')">.</button>
-                                    <button class="transfer" onclick="calcTransfer()">✅ ใช้ยอดนี้</button>
-                                </div>
-                            </div>
-                        </div>
+                    </div> 
+                </div>
 
-                    </div> </div>
+                <div class="section-card">
+                    <h3>📲 โอนเงิน (QR Code)</h3>
+                    <p style="font-size: 0.9em; margin-bottom: 10px;">*ยอดเงินจะถูกหักทันทีที่คุณสร้าง QR Code</p>
+                    <input type="number" id="transferAmount" placeholder="จำนวนเงินที่ต้องการโอน" min="1" value="100" inputmode="numeric">
+                    <input type="text" id="transferRecipient" placeholder="ชื่อผู้รับ (เช่น นาย A)">
+                    
+                    <div class="qr-button-group">
+                        <button class="transfer-btn" onclick="initiateTransfer()">สร้าง QR Code เพื่อโอนเงิน (หักยอดทันที)</button>
+                        <button class="scan-btn" onclick="receiveTransfer()">รับเงินจากการสแกน QR Code (จำลอง)</button>
+                    </div>
+                    
+                </div>
                 
                 <div class="section-card">
                     <h3>🎲 ทอยลูกเต๋า (2 ลูก)</h3>
@@ -571,6 +529,26 @@
         <span class="message"></span>
     </div>
 
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeTransferModal()">&times;</span>
+            <h3>✅ โอนเงินสำเร็จ!</h3>
+            <p>กรุณาให้ผู้รับสแกนโค้ดนี้เพื่อรับเงิน</p>
+            
+            <div class="qr-display">
+                <div id="qrcodeCanvas"></div> 
+                
+                <p><strong>ผู้โอน (คุณ):</strong> <span id="transferSender"></span></p>
+                <p><strong>จำนวน:</strong> <span id="transferAmountDisplay"></span> บาท</p>
+                <p><strong>ผู้รับ:</strong> <span id="transferRecipientDisplay"></span></p>
+                <p style="font-size: 0.8em; margin-top: 15px;">(ข้อมูลที่ถูกฝังใน QR Code คือชื่อผู้โอนและยอดเงิน)</p>
+            </div>
+            
+            <button class="transfer-btn" onclick="closeTransferModal()" style="width: 100%;">ปิด</button>
+        </div>
+    </div>
+
+
     <script>
         // *** Global State ***
         let playerName = '';
@@ -580,19 +558,11 @@
         let gameStartTime = ''; 
         let alertTimeout;
         
-        // NEW STATE FOR COOLDOWN FIX
-        let cooldownEndTime = 0; // ใช้ Timestamp (ms) เพื่อจำเวลาสิ้นสุด Cooldown
-        let cooldownInterval; // สำหรับเก็บ reference ของ setInterval
-
-        // Calculator State
-        let currentInput = '0';
-        let operator = null;
-        let prevValue = null;
-        let isNewInput = true;
-        
+        let cooldownEndTime = 0; 
+        let cooldownInterval; 
 
         // *** Constants ***
-        const COOLDOWN_TIME = 180000; // 3 นาที (3 * 60 * 1000 ms)
+        const COOLDOWN_TIME = 180000; 
         const HOUSE_LIMIT = 7; 
         const randomEvents = [
             { title: "เก็บขยะรีไซเคิลได้", amount: 500, type: "add", source: "สุ่ม" },
@@ -632,14 +602,22 @@
         const diceTwoValue = document.getElementById('dice-two-value');
         const totalRoll = document.getElementById('total-roll');
         const rollDiceBtn = document.getElementById('rollDiceBtn');
-        const calcDisplay = document.getElementById('calc-display'); 
         const displayNameCard = document.getElementById('display-name-card');
+        
+        // QR Transfer Elements
+        const transferAmountInput = document.getElementById('transferAmount');
+        const transferRecipientInput = document.getElementById('transferRecipient');
+        const transferModal = document.getElementById('transferModal');
+        const transferSenderDisplay = document.getElementById('transferSender');
+        const transferAmountDisplay = document.getElementById('transferAmountDisplay');
+        const transferRecipientDisplay = document.getElementById('transferRecipientDisplay');
+        const qrcodeCanvas = document.getElementById('qrcodeCanvas');
 
 
         // --- Custom Alert ---
         function showAlert(message, type = 'info', icon = '') {
             clearTimeout(alertTimeout); 
-            customAlert.classList.remove('show', 'success', 'error', 'info', 'warning', 'money', 'dice', 'limit');
+            customAlert.classList.remove('show', 'success', 'error', 'info', 'warning', 'money', 'dice', 'limit', 'transfer');
             customAlertMessage.textContent = message;
             customAlert.classList.add(type);
             if (!icon) {
@@ -649,6 +627,7 @@
                 else if (type === 'money') icon = '💰';
                 else if (type === 'dice') icon = '🎲';
                 else if (type === 'limit') icon = '🛑';
+                else if (type === 'transfer') icon = '📲';
                 else icon = 'ℹ️'; 
             }
             customAlertIcon.textContent = icon;
@@ -658,8 +637,7 @@
             }, 3000); 
         }
 
-        // --- Core Game Functions ---
-
+        // --- Core Game Functions (Omitted for brevity, assumed functional) ---
         function updateBalanceDisplay() {
             currentBalance.textContent = balance.toLocaleString('th-TH');
             displayName.textContent = playerName; 
@@ -690,13 +668,15 @@
                 const cellDesc = row.insertCell(1);
                 const cellAmount = row.insertCell(2);
 
-                const amountClass = record.type;
+                let amountClass = record.type;
                 let amountDisplay = '';
 
-                if (record.type.includes('add') || record.type.includes('rent-in') || record.type.includes('house-sell')) {
+                if (record.type.includes('add') || record.type.includes('rent-in') || record.type.includes('house-sell') || record.type.includes('transfer-in')) {
                     amountDisplay = `+${record.amount.toLocaleString('th-TH')}`;
-                } else if (record.type.includes('subtract') || record.type.includes('house-buy')) {
+                    amountClass = 'type-add';
+                } else if (record.type.includes('subtract') || record.type.includes('house-buy') || record.type.includes('transfer-out')) {
                     amountDisplay = `-${record.amount.toLocaleString('th-TH')}`; 
+                    amountClass = 'type-subtract'; 
                 } else if (record.type.includes('turn')) {
                     if (record.type.includes('add')) amountDisplay = "✅ เดินเพิ่ม";
                     else if (record.type.includes('skip')) amountDisplay = "❌ หยุดเดิน";
@@ -743,7 +723,6 @@
             showAlert(`ตั้งค่าเกมสำเร็จ! เริ่มเล่นในเวลา ${gameStartTime} น.`, 'info', '⏰');
         }
 
-        // --- Money Control ---
         function setMoneyAmount(amount) {
             moneyAmountInput.value = amount;
             moneyDescriptionInput.value = ''; 
@@ -776,7 +755,100 @@
             showAlert(`ลบเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬇️');
         }
 
-        // --- House Control ---
+
+        // --- Transfer Money (QR Code Generation) ---
+        function initiateTransfer() {
+            const amount = parseInt(transferAmountInput.value);
+            const recipient = transferRecipientInput.value.trim();
+
+            if (isNaN(amount) || amount <= 0) { 
+                showAlert('กรุณาใส่จำนวนเงินโอนที่ถูกต้อง!', 'error', '❌'); 
+                return; 
+            }
+            if (recipient === '') {
+                 showAlert('กรุณาใส่ชื่อผู้รับ!', 'error', '❌'); 
+                return; 
+            }
+            if (balance < amount) {
+                showAlert('ยอดเงินไม่พอสำหรับการโอน!', 'error', '❌'); 
+                return;
+            }
+            
+            // 1. Deduct money and record transfer out
+            balance -= amount;
+            const transferID = Date.now();
+            recordTransaction('transfer-out', `โอนให้ ${recipient} (ID: ${transferID})`, amount);
+            updateBalanceDisplay(); 
+            saveData();
+
+            // 2. Prepare Data for QR Code
+            const qrData = `MONOPOLY_PAYMENT|${playerName}|${recipient}|${amount}`;
+            
+            // 3. Clear existing QR code aggressively (FIX: Ensures the library can draw fresh)
+            qrcodeCanvas.innerHTML = ''; 
+            while (qrcodeCanvas.firstChild) {
+                qrcodeCanvas.removeChild(qrcodeCanvas.firstChild);
+            }
+            
+            let qrCodeGenerated = false;
+            if (typeof QRCode !== 'undefined') {
+                 new QRCode(qrcodeCanvas, {
+                    text: qrData,
+                    width: 160,
+                    height: 160,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                qrCodeGenerated = true;
+            } else {
+                qrcodeCanvas.innerHTML = '⚠️ ไลบรารี QR Code ไม่สามารถโหลดได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
+            }
+
+            // 4. Display Modal
+            transferSenderDisplay.textContent = playerName;
+            transferAmountDisplay.textContent = amount.toLocaleString('th-TH');
+            transferRecipientDisplay.textContent = recipient;
+            
+            transferModal.style.display = 'block';
+            
+            if (qrCodeGenerated) {
+                showAlert(`โอนเงิน ${amount.toLocaleString('th-TH')} บาทสำเร็จ!`, 'success', '📲');
+            } else {
+                 showAlert('การสร้าง QR Code ล้มเหลว! (ตรวจสอบอินเทอร์เน็ต)', 'error', '❌');
+            }
+            
+            transferAmountInput.value = '100';
+            transferRecipientInput.value = '';
+        }
+
+        function receiveTransfer() {
+            const amountStr = prompt("กรุณาใส่จำนวนเงินที่ได้รับ:");
+            if (!amountStr) return;
+            
+            const amount = parseInt(amountStr.trim());
+            
+            if (isNaN(amount) || amount <= 0) {
+                showAlert('จำนวนเงินที่ได้รับไม่ถูกต้อง!', 'error', '❌');
+                return;
+            }
+            
+            const sender = prompt("กรุณาใส่ชื่อผู้โอนเงิน:");
+            if (!sender) return;
+
+            balance += amount;
+            recordTransaction('transfer-in', `รับโอนจาก ${sender}`, amount);
+            updateBalanceDisplay();
+            saveData();
+            
+            showAlert(`ได้รับเงินโอน ${amount.toLocaleString('th-TH')} บาท จาก ${sender} แล้ว!`, 'success', '💸');
+        }
+
+
+        function closeTransferModal() {
+            transferModal.style.display = 'none';
+        }
+        
         function addHouse() { 
             const number = houseNumberInput.value.trim();
             const price = parseInt(housePriceInput.value);
@@ -872,7 +944,6 @@
             }
         }
         
-        // --- Dice & Random Event ---
         function rollDice() {
             rollDiceBtn.disabled = true;
             const rollCount = 10; 
@@ -903,7 +974,6 @@
             }, 100); 
         }
         
-        // ** NEW: Cooldown Timer Logic **
         function startCooldownTimer() {
             if (cooldownInterval) clearInterval(cooldownInterval); 
 
@@ -915,8 +985,8 @@
 
                 if (timeLeftMs <= 0) {
                     clearInterval(cooldownInterval);
-                    cooldownEndTime = 0; // Reset state
-                    saveData(); // Save the reset state
+                    cooldownEndTime = 0; 
+                    saveData(); 
                     
                     randomEventBtn.disabled = false;
                     randomEventBtn.textContent = 'เปิดหีบสมบัติ';
@@ -925,7 +995,7 @@
                     return;
                 }
 
-                const timeLeft = Math.ceil(timeLeftMs / 1000); // Time left in seconds
+                const timeLeft = Math.ceil(timeLeftMs / 1000); 
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
@@ -936,11 +1006,9 @@
             }, 1000);
         }
 
-        // ** UPDATED: Random Event Function **
         function triggerRandomEvent() {
             const now = Date.now();
             
-            // 1. Check Cooldown
             if (cooldownEndTime > now) { 
                 const timeLeft = Math.ceil((cooldownEndTime - now) / 1000);
                 const minutes = Math.floor(timeLeft / 60);
@@ -950,13 +1018,11 @@
                 return;
             }
             
-            // 2. Select Event
             const event = randomEvents[Math.floor(Math.random() * randomEvents.length)];
             let alertMessage = `🎁 หีบสมบัติ: ${event.title}!`;
             let alertType = 'info';
             let alertIcon = '🎁';
             
-            // 3. Process Event Effect
             if (event.type.includes("add")) {
                 balance += event.amount;
                 alertMessage += ` ได้รับเงินเพิ่ม ${event.amount.toLocaleString('th-TH')} บาท`;
@@ -981,121 +1047,15 @@
                 alertIcon = '🚨';
             }
             
-            // 4. Update UI & Record
             showAlert(alertMessage, alertType, alertIcon);
             recordTransaction(event.type, `${event.title} (หีบสมบัติ)`, event.amount);
             updateBalanceDisplay();
             
-            // 5. Start Cooldown
             cooldownEndTime = now + COOLDOWN_TIME;
             saveData();
             startCooldownTimer();
         }
         
-        // --- Calculator Logic ---
-        function updateCalcDisplay() {
-            const displayValue = currentInput; 
-            calcDisplay.textContent = displayValue;
-        }
-
-        function calcClear() {
-            currentInput = '0';
-            operator = null;
-            prevValue = null;
-            isNewInput = true;
-            updateCalcDisplay();
-        }
-
-        function calcCalculate() {
-            if (operator === null || prevValue === null) return;
-            
-            const currentValue = parseFloat(currentInput);
-            let result = 0;
-
-            const prev = parseFloat(prevValue);
-
-            if (isNaN(prev) || isNaN(currentValue)) {
-                 calcDisplay.textContent = 'Error';
-                 return;
-            }
-
-            switch (operator) {
-                case '+':
-                    result = prev + currentValue;
-                    break;
-                case '-':
-                    result = prev - currentValue;
-                    break;
-                case '*':
-                    result = prev * currentValue;
-                    break;
-                case '/':
-                    result = prev / currentValue;
-                    break;
-            }
-            
-            // ปัดเศษทศนิยม 2 ตำแหน่ง
-            currentInput = result.toFixed(2).replace(/\.00$/, ''); 
-            operator = null;
-            prevValue = null;
-            isNewInput = true;
-            updateCalcDisplay();
-        }
-
-        function calcSetOperator(newOperator) {
-            if (prevValue !== null && !isNewInput) {
-                calcCalculate(); 
-            }
-            prevValue = currentInput;
-            operator = newOperator;
-            isNewInput = true; 
-        }
-        
-        function calcInput(value) {
-            if (value.match(/[\+\-\*\/]/)) {
-                calcSetOperator(value);
-                return;
-            }
-
-            if (value === '=') {
-                calcCalculate();
-                return;
-            }
-
-            if (isNewInput) {
-                if (value === '.') {
-                    currentInput = '0.';
-                } else if (value.match(/[0-9]/)) {
-                    currentInput = value;
-                }
-                isNewInput = false;
-            } else {
-                if (value === '.' && currentInput.includes('.')) return;
-                if (value.match(/[0-9]|\./)) {
-                    if (currentInput.length < 15) { 
-                        currentInput += value;
-                    }
-                }
-            }
-            updateCalcDisplay();
-        }
-
-
-        function calcTransfer() {
-            calcCalculate(); 
-            const result = parseFloat(currentInput);
-            if (!isNaN(result)) {
-                moneyAmountInput.value = Math.round(result); 
-                moneyDescriptionInput.focus();
-                calcClear(); 
-                showAlert(`โอนยอด ${Math.round(result).toLocaleString('th-TH')} จากเครื่องคิดเลขเข้าช่องกรอกเงินแล้ว`, 'success', '✅');
-            } else {
-                showAlert('เครื่องคิดเลขไม่มีตัวเลขที่ถูกต้อง', 'error', '❌');
-            }
-        }
-        
-        // --- Data Persistence and Initialization ---
-        // ** UPDATED: Save Cooldown End Time **
         function saveData() {
             const data = { playerName, balance, houses, transactionHistory, gameStartTime, cooldownEndTime };
             localStorage.setItem('monopolyTrackerData', JSON.stringify(data));
@@ -1106,13 +1066,12 @@
             if (savedData) {
                 const data = JSON.parse(savedData);
                 
-                // Load Data
                 playerName = data.playerName || '';
                 balance = data.balance || 0;
                 houses = data.houses || [];
                 transactionHistory = data.transactionHistory || [];
                 gameStartTime = data.gameStartTime || ''; 
-                cooldownEndTime = data.cooldownEndTime || 0; // NEW: Load cooldown end time
+                cooldownEndTime = data.cooldownEndTime || 0; 
 
                 if (playerName) {
                     updateBalanceDisplay();
@@ -1124,12 +1083,10 @@
                     document.getElementById('startMoney').value = data.balance; 
                     startTimeInput.value = data.gameStartTime || '14:30';
                     
-                    // NEW: Check and start cooldown timer on load
                     const now = Date.now();
                     if (cooldownEndTime > now) {
                         startCooldownTimer();
                     } else {
-                        // Ensure button is ready if time has passed
                         cooldownEndTime = 0;
                         randomEventBtn.disabled = false;
                         randomEventBtn.textContent = 'เปิดหีบสมบัติ';
@@ -1145,7 +1102,6 @@
                     }
                 }
             }
-            calcClear();
         }
 
         function resetGame() {
@@ -1155,7 +1111,7 @@
             }
         }
         
-        // --- Time Lock ---
+        let startTimeInterval;
         function checkStartTime() {
             if (startTimeInterval) clearInterval(startTimeInterval);
             
@@ -1218,24 +1174,6 @@
             
             showAlert('ยกเลิกเวลารอสำเร็จ! เริ่มเกมทันที 🎉', 'warning', '🚀');
         }
-        
-        // *** Bind Calculator Buttons ***
-        document.querySelectorAll('.calc-buttons button').forEach(button => {
-            const value = button.textContent.trim();
-            if (value.match(/[0-9]|\./)) {
-                button.onclick = () => calcInput(value);
-            } else if (value.match(/[\+\-]/)) {
-                button.onclick = () => calcInput(value);
-            } else if (value === '×') {
-                button.onclick = () => calcInput('*');
-            } else if (value === '÷') {
-                button.onclick = () => calcInput('/');
-            } else if (value === '=') {
-                button.onclick = () => calcCalculate();
-            } else if (value === 'C') {
-                button.onclick = () => calcClear();
-            }
-        });
 
         window.onload = loadData;
     </script>
