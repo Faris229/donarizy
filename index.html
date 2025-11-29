@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บันทึกยอดเงินเกมเศรษฐี | V6</title>
+    <title>บันทึกยอดเงินเกมเศรษฐี | V7 Base V6 Minimal Fix</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap');
 
         :root {
-            /* กำหนดตัวแปรสีสำหรับ Green & White Theme */
-            --bg-color: #f7fff7; /* Very Light Green Background */
-            --container-bg: #ffffff; /* White Container */
-            --text-color: #333333; /* Dark Gray for text */
+            /* V6 Green & White Theme */
+            --bg-color: #f7fff7; 
+            --container-bg: #ffffff; 
+            --text-color: #333333; 
             --primary-color: #4CAF50; /* Green Primary */
             --secondary-color: #81c784; /* Lighter Green Accent */
-            --success-color: #4CAF50; /* Green */
+            --success-color: #4CAF50; 
             --danger-color: #f44336; /* Red */
-            --border-color: #e0e0e0; /* Light Gray Border */
+            --border-color: #e0e0e0; 
             --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --house-btn-color: #00bcd4; /* สีเขียวน้ำทะเลสำหรับปุ่มบ้าน */
-            --quick-btn-color: #607d8b; /* สีเทาน้ำเงินสำหรับปุ่มลัด */
-            --dice-color: #fbc02d; /* สีเหลืองทองสำหรับลูกเต๋า */
-            --rent-btn-color: #ff9800; /* สีส้มสำหรับปุ่มรับค่าเช่า */
-            --limit-color: #ff5722; /* สีส้มแดงสำหรับแจ้งเตือนขีดจำกัด */
+            --house-btn-color: #00bcd4; 
+            --quick-btn-color: #607d8b; 
+            --dice-color: #fbc02d; 
+            --rent-btn-color: #ff9800; 
+            --limit-color: #ff5722; 
         }
 
         body {
@@ -34,7 +34,7 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             line-height: 1.6;
         }
@@ -44,9 +44,9 @@
             border-radius: 12px;
             padding: 35px;
             box-shadow: var(--shadow);
-            max-width: 680px;
+            max-width: 750px; 
             width: 100%;
-            position: relative;
+            position: relative; 
         }
 
         h1 {
@@ -57,7 +57,14 @@
             letter-spacing: 1px;
         }
 
-        h2, h3, h4 {
+        h2 {
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        h3, h4 {
             color: var(--text-color);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 5px;
@@ -74,42 +81,60 @@
             border: 1px solid #f0f0f0;
         }
         
-        #current-balance {
-            font-size: 3em;
-            color: var(--primary-color); 
+        /* ---------------------------------- */
+        /* Credit Card Balance Display */
+        /* ---------------------------------- */
+        .card-balance {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--house-btn-color) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0 30px 0;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            min-height: 120px;
+        }
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background-color: var(--dice-color); 
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .card-logo {
+            font-family: Arial, sans-serif;
+            font-size: 1.2em;
             font-weight: 700;
-            display: block;
-            text-align: center;
-            margin: 15px 0 25px 0;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            opacity: 0.8;
             letter-spacing: 1px;
         }
-
-        /* Time Lock Styles */
-        #lock-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.98);
-            z-index: 10;
+        .card-label {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        #current-balance {
+            font-size: 2.5em; 
+            font-weight: 700;
+            display: block;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .card-player-info {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.4em;
-            font-weight: 500;
-            color: var(--text-color);
-            text-align: center;
-            padding: 20px;
-            border-radius: 12px;
-            transition: opacity 0.5s;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 15px;
         }
-        
-        #lock-overlay button {
-            margin-top: 20px;
-            background-color: #ff9800;
-            width: 80%;
-            max-width: 250px;
-            box-shadow: 0 2px 5px rgba(255, 152, 0, 0.5);
+        .card-player-info span {
+            font-size: 1em;
+            font-weight: 400;
         }
+
 
         /* Input and Button Styles */
         input[type="text"], input[type="number"], textarea {
@@ -117,7 +142,7 @@
             margin-bottom: 10px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            width: calc(100% - 24px);
+            width: 100%; 
             box-sizing: border-box;
             font-size: 16px;
             background-color: #ffffff;
@@ -161,41 +186,26 @@
             box-shadow: none;
         }
 
-        #start-area button {
-            background-color: var(--primary-color);
-            width: 100%;
-            margin-top: 15px;
-        }
-        
-        #randomEventBtn {
-            background-color: #795548; /* Brown */
-            width: 100%;
-        }
-        
-        .cooldown-status {
-            text-align: center;
-            color: #26a69a; 
-            font-weight: 500;
-            margin-top: 5px;
-        }
-
         /* ---------------------------------- */
-        /* การควบคุมเงินและปุ่มลัด */
+        /* Money Control & Calculator Layout */
         /* ---------------------------------- */
 
-        .money-control button {
-            width: calc(50% - 15px);
+        .money-control-layout {
+            display: flex;
+            gap: 20px;
         }
-        .money-control .input-group {
-            margin-bottom: 15px;
+        .money-input-area {
+            flex: 2; 
+        }
+        .calculator-area {
+            flex: 1; 
+            min-width: 200px;
         }
         
-        /* สไตล์สำหรับปุ่มลัดยอดเงิน */
         .quick-amounts {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px; /* ระยะห่างระหว่างปุ่ม */
-            margin-top: 10px;
+            gap: 8px; 
             margin-bottom: 15px;
             justify-content: flex-start;
         }
@@ -209,222 +219,195 @@
             width: auto;
             min-width: 60px;
         }
-        .quick-amounts button:hover {
-            background-color: #455a64;
-        }
 
         .add-btn {
             background-color: var(--success-color);
+            width: calc(50% - 5px); 
+            margin-right: 10px;
         }
 
         .subtract-btn {
             background-color: var(--danger-color);
-        }
-        
-        /* ---------------------------------- */
-        /* ลูกเต๋า สไตล์และ Animation */
-        /* ---------------------------------- */
-        .dice-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        #rollDiceBtn {
-            background-color: var(--dice-color);
-            color: #333;
-            width: 100%;
-            box-shadow: 0 2px 5px rgba(251, 192, 45, 0.5);
-            font-size: 1.1em;
-        }
-        #rollDiceBtn:hover {
-            background-color: #fdd835;
-        }
-        .dice-result {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 10px;
-            min-height: 40px; 
-        }
-        .dice-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--text-color);
-            display: inline-block;
-            transition: transform 0.1s;
-        }
-        /* Keyframes สำหรับเอฟเฟกต์สั่น */
-        @keyframes roll-effect {
-            0% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-3px) rotate(5deg); }
-            75% { transform: translateY(3px) rotate(-5deg); }
-            100% { transform: translateY(0) rotate(0deg); }
-        }
-        /* คลาสที่ใช้ระหว่างการทอย */
-        .dice-rolling {
-            animation: roll-effect 0.1s infinite;
-        }
-        #total-roll {
-            font-size: 2.5em;
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-
-
-        /* ---------------------------------- */
-        /* การควบคุมบ้านและปุ่มรับค่าเช่า */
-        /* ---------------------------------- */
-        .house-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        #house-count {
-            font-weight: 700;
-            color: var(--primary-color);
-            font-size: 1.1em;
-        }
-        
-        .house-input button {
-            background-color: var(--house-btn-color); /* สีเขียวน้ำทะเล/ฟ้าอ่อน */
-            width: 100%;
-            margin-top: 5px;
+            width: calc(50% - 5px);
             margin-right: 0;
-            box-shadow: 0 2px 5px rgba(0, 188, 212, 0.5);
-        }
-        .house-input button:hover:not(:disabled) {
-             background-color: #00a0b6; 
         }
 
-        /* ตารางบ้าน */
-        #house-list .action-btns {
-            display: flex;
-            gap: 5px;
-            flex-wrap: nowrap;
-        }
-        #house-list .rent-btn {
-            background-color: var(--rent-btn-color);
-            padding: 5px 8px;
-            font-size: 13px;
-            margin: 0;
-            box-shadow: none;
-            white-space: nowrap; /* ไม่ให้ข้อความปุ่มตัดบรรทัด */
-        }
-        #house-list .rent-btn:hover {
-            background-color: #e68900;
-        }
-        #house-list .remove-btn {
-            background-color: #bdbdbd;
-            padding: 5px 8px;
-            font-size: 13px;
-            margin: 0;
-            color: var(--text-color);
-            box-shadow: none;
-        }
-        #house-list .remove-btn:hover {
-            background-color: #a0a0a0;
-        }
-
-        /* ตารางประวัติ */
-        #house-list, #history-list {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        #house-list th, #house-list td, #history-list th, #history-list td {
-            border: none;
-            border-bottom: 1px solid var(--border-color);
+        /* Calculator Styles */
+        .calculator {
+            background-color: #f0f0f0; 
+            border-radius: 10px;
             padding: 10px;
-            text-align: left;
-            font-size: 0.9em;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-
-        #history-list td:nth-child(2) { /* Description column */
-            max-width: 50%; 
-            word-wrap: break-word;
+        #calc-display {
+            background-color: #ffffff;
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 1.5em;
+            font-weight: 500;
+            height: 40px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
-
-        #house-list th, #history-list th {
-            background-color: #f0f0f0;
-            color: var(--primary-color);
-            font-weight: 700;
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
         }
-        
-        /* ประวัติรายการสี */
-        #history-list .type-add { color: var(--success-color); font-weight: 700; }
-        #history-list .type-subtract { color: var(--danger-color); font-weight: 700; }
-        #history-list .type-house-buy { color: #5cb85c; } 
-        #history-list .type-house-sell { color: #f0ad4e; } 
-        #history-list .type-rent-in { color: var(--rent-btn-color); font-weight: 700; } 
-        #history-list .type-turn-add { color: #26a69a; } 
-        #history-list .type-turn-skip { color: var(--danger-color); } 
-        #history-list .type-penalty-physical { color: #d32f2f; font-weight: 700; }
-        #history-list .type-start { color: #757575; } 
-
-
-        /* ปุ่มเริ่มใหม่ */
-        .reset-btn {
+        .calc-buttons button {
+            padding: 10px 0;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 500;
+            box-shadow: none;
+            background-color: var(--secondary-color); 
+            color: white;
+            border-radius: 4px;
+        }
+        .calc-buttons button:hover {
+            transform: none;
+            opacity: 0.9;
+        }
+        .calc-buttons button.operator {
+            background-color: var(--dice-color); 
+            color: var(--text-color);
+        }
+        .calc-buttons button.clear {
             background-color: var(--danger-color);
-            width: 100%;
-            margin-top: 30px;
         }
-        hr {
-            border: 0;
-            border-top: 1px solid var(--border-color);
-            margin: 20px 0;
+        .calc-buttons button.equal {
+            background-color: var(--primary-color);
+        }
+        .calc-buttons button.transfer {
+            background-color: var(--house-btn-color); 
+            grid-column: span 2;
         }
 
-        /* Custom Popup Alert */
+
+        /* ---------------------------------- */
+        /* Custom Alert Styles (FIXED: เพื่อให้ป็อปอัพทำงานถูกและไม่ดันประวัติ) */
+        /* ---------------------------------- */
         #custom-alert {
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: rgba(255, 255, 255, 0.98);
-            border: 1px solid var(--border-color);
-            border-left: 5px solid var(--primary-color);
+            background-color: #333;
+            color: white;
+            padding: 12px 18px;
             border-radius: 8px;
-            padding: 15px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1em;
-            color: var(--text-color);
-            max-width: 350px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             z-index: 1000;
             opacity: 0;
             transform: translateY(-20px);
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            max-width: 300px;
+            pointer-events: none; 
         }
-
         #custom-alert.show {
             opacity: 1;
             transform: translateY(0);
+            pointer-events: auto; 
+        }
+        #custom-alert .icon {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        #custom-alert.success { background-color: var(--success-color); }
+        #custom-alert.error { background-color: var(--danger-color); }
+        #custom-alert.warning { background-color: #ffc107; color: var(--text-color); }
+        #custom-alert.money { background-color: #26a69a; }
+        #custom-alert.dice { background-color: #795548; }
+        #custom-alert.limit { background-color: var(--limit-color); }
+        
+        /* ---------------------------------- */
+        /* Responsive Adjustments & Other V6 Styles */
+        /* ---------------------------------- */
+        @media (max-width: 768px) {
+            .money-control-layout {
+                flex-direction: column;
+            }
+            .calculator-area {
+                min-width: 100%;
+            }
+            #custom-alert {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+                text-align: center;
+            }
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: 15px;
+                border-radius: 10px;
+            }
+            .add-btn, .subtract-btn {
+                width: 100%;
+                margin-right: 0;
+            }
         }
 
-        #custom-alert .icon {
-            font-size: 1.5em;
-            margin-right: 10px;
-            line-height: 1;
+        /* V6 General Styles (Dice, House, History) */
+        .dice-area { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        #rollDiceBtn { background-color: var(--dice-color); color: #333; width: 100%; box-shadow: 0 2px 5px rgba(251, 192, 45, 0.5); font-size: 1.1em; }
+        .dice-result { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 10px; min-height: 40px; }
+        .dice-value { font-size: 2em; font-weight: 700; color: var(--text-color); display: inline-block; transition: transform 0.1s; }
+        @keyframes roll-effect { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-3px) rotate(5deg); } 75% { transform: translateY(3px) rotate(-5deg); } 100% { transform: translateY(0) rotate(0deg); } }
+        .dice-rolling { animation: roll-effect 0.1s infinite; }
+        #total-roll { font-size: 2.5em; color: var(--primary-color); font-weight: 700; }
+        .house-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        #house-count { font-weight: 700; color: var(--primary-color); font-size: 1.1em; }
+        .house-input button { background-color: var(--house-btn-color); width: 100%; margin-top: 5px; margin-right: 0; box-shadow: 0 2px 5px rgba(0, 188, 212, 0.5); }
+        #house-list .action-btns { display: flex; gap: 5px; flex-wrap: nowrap; }
+        #house-list .rent-btn { background-color: var(--rent-btn-color); padding: 5px 8px; font-size: 13px; margin: 0; box-shadow: none; white-space: nowrap; }
+        #house-list .remove-btn { background-color: #bdbdbd; padding: 5px 8px; font-size: 13px; margin: 0; color: var(--text-color); box-shadow: none; }
+        #house-list, #history-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        #house-list th, #history-list th { background-color: #f0f0f0; color: var(--primary-color); font-weight: 700; }
+        #house-list th, #house-list td, #history-list th, #history-list td { border-bottom: 1px solid var(--border-color); padding: 10px; text-align: left; font-size: 0.9em; border-top: none;}
+        #history-list .type-add, #history-list .type-rent-in { color: var(--success-color); font-weight: 700; }
+        #history-list .type-subtract, #history-list .type-house-buy { color: var(--danger-color); font-weight: 700; }
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
+        .reset-btn { background-color: var(--danger-color); width: 100%; margin-top: 30px; }
+        .cooldown-status { text-align: center; color: #26a69a; font-weight: 500; margin-top: 5px; }
+        
+        
+        /* Time Lock Overlay Styles */
+        #lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 50;
+            border-radius: 12px;
+            padding: 30px;
+            box-sizing: border-box;
         }
-        #custom-alert .message {
-            flex-grow: 1;
+        #lock-message {
+            font-size: 1.5em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
             font-weight: 500;
         }
-
-        /* Specific alert styles */
-        #custom-alert.success { border-left-color: var(--success-color); }
-        #custom-alert.error { border-left-color: var(--danger-color); }
-        #custom-alert.info { border-left-color: #26a69a; }
-        #custom-alert.warning { border-left-color: #ffc107; }
-        #custom-alert.money { border-left-color: #2196f3; }
-        #custom-alert.dice { border-left-color: var(--dice-color); }
-        #custom-alert.limit { border-left-color: var(--limit-color); }
+        #lock-overlay button {
+            background-color: var(--dice-color);
+            color: var(--text-color);
+            margin-top: 10px;
+            width: 80%;
+            max-width: 300px;
+        }
     </style>
 </head>
 <body>
@@ -447,10 +430,72 @@
             </div>
 
             <div id="game-controls">
+                
                 <h2>ผู้เล่น: <span id="display-name"></span></h2>
-                <h3>ยอดเงินปัจจุบัน: <span id="current-balance">0</span></h3>
+
+                <div class="card-balance">
+                    <div class="card-logo">MONOPOLY</div>
+                    <div class="card-chip"></div>
+                    <div class="card-label">ยอดเงินปัจจุบัน</div>
+                    <span id="current-balance">0</span>
+                    <div class="card-player-info">
+                        <span id="display-name-card">PLAYER NAME</span>
+                        <span>CHIP: X409</span>
+                    </div>
+                </div>
                 
                 <hr>
+                
+                <div class="section-card">
+                    <h3>💵 ควบคุมยอดเงิน & คำนวณ</h3>
+                    <div class="money-control-layout">
+                        
+                        <div class="money-input-area">
+                            
+                            <div class="quick-amounts">
+                                <button onclick="setMoneyAmount(100)">100</button>
+                                <button onclick="setMoneyAmount(500)">500</button>
+                                <button onclick="setMoneyAmount(1000)">1K</button>
+                                <button onclick="setMoneyAmount(5000)">5K</button>
+                                <button onclick="setMoneyAmount(10000)">10K</button>
+                            </div>
+                            
+                            <div class="input-group">
+                                <input type="number" id="moneyAmount" placeholder="จำนวนเงินที่ต้องการเพิ่ม/ลบ" min="1" value="100" inputmode="numeric">
+                                <input type="text" id="moneyDescription" placeholder="หมายเหตุ: เช่น ค่าเช่า, เก็บโบนัส">
+                                <button class="add-btn" onclick="addMoney()">+ เพิ่มเงิน</button>
+                                <button class="subtract-btn" onclick="subtractMoney()">- ลบเงิน</button>
+                            </div>
+                        </div>
+
+                        <div class="calculator-area">
+                            <h4 style="margin-top: 0; padding-bottom: 5px;">🧮 เครื่องคิดเลข</h4>
+                            <div class="calculator">
+                                <div id="calc-display">0</div>
+                                <div class="calc-buttons">
+                                    <button class="clear" onclick="calcClear()">C</button>
+                                    <button class="operator" onclick="calcInput('/')">÷</button>
+                                    <button class="operator" onclick="calcInput('*')">×</button>
+                                    <button onclick="calcInput('7')">7</button>
+                                    <button onclick="calcInput('8')">8</button>
+                                    <button onclick="calcInput('9')">9</button>
+                                    <button class="operator" onclick="calcInput('-')">-</button>
+                                    <button onclick="calcInput('4')">4</button>
+                                    <button onclick="calcInput('5')">5</button>
+                                    <button onclick="calcInput('6')">6</button>
+                                    <button class="operator" onclick="calcInput('+')">+</button>
+                                    <button onclick="calcInput('1')">1</button>
+                                    <button onclick="calcInput('2')">2</button>
+                                    <button onclick="calcInput('3')">3</button>
+                                    <button class="equal" onclick="calcCalculate()">=</button>
+                                    <button onclick="calcInput('0')">0</button>
+                                    <button onclick="calcInput('.')">.</button>
+                                    <button class="transfer" onclick="calcTransfer()">✅ ใช้ยอดนี้</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> </div>
                 
                 <div class="section-card">
                     <h3>🎲 ทอยลูกเต๋า (2 ลูก)</h3>
@@ -465,26 +510,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="section-card">
-                    <h3>💵 ควบคุมยอดเงิน</h3>
-                    <div class="money-control">
-                        <div class="quick-amounts">
-                            <button onclick="setMoneyAmount(100)">100</button>
-                            <button onclick="setMoneyAmount(500)">500</button>
-                            <button onclick="setMoneyAmount(1000)">1K</button>
-                            <button onclick="setMoneyAmount(1500)">1.5K</button>
-                            <button onclick="setMoneyAmount(2000)">2K</button>
-                        </div>
-                        
-                        <div class="input-group">
-                            <input type="number" id="moneyAmount" placeholder="จำนวนเงิน" min="1" value="100" inputmode="numeric">
-                            <input type="text" id="moneyDescription" placeholder="หมายเหตุ: เช่น ค่าเช่า, เก็บโบนัส">
-                            <button class="add-btn" onclick="addMoney()">+ เพิ่มเงิน</button>
-                            <button class="subtract-btn" onclick="subtractMoney()">- ลบเงิน</button>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="section-card">
                     <h3>🎁 หีบสมบัติ (สุ่มรางวัล)</h3>
@@ -493,7 +518,7 @@
                 </div>
                 
                 <div class="section-card">
-                    <h3>🏡 บันทึกการซื้อ/ขายบ้าน (หักเงินอัตโนมัติ)</h3>
+                    <h3>🏡 บันทึกการซื้อ/ขายบ้าน (จำกัด 7 หลัง)</h3>
                     
                     <div class="house-info">
                         <h4 style="border-bottom: none; margin-top: 0; padding-bottom: 0;">รายการที่ดินที่ถือครอง:</h4>
@@ -505,7 +530,6 @@
                         <input type="number" id="housePrice" placeholder="ราคา" min="1" value="200" inputmode="numeric">
                         <button id="addHouseBtn" onclick="addHouse()">บันทึกการซื้อ</button> 
                     </div>
-                    
                     
                     <table id="house-list">
                         <thead>
@@ -548,39 +572,41 @@
     </div>
 
     <script>
+        // *** Global State ***
         let playerName = '';
         let balance = 0;
         let houses = [];
         let transactionHistory = [];
-        let isCooldown = false;
         let gameStartTime = ''; 
-        let startTimeInterval;
         let alertTimeout;
+        
+        // NEW STATE FOR COOLDOWN FIX
+        let cooldownEndTime = 0; // ใช้ Timestamp (ms) เพื่อจำเวลาสิ้นสุด Cooldown
+        let cooldownInterval; // สำหรับเก็บ reference ของ setInterval
 
-        const COOLDOWN_TIME = 180000; // 3 นาที
-        const HOUSE_LIMIT = 7; // จำกัดจำนวนบ้านสูงสุด
+        // Calculator State
+        let currentInput = '0';
+        let operator = null;
+        let prevValue = null;
+        let isNewInput = true;
+        
 
+        // *** Constants ***
+        const COOLDOWN_TIME = 180000; // 3 นาที (3 * 60 * 1000 ms)
+        const HOUSE_LIMIT = 7; 
         const randomEvents = [
-            // เงินรางวัล (Monetary Rewards)
             { title: "เก็บขยะรีไซเคิลได้", amount: 500, type: "add", source: "สุ่ม" },
             { title: "ได้รับโบนัสประจำปี", amount: 1800, type: "add", source: "สุ่ม" },
             { title: "ได้รับมรดกจากญาติที่ไม่เคยรู้จัก", amount: 2000, type: "add", source: "สุ่ม" },
-            { title: "ลูกค้าจ่ายหนี้คืน", amount: 1300, type: "add", source: "สุ่ม" },
-            // บทลงโทษทางการเงิน (Monetary Penalties)
             { title: "โดนค่าปรับจอดรถผิดที่", amount: 300, type: "subtract", source: "สุ่ม" },
             { title: "ต้องจ่ายค่ารักษาพยาบาลฉุกเฉิน", amount: 1200, type: "subtract", source: "สุ่ม" },
             { title: "โดนเก็บภาษีย้อนหลัง", amount: 1000, type: "subtract", source: "สุ่ม" },
-            // รางวัลการเดิน (Turn Rewards)
             { title: "บัตรโอกาส: เดินต่อได้อีก 1 ตา", amount: 0, type: "turn-add", source: "สุ่ม" },
-            { title: "บัตรโอกาส: เดินต่อได้อีก 2 ตา", amount: 0, type: "turn-add", source: "สุ่ม" },
-            // บทลงโทษการเดิน (Turn Penalties)
             { title: "บัตรโอกาส: หยุดเดิน 1 ตา", amount: 0, type: "turn-skip", source: "สุ่ม" },
-            { title: "บัตรโอกาส: หยุดเดิน 2 ตา", amount: 0, type: "turn-skip", source: "สุ่ม" },
-            // บทลงโทษทางกาย (Physical Penalty)
             { title: "บทลงโทษ: โดนตบ 10 ครั้ง", amount: 0, type: "penalty-physical", source: "สุ่ม" }, 
         ];
 
-        // ดึง element ที่จำเป็น
+        // *** Element References ***
         const startArea = document.getElementById('start-area');
         const gameArea = document.getElementById('game-area');
         const displayName = document.getElementById('display-name');
@@ -602,23 +628,20 @@
         const customAlertMessage = customAlert.querySelector('.message');
         const houseCountDisplay = document.getElementById('house-count');
         const addHouseBtn = document.getElementById('addHouseBtn');
-        
-        // Dice Elements
         const diceOneValue = document.getElementById('dice-one-value');
         const diceTwoValue = document.getElementById('dice-two-value');
         const totalRoll = document.getElementById('total-roll');
         const rollDiceBtn = document.getElementById('rollDiceBtn');
+        const calcDisplay = document.getElementById('calc-display'); 
+        const displayNameCard = document.getElementById('display-name-card');
 
 
-        // --- Custom Alert Function ---
+        // --- Custom Alert ---
         function showAlert(message, type = 'info', icon = '') {
             clearTimeout(alertTimeout); 
-
             customAlert.classList.remove('show', 'success', 'error', 'info', 'warning', 'money', 'dice', 'limit');
-            
             customAlertMessage.textContent = message;
             customAlert.classList.add(type);
-
             if (!icon) {
                 if (type === 'success') icon = '✅';
                 else if (type === 'error') icon = '❌';
@@ -629,15 +652,510 @@
                 else icon = 'ℹ️'; 
             }
             customAlertIcon.textContent = icon;
-
             customAlert.classList.add('show');
-
             alertTimeout = setTimeout(() => {
                 customAlert.classList.remove('show');
             }, 3000); 
         }
 
-        // --- ฟังก์ชัน Time Lock (ไม่เปลี่ยนแปลง) ---
+        // --- Core Game Functions ---
+
+        function updateBalanceDisplay() {
+            currentBalance.textContent = balance.toLocaleString('th-TH');
+            displayName.textContent = playerName; 
+            displayNameCard.textContent = playerName.toUpperCase(); 
+        }
+
+        function recordTransaction(type, description, amount) {
+            const now = new Date();
+            const timeString = `${now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'})}`;
+            
+            const record = {
+                time: timeString,
+                type: type, 
+                description: description,
+                amount: amount
+            };
+            transactionHistory.unshift(record);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyListBody.innerHTML = '';
+            const recentHistory = transactionHistory.slice(0, 15);
+
+            recentHistory.forEach(record => {
+                const row = historyListBody.insertRow();
+                const cellTime = row.insertCell(0);
+                const cellDesc = row.insertCell(1);
+                const cellAmount = row.insertCell(2);
+
+                const amountClass = record.type;
+                let amountDisplay = '';
+
+                if (record.type.includes('add') || record.type.includes('rent-in') || record.type.includes('house-sell')) {
+                    amountDisplay = `+${record.amount.toLocaleString('th-TH')}`;
+                } else if (record.type.includes('subtract') || record.type.includes('house-buy')) {
+                    amountDisplay = `-${record.amount.toLocaleString('th-TH')}`; 
+                } else if (record.type.includes('turn')) {
+                    if (record.type.includes('add')) amountDisplay = "✅ เดินเพิ่ม";
+                    else if (record.type.includes('skip')) amountDisplay = "❌ หยุดเดิน";
+                } else if (record.type.includes('penalty')) {
+                    amountDisplay = "💀 ลงโทษ";
+                } else {
+                    amountDisplay = "-";
+                }
+                
+                cellTime.textContent = record.time;
+                cellDesc.textContent = record.description;
+                cellAmount.innerHTML = `<span class="${amountClass}">${amountDisplay}</span>`;
+            });
+        }
+        
+        function startGame() {
+            const nameInput = document.getElementById('playerName').value.trim();
+            const startMoneyInput = parseInt(document.getElementById('startMoney').value);
+            const timeInput = startTimeInput.value.trim();
+
+            if (nameInput === '' || isNaN(startMoneyInput) || startMoneyInput < 0) {
+                showAlert('กรุณาใส่ชื่อและเงินเริ่มต้นที่ถูกต้อง!', 'error', '❌');
+                return;
+            }
+            if (!/^\d{1,2}:\d{2}$/.test(timeInput)) {
+                showAlert('รูปแบบเวลาไม่ถูกต้อง (HH:MM)!', 'error', '❌');
+                return;
+            }
+
+            playerName = nameInput;
+            balance = startMoneyInput;
+            gameStartTime = timeInput; 
+            transactionHistory = [];
+            
+            recordTransaction('start', `เริ่มต้นเกม (เงินตั้งต้น: ${startMoneyInput.toLocaleString('th-TH')})`, startMoneyInput);
+            
+            updateBalanceDisplay();
+
+            startArea.style.display = 'none';
+            gameArea.style.display = 'block';
+
+            saveData();
+            checkStartTime();
+            showAlert(`ตั้งค่าเกมสำเร็จ! เริ่มเล่นในเวลา ${gameStartTime} น.`, 'info', '⏰');
+        }
+
+        // --- Money Control ---
+        function setMoneyAmount(amount) {
+            moneyAmountInput.value = amount;
+            moneyDescriptionInput.value = ''; 
+        }
+
+        function addMoney() { 
+            const amount = parseInt(moneyAmountInput.value);
+            const description = moneyDescriptionInput.value.trim() || 'เพิ่มเงินด้วยตนเอง';
+
+            if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
+            balance += amount;
+            recordTransaction('add', description, amount);
+            updateBalanceDisplay(); 
+            moneyAmountInput.value = '100'; 
+            moneyDescriptionInput.value = '';
+            saveData();
+            showAlert(`เพิ่มเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬆️');
+        }
+        function subtractMoney() { 
+            const amount = parseInt(moneyAmountInput.value);
+            const description = moneyDescriptionInput.value.trim() || 'ลบเงินด้วยตนเอง';
+
+            if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
+            balance -= amount;
+            recordTransaction('subtract', description, amount);
+            updateBalanceDisplay(); 
+            moneyAmountInput.value = '100';
+            moneyDescriptionInput.value = '';
+            saveData();
+            showAlert(`ลบเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬇️');
+        }
+
+        // --- House Control ---
+        function addHouse() { 
+            const number = houseNumberInput.value.trim();
+            const price = parseInt(housePriceInput.value);
+            
+            if (number === '' || isNaN(price) || price <= 0) { 
+                showAlert('กรุณาใส่ชื่อที่ดินและราคาให้ถูกต้อง!', 'error', '❌'); 
+                return; 
+            }
+            
+            if (houses.length >= HOUSE_LIMIT) {
+                showAlert(`ไม่สามารถซื้อบ้านได้อีก! จำกัดสูงสุด ${HOUSE_LIMIT} หลัง`, 'limit', '🛑');
+                return;
+            }
+
+            balance -= price; 
+
+            const newHouse = { id: Date.now(), number: number, price: price };
+            houses.push(newHouse); 
+            
+            recordTransaction('house-buy', `ซื้อ ${number} (ราคา)`, price);
+            
+            updateBalanceDisplay();
+            renderHouses();
+
+            houseNumberInput.value = ''; 
+            housePriceInput.value = '200'; 
+            saveData();
+            showAlert(`บันทึกการซื้อ ${number} ราคา ${price.toLocaleString('th-TH')} บาทแล้ว! (หักเงินแล้ว)`, 'success', '🏠');
+        }
+        
+        function removeHouse(id) { 
+            const houseToRemove = houses.find(house => house.id === id);
+            if (houseToRemove) { 
+                recordTransaction('house-sell', `ขาย ${houseToRemove.number} (ราคาทุน)`, houseToRemove.price);
+                showAlert(`บันทึกการขาย ${houseToRemove.number} ราคา ${houseToRemove.price.toLocaleString('th-TH')} บาทแล้ว! (กรุณาเพิ่มเงินด้วยตนเอง)`, 'warning', '🏠');
+            }
+            houses = houses.filter(house => house.id !== id);
+            renderHouses(); 
+            saveData();
+        }
+        
+        function collectRent(id) {
+            const house = houses.find(h => h.id === id);
+            if (!house) return;
+            
+            balance += house.price;
+            
+            recordTransaction('rent-in', `รับค่าเช่า ${house.number}`, house.price);
+            updateBalanceDisplay();
+            saveData();
+            showAlert(`ได้รับค่าเช่า ${house.number} จำนวน ${house.price.toLocaleString('th-TH')} บาท!`, 'money', '💵');
+        }
+
+
+        function renderHouses() {
+            houseListBody.innerHTML = '';
+            houses.forEach(house => {
+                const row = houseListBody.insertRow();
+                const cellNumber = row.insertCell(0);
+                const cellPrice = row.insertCell(1);
+                const cellAction = row.insertCell(2);
+                
+                cellNumber.textContent = house.number;
+                cellPrice.textContent = house.price.toLocaleString('th-TH');
+                
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'action-btns';
+
+                const rentButton = document.createElement('button');
+                rentButton.className = 'rent-btn';
+                rentButton.textContent = '💵 เช่า';
+                rentButton.onclick = () => collectRent(house.id);
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-btn';
+                removeButton.textContent = 'ขาย';
+                removeButton.onclick = () => removeHouse(house.id);
+                
+                actionDiv.appendChild(rentButton);
+                actionDiv.appendChild(removeButton);
+                cellAction.appendChild(actionDiv);
+            });
+            
+            houseCountDisplay.textContent = `บ้าน: ${houses.length}/${HOUSE_LIMIT}`;
+            if (houses.length >= HOUSE_LIMIT) {
+                addHouseBtn.disabled = true;
+                addHouseBtn.textContent = `เต็ม ${HOUSE_LIMIT} หลัง`;
+                houseCountDisplay.style.color = 'var(--limit-color)';
+            } else {
+                addHouseBtn.disabled = false;
+                addHouseBtn.textContent = 'บันทึกการซื้อ';
+                houseCountDisplay.style.color = 'var(--primary-color)';
+            }
+        }
+        
+        // --- Dice & Random Event ---
+        function rollDice() {
+            rollDiceBtn.disabled = true;
+            const rollCount = 10; 
+            let currentRoll = 0;
+            diceOneValue.classList.add('dice-rolling');
+            diceTwoValue.classList.add('dice-rolling');
+            const finalDice1 = Math.floor(Math.random() * 6) + 1;
+            const finalDice2 = Math.floor(Math.random() * 6) + 1;
+            const finalTotal = finalDice1 + finalDice2;
+
+            const rollInterval = setInterval(() => {
+                diceOneValue.textContent = Math.floor(Math.random() * 6) + 1;
+                diceTwoValue.textContent = Math.floor(Math.random() * 6) + 1;
+                totalRoll.textContent = '?';
+                currentRoll++;
+                if (currentRoll >= rollCount) {
+                    clearInterval(rollInterval);
+                    diceOneValue.textContent = finalDice1;
+                    diceTwoValue.textContent = finalDice2;
+                    totalRoll.textContent = finalTotal;
+                    diceOneValue.classList.remove('dice-rolling');
+                    diceTwoValue.classList.remove('dice-rolling');
+                    rollDiceBtn.disabled = false;
+                    let message = `ทอยลูกเต๋าได้ ${finalDice1} + ${finalDice2} = **${finalTotal}**`;
+                    if (finalDice1 === finalDice2) { message += " (เบิ้ล!)"; }
+                    showAlert(message, 'dice', '🎲');
+                }
+            }, 100); 
+        }
+        
+        // ** NEW: Cooldown Timer Logic **
+        function startCooldownTimer() {
+            if (cooldownInterval) clearInterval(cooldownInterval); 
+
+            randomEventBtn.disabled = true;
+
+            cooldownInterval = setInterval(() => {
+                const now = Date.now();
+                const timeLeftMs = cooldownEndTime - now;
+
+                if (timeLeftMs <= 0) {
+                    clearInterval(cooldownInterval);
+                    cooldownEndTime = 0; // Reset state
+                    saveData(); // Save the reset state
+                    
+                    randomEventBtn.disabled = false;
+                    randomEventBtn.textContent = 'เปิดหีบสมบัติ';
+                    cooldownStatus.textContent = '✅ พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
+                    showAlert('เปิดหีบสมบัติได้แล้ว!', 'info', '🎁');
+                    return;
+                }
+
+                const timeLeft = Math.ceil(timeLeftMs / 1000); // Time left in seconds
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                randomEventBtn.textContent = `⏳ รอ... (${formattedTime})`;
+                cooldownStatus.textContent = `สามารถเปิดหีบได้อีกครั้งใน ${formattedTime}`;
+
+            }, 1000);
+        }
+
+        // ** UPDATED: Random Event Function **
+        function triggerRandomEvent() {
+            const now = Date.now();
+            
+            // 1. Check Cooldown
+            if (cooldownEndTime > now) { 
+                const timeLeft = Math.ceil((cooldownEndTime - now) / 1000);
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                showAlert(`ยังอยู่ในช่วง Cooldown! กรุณารอ ${formattedTime}`, 'limit', '⏳');
+                return;
+            }
+            
+            // 2. Select Event
+            const event = randomEvents[Math.floor(Math.random() * randomEvents.length)];
+            let alertMessage = `🎁 หีบสมบัติ: ${event.title}!`;
+            let alertType = 'info';
+            let alertIcon = '🎁';
+            
+            // 3. Process Event Effect
+            if (event.type.includes("add")) {
+                balance += event.amount;
+                alertMessage += ` ได้รับเงินเพิ่ม ${event.amount.toLocaleString('th-TH')} บาท`;
+                alertType = 'money';
+                alertIcon = '⬆️';
+            } else if (event.type.includes("subtract")) {
+                balance -= event.amount;
+                alertMessage += ` เสียเงิน ${event.amount.toLocaleString('th-TH')} บาท`;
+                alertType = 'money';
+                alertIcon = '⬇️';
+            } else if (event.type.includes("turn-add")) {
+                alertMessage = `🎉 ${event.title}`;
+                alertType = 'success';
+                alertIcon = '🎲';
+            } else if (event.type.includes("turn-skip")) {
+                alertMessage = `🚫 ${event.title}`;
+                alertType = 'error';
+                alertIcon = '🛑';
+            } else if (event.type.includes("penalty-physical")) {
+                alertMessage = `☠️ ${event.title}`;
+                alertType = 'error';
+                alertIcon = '🚨';
+            }
+            
+            // 4. Update UI & Record
+            showAlert(alertMessage, alertType, alertIcon);
+            recordTransaction(event.type, `${event.title} (หีบสมบัติ)`, event.amount);
+            updateBalanceDisplay();
+            
+            // 5. Start Cooldown
+            cooldownEndTime = now + COOLDOWN_TIME;
+            saveData();
+            startCooldownTimer();
+        }
+        
+        // --- Calculator Logic ---
+        function updateCalcDisplay() {
+            const displayValue = currentInput; 
+            calcDisplay.textContent = displayValue;
+        }
+
+        function calcClear() {
+            currentInput = '0';
+            operator = null;
+            prevValue = null;
+            isNewInput = true;
+            updateCalcDisplay();
+        }
+
+        function calcCalculate() {
+            if (operator === null || prevValue === null) return;
+            
+            const currentValue = parseFloat(currentInput);
+            let result = 0;
+
+            const prev = parseFloat(prevValue);
+
+            if (isNaN(prev) || isNaN(currentValue)) {
+                 calcDisplay.textContent = 'Error';
+                 return;
+            }
+
+            switch (operator) {
+                case '+':
+                    result = prev + currentValue;
+                    break;
+                case '-':
+                    result = prev - currentValue;
+                    break;
+                case '*':
+                    result = prev * currentValue;
+                    break;
+                case '/':
+                    result = prev / currentValue;
+                    break;
+            }
+            
+            // ปัดเศษทศนิยม 2 ตำแหน่ง
+            currentInput = result.toFixed(2).replace(/\.00$/, ''); 
+            operator = null;
+            prevValue = null;
+            isNewInput = true;
+            updateCalcDisplay();
+        }
+
+        function calcSetOperator(newOperator) {
+            if (prevValue !== null && !isNewInput) {
+                calcCalculate(); 
+            }
+            prevValue = currentInput;
+            operator = newOperator;
+            isNewInput = true; 
+        }
+        
+        function calcInput(value) {
+            if (value.match(/[\+\-\*\/]/)) {
+                calcSetOperator(value);
+                return;
+            }
+
+            if (value === '=') {
+                calcCalculate();
+                return;
+            }
+
+            if (isNewInput) {
+                if (value === '.') {
+                    currentInput = '0.';
+                } else if (value.match(/[0-9]/)) {
+                    currentInput = value;
+                }
+                isNewInput = false;
+            } else {
+                if (value === '.' && currentInput.includes('.')) return;
+                if (value.match(/[0-9]|\./)) {
+                    if (currentInput.length < 15) { 
+                        currentInput += value;
+                    }
+                }
+            }
+            updateCalcDisplay();
+        }
+
+
+        function calcTransfer() {
+            calcCalculate(); 
+            const result = parseFloat(currentInput);
+            if (!isNaN(result)) {
+                moneyAmountInput.value = Math.round(result); 
+                moneyDescriptionInput.focus();
+                calcClear(); 
+                showAlert(`โอนยอด ${Math.round(result).toLocaleString('th-TH')} จากเครื่องคิดเลขเข้าช่องกรอกเงินแล้ว`, 'success', '✅');
+            } else {
+                showAlert('เครื่องคิดเลขไม่มีตัวเลขที่ถูกต้อง', 'error', '❌');
+            }
+        }
+        
+        // --- Data Persistence and Initialization ---
+        // ** UPDATED: Save Cooldown End Time **
+        function saveData() {
+            const data = { playerName, balance, houses, transactionHistory, gameStartTime, cooldownEndTime };
+            localStorage.setItem('monopolyTrackerData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('monopolyTrackerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // Load Data
+                playerName = data.playerName || '';
+                balance = data.balance || 0;
+                houses = data.houses || [];
+                transactionHistory = data.transactionHistory || [];
+                gameStartTime = data.gameStartTime || ''; 
+                cooldownEndTime = data.cooldownEndTime || 0; // NEW: Load cooldown end time
+
+                if (playerName) {
+                    updateBalanceDisplay();
+                    renderHouses();
+                    renderHistory();
+                    startArea.style.display = 'none';
+                    gameArea.style.display = 'block';
+                    document.getElementById('playerName').value = playerName; 
+                    document.getElementById('startMoney').value = data.balance; 
+                    startTimeInput.value = data.gameStartTime || '14:30';
+                    
+                    // NEW: Check and start cooldown timer on load
+                    const now = Date.now();
+                    if (cooldownEndTime > now) {
+                        startCooldownTimer();
+                    } else {
+                        // Ensure button is ready if time has passed
+                        cooldownEndTime = 0;
+                        randomEventBtn.disabled = false;
+                        randomEventBtn.textContent = 'เปิดหีบสมบัติ';
+                        cooldownStatus.textContent = '✅ พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
+                    }
+
+                    if (gameStartTime) {
+                        checkStartTime();
+                    } else {
+                        lockOverlay.style.display = 'none';
+                        gameControls.style.opacity = '1';
+                        gameControls.style.pointerEvents = 'auto';
+                    }
+                }
+            }
+            calcClear();
+        }
+
+        function resetGame() {
+            if (confirm('คุณต้องการเริ่มเกมใหม่และล้างข้อมูลทั้งหมดหรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้')) {
+                localStorage.removeItem('monopolyTrackerData');
+                location.reload(); 
+            }
+        }
+        
+        // --- Time Lock ---
         function checkStartTime() {
             if (startTimeInterval) clearInterval(startTimeInterval);
             
@@ -700,425 +1218,24 @@
             
             showAlert('ยกเลิกเวลารอสำเร็จ! เริ่มเกมทันที 🎉', 'warning', '🚀');
         }
-
-        // --- ฟังก์ชันพื้นฐาน (recordTransaction, renderHistory, updateBalanceDisplay) ---
-
-        function recordTransaction(type, description, amount) {
-            const now = new Date();
-            const timeString = `${now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'})}`;
-            
-            const record = {
-                time: timeString,
-                type: type, 
-                description: description,
-                amount: amount
-            };
-            
-            transactionHistory.unshift(record);
-            renderHistory();
-        }
-
-        function renderHistory() {
-            historyListBody.innerHTML = '';
-            const recentHistory = transactionHistory.slice(0, 15);
-
-            recentHistory.forEach(record => {
-                const row = historyListBody.insertRow();
-                const cellTime = row.insertCell(0);
-                const cellDesc = row.insertCell(1);
-                const cellAmount = row.insertCell(2);
-
-                const amountClass = record.type;
-                let amountDisplay = '';
-
-                if (record.type.includes('add') || record.type.includes('rent-in') || record.type.includes('house-sell')) {
-                    amountDisplay = `+${record.amount.toLocaleString('th-TH')}`;
-                } else if (record.type.includes('subtract') || record.type.includes('house-buy')) {
-                    amountDisplay = `-${record.amount.toLocaleString('th-TH')}`; // แสดงยอดลบ
-                } else if (record.type.includes('turn')) {
-                    if (record.type.includes('add')) amountDisplay = "✅ เดินเพิ่ม";
-                    else if (record.type.includes('skip')) amountDisplay = "❌ หยุดเดิน";
-                } else if (record.type.includes('penalty')) {
-                    amountDisplay = "💀 ลงโทษ";
-                } else {
-                    amountDisplay = "-";
-                }
-                
-                cellTime.textContent = record.time;
-                cellDesc.textContent = record.description;
-                cellAmount.innerHTML = `<span class="${amountClass}">${amountDisplay}</span>`;
-            });
-        }
-
-        function updateBalanceDisplay() {
-            currentBalance.textContent = balance.toLocaleString('th-TH');
-        }
-
-        function startGame() {
-            const nameInput = document.getElementById('playerName').value.trim();
-            const startMoneyInput = parseInt(document.getElementById('startMoney').value);
-            const timeInput = startTimeInput.value.trim();
-
-            if (nameInput === '' || isNaN(startMoneyInput) || startMoneyInput < 0) {
-                showAlert('กรุณาใส่ชื่อและเงินเริ่มต้นที่ถูกต้อง!', 'error', '❌');
-                return;
-            }
-            if (!/^\d{1,2}:\d{2}$/.test(timeInput)) {
-                showAlert('รูปแบบเวลาไม่ถูกต้อง (HH:MM)!', 'error', '❌');
-                return;
-            }
-
-            playerName = nameInput;
-            balance = startMoneyInput;
-            gameStartTime = timeInput; 
-            transactionHistory = [];
-            
-            recordTransaction('start', `เริ่มต้นเกม (เงินตั้งต้น: ${startMoneyInput.toLocaleString('th-TH')})`, startMoneyInput);
-            
-            displayName.textContent = playerName;
-            updateBalanceDisplay();
-
-            startArea.style.display = 'none';
-            gameArea.style.display = 'block';
-
-            saveData();
-            checkStartTime();
-            showAlert(`ตั้งค่าเกมสำเร็จ! เริ่มเล่นในเวลา ${gameStartTime} น.`, 'info', '⏰');
-        }
         
-        // --- ฟังก์ชันทอยลูกเต๋า พร้อมเอฟเฟกต์ ---
-        function rollDice() {
-            rollDiceBtn.disabled = true;
-            
-            const rollCount = 10; // จำนวนครั้งที่สุ่มหลอก
-            let currentRoll = 0;
-
-            diceOneValue.classList.add('dice-rolling');
-            diceTwoValue.classList.add('dice-rolling');
-
-            const finalDice1 = Math.floor(Math.random() * 6) + 1;
-            const finalDice2 = Math.floor(Math.random() * 6) + 1;
-            const finalTotal = finalDice1 + finalDice2;
-
-            const rollInterval = setInterval(() => {
-                // สุ่มตัวเลขระหว่างทำเอฟเฟกต์
-                diceOneValue.textContent = Math.floor(Math.random() * 6) + 1;
-                diceTwoValue.textContent = Math.floor(Math.random() * 6) + 1;
-                totalRoll.textContent = '?';
-
-                currentRoll++;
-
-                if (currentRoll >= rollCount) {
-                    clearInterval(rollInterval);
-                    
-                    // แสดงผลลัพธ์จริง
-                    diceOneValue.textContent = finalDice1;
-                    diceTwoValue.textContent = finalDice2;
-                    totalRoll.textContent = finalTotal;
-                    
-                    diceOneValue.classList.remove('dice-rolling');
-                    diceTwoValue.classList.remove('dice-rolling');
-                    rollDiceBtn.disabled = false;
-
-                    let message = `ทอยลูกเต๋าได้ ${finalDice1} + ${finalDice2} = **${finalTotal}**`;
-                    
-                    if (finalDice1 === finalDice2) {
-                        message += " (เบิ้ล!)";
-                    }
-                    
-                    showAlert(message, 'dice', '🎲');
-                }
-            }, 100); 
-        }
-
-        // --- ฟังก์ชันกำหนดจำนวนเงินลัด ---
-        function setMoneyAmount(amount) {
-            moneyAmountInput.value = amount;
-            moneyDescriptionInput.value = ''; 
-        }
-
-        // --- ฟังก์ชันควบคุมเงิน ---
-        function addMoney() { 
-            const amount = parseInt(moneyAmountInput.value);
-            const description = moneyDescriptionInput.value.trim() || 'เพิ่มเงินด้วยตนเอง';
-
-            if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
-            balance += amount;
-            recordTransaction('add', description, amount);
-            updateBalanceDisplay(); 
-            moneyAmountInput.value = '100'; 
-            moneyDescriptionInput.value = '';
-            saveData();
-            showAlert(`เพิ่มเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬆️');
-        }
-        function subtractMoney() { 
-            const amount = parseInt(moneyAmountInput.value);
-            const description = moneyDescriptionInput.value.trim() || 'ลบเงินด้วยตนเอง';
-
-            if (isNaN(amount) || amount <= 0) { showAlert('กรุณาใส่จำนวนเงินที่ถูกต้อง!', 'error', '❌'); return; }
-            balance -= amount;
-            recordTransaction('subtract', description, amount);
-            updateBalanceDisplay(); 
-            moneyAmountInput.value = '100';
-            moneyDescriptionInput.value = '';
-            saveData();
-            showAlert(`ลบเงิน ${amount.toLocaleString('th-TH')} บาทแล้ว!`, 'money', '⬇️');
-        }
-
-        // --- ฟังก์ชันควบคุมบ้าน ---
-        function addHouse() { 
-            const number = houseNumberInput.value.trim();
-            const price = parseInt(housePriceInput.value);
-            
-            if (number === '' || isNaN(price) || price <= 0) { 
-                showAlert('กรุณาใส่ชื่อที่ดินและราคาให้ถูกต้อง!', 'error', '❌'); 
-                return; 
+        // *** Bind Calculator Buttons ***
+        document.querySelectorAll('.calc-buttons button').forEach(button => {
+            const value = button.textContent.trim();
+            if (value.match(/[0-9]|\./)) {
+                button.onclick = () => calcInput(value);
+            } else if (value.match(/[\+\-]/)) {
+                button.onclick = () => calcInput(value);
+            } else if (value === '×') {
+                button.onclick = () => calcInput('*');
+            } else if (value === '÷') {
+                button.onclick = () => calcInput('/');
+            } else if (value === '=') {
+                button.onclick = () => calcCalculate();
+            } else if (value === 'C') {
+                button.onclick = () => calcClear();
             }
-            
-            // ตรวจสอบขีดจำกัดบ้าน
-            if (houses.length >= HOUSE_LIMIT) {
-                showAlert(`ไม่สามารถซื้อบ้านได้อีก! จำกัดสูงสุด ${HOUSE_LIMIT} หลัง`, 'limit', '🛑');
-                return;
-            }
-
-            // หักเงินอัตโนมัติ
-            balance -= price; 
-
-            const newHouse = { id: Date.now(), number: number, price: price };
-            houses.push(newHouse); 
-            
-            recordTransaction('house-buy', `ซื้อ ${number} (ราคา)`, price);
-            
-            updateBalanceDisplay();
-            renderHouses(); // เรียก renderHouses เพื่ออัปเดตทั้งตารางและจำนวนบ้าน
-
-            houseNumberInput.value = ''; 
-            housePriceInput.value = '200'; 
-            saveData();
-            showAlert(`บันทึกการซื้อ ${number} ราคา ${price.toLocaleString('th-TH')} บาทแล้ว! (หักเงินแล้ว)`, 'success', '🏠');
-        }
-        
-        function removeHouse(id) { 
-            const houseToRemove = houses.find(house => house.id === id);
-            if (houseToRemove) { 
-                // บันทึกการขาย (เงินไม่เพิ่มอัตโนมัติ ให้ผู้เล่นใช้ปุ่มเพิ่มเงินเอง หากต้องการ)
-                recordTransaction('house-sell', `ขาย ${houseToRemove.number} (ราคาทุน)`, houseToRemove.price);
-                showAlert(`บันทึกการขาย ${houseToRemove.number} ราคา ${houseToRemove.price.toLocaleString('th-TH')} บาทแล้ว! (กรุณาเพิ่มเงินด้วยตนเอง)`, 'warning', '🏠');
-            }
-            houses = houses.filter(house => house.id !== id);
-            renderHouses(); 
-            saveData();
-        }
-        
-        // ฟังก์ชันรับค่าเช่า
-        function collectRent(id) {
-            const house = houses.find(h => h.id === id);
-            if (!house) return;
-            
-            // เพิ่มเงิน
-            balance += house.price;
-            
-            // บันทึกประวัติ
-            recordTransaction('rent-in', `รับค่าเช่า ${house.number}`, house.price);
-            updateBalanceDisplay();
-            saveData();
-            showAlert(`ได้รับค่าเช่า ${house.number} จำนวน ${house.price.toLocaleString('th-TH')} บาท!`, 'money', '💵');
-        }
-
-
-        function renderHouses() {
-            houseListBody.innerHTML = '';
-            houses.forEach(house => {
-                const row = houseListBody.insertRow();
-                const cellNumber = row.insertCell(0);
-                const cellPrice = row.insertCell(1);
-                const cellAction = row.insertCell(2);
-                
-                cellNumber.textContent = house.number;
-                cellPrice.textContent = house.price.toLocaleString('th-TH');
-                
-                const actionDiv = document.createElement('div');
-                actionDiv.className = 'action-btns';
-
-                // ปุ่มรับค่าเช่า
-                const rentButton = document.createElement('button');
-                rentButton.className = 'rent-btn';
-                rentButton.textContent = '💵 รับค่าเช่า';
-                rentButton.onclick = () => collectRent(house.id);
-                
-                // ปุ่มลบ/ขาย
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-btn';
-                removeButton.textContent = 'ลบ/ขาย';
-                removeButton.onclick = () => removeHouse(house.id);
-                
-                actionDiv.appendChild(rentButton);
-                actionDiv.appendChild(removeButton);
-                cellAction.appendChild(actionDiv);
-            });
-            
-            // อัปเดตการแสดงจำนวนบ้านและปุ่มซื้อ
-            houseCountDisplay.textContent = `บ้าน: ${houses.length}/${HOUSE_LIMIT}`;
-            if (houses.length >= HOUSE_LIMIT) {
-                addHouseBtn.disabled = true;
-                addHouseBtn.textContent = `เต็ม ${HOUSE_LIMIT} หลัง`;
-                houseCountDisplay.style.color = 'var(--limit-color)';
-            } else {
-                addHouseBtn.disabled = false;
-                addHouseBtn.textContent = 'บันทึกการซื้อ';
-                houseCountDisplay.style.color = 'var(--primary-color)';
-            }
-        }
-        
-        // --- ฟังก์ชันสำหรับหีบสมบัติ (Random Event) (ไม่เปลี่ยนแปลง) ---
-        function startCooldown() {
-            isCooldown = true;
-            randomEventBtn.disabled = true;
-            
-            let timeLeft = COOLDOWN_TIME / 1000;
-            
-            const interval = setInterval(() => {
-                timeLeft--;
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-                randomEventBtn.textContent = `⏳ รอ... (${formattedTime})`;
-                cooldownStatus.textContent = `สามารถเปิดหีบได้อีกครั้งใน ${formattedTime}`;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    isCooldown = false;
-                    randomEventBtn.disabled = false;
-                    randomEventBtn.textContent = 'เปิดหีบสมบัติ';
-                    cooldownStatus.textContent = '✅ พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
-                    showAlert('เปิดหีบสมบัติได้แล้ว!', 'info', '🎁');
-                }
-            }, 1000);
-        }
-
-        function triggerRandomEvent() {
-            if (isCooldown) {
-                showAlert('ยังอยู่ในช่วง Cooldown! กรุณารอ 3 นาที', 'warning', '⏳');
-                return; 
-            }
-
-            const randomIndex = Math.floor(Math.random() * randomEvents.length);
-            const event = randomEvents[randomIndex];
-
-            let alertMessage = `🎁 หีบสมบัติ: ${event.title}!`;
-            let alertType = 'info';
-            let alertIcon = '🎁';
-            
-            if (event.type.includes("add")) {
-                balance += event.amount;
-                alertMessage += ` ได้รับเงินเพิ่ม ${event.amount.toLocaleString('th-TH')} บาท`;
-                alertType = 'money';
-                alertIcon = '⬆️';
-            } else if (event.type.includes("subtract")) {
-                balance -= event.amount;
-                alertMessage += ` เสียเงิน ${event.amount.toLocaleString('th-TH')} บาท`;
-                alertType = 'money';
-                alertIcon = '⬇️';
-            } else if (event.type.includes("turn-add")) {
-                const turns = event.title.match(/อีก (\d+) ตา/)[1];
-                alertMessage = `🎉 ${event.title} (หมายเหตุ: ได้เดินเพิ่ม ${turns} ตา)`;
-                alertType = 'success';
-                alertIcon = '🎲';
-            } else if (event.type.includes("turn-skip")) {
-                const turns = event.title.match(/หยุดเดิน (\d+) ตา/)[1];
-                alertMessage = `🚫 ${event.title} (หมายเหตุ: ถูกข้าม ${turns} ตา)`;
-                alertType = 'error';
-                alertIcon = '🛑';
-            } else if (event.type.includes("penalty-physical")) {
-                alertMessage = `☠️ ${event.title} (โปรดปฏิบัติตามบทลงโทษ)`;
-                alertType = 'error';
-                alertIcon = '🚨';
-            }
-            
-            showAlert(alertMessage, alertType, alertIcon);
-            
-            recordTransaction(event.type, `${event.title} (หีบสมบัติ)`, event.amount);
-            updateBalanceDisplay();
-            saveData();
-
-            startCooldown();
-        }
-
-        // --- ฟังก์ชันบันทึกและโหลดข้อมูล (ไม่เปลี่ยนแปลง) ---
-
-        function saveData() {
-            const data = { playerName, balance, houses, transactionHistory, gameStartTime };
-            localStorage.setItem('monopolyTrackerData', JSON.stringify(data));
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem('monopolyTrackerData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                playerName = data.playerName || '';
-                balance = data.balance || 0;
-                houses = data.houses || [];
-                transactionHistory = data.transactionHistory || [];
-                gameStartTime = data.gameStartTime || ''; 
-
-                if (playerName) {
-                    displayName.textContent = playerName;
-                    updateBalanceDisplay();
-                    renderHouses();
-                    renderHistory();
-                    startArea.style.display = 'none';
-                    gameArea.style.display = 'block';
-                    startTimeInput.value = data.gameStartTime || '14:30';
-                    
-                    randomEventBtn.disabled = false; 
-                    randomEventBtn.textContent = 'เปิดหีบสมบัติ';
-                    cooldownStatus.textContent = '✅ พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
-
-                    if (gameStartTime) {
-                        checkStartTime();
-                    } else {
-                        lockOverlay.style.display = 'none';
-                        gameControls.style.opacity = '1';
-                        gameControls.style.pointerEvents = 'auto';
-                    }
-                }
-            }
-        }
-
-        function resetGame() {
-            if (confirm('คุณต้องการเริ่มเกมใหม่และล้างข้อมูลทั้งหมดหรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้')) {
-                localStorage.removeItem('monopolyTrackerData');
-                
-                if (startTimeInterval) clearInterval(startTimeInterval);
-                
-                playerName = ''; balance = 0; houses = []; transactionHistory = []; gameStartTime = '';
-
-                document.getElementById('playerName').value = '';
-                document.getElementById('startMoney').value = '1500';
-                startTimeInput.value = '14:30';
-                houseListBody.innerHTML = '';
-                historyListBody.innerHTML = '';
-                updateBalanceDisplay();
-                
-                gameArea.style.display = 'none';
-                startArea.style.display = 'block';
-                
-                isCooldown = false;
-                randomEventBtn.disabled = false;
-                randomEventBtn.textContent = 'เปิดหีบสมบัติ';
-                cooldownStatus.textContent = 'พร้อมแล้ว! เปิดหีบสมบัติได้เลย';
-
-                lockOverlay.style.display = 'none';
-                
-                // Reset Dice display
-                diceOneValue.textContent = '?';
-                diceTwoValue.textContent = '?';
-                totalRoll.textContent = '0';
-
-                showAlert('รีเซ็ตเกมสำเร็จ! เริ่มต้นใหม่ได้เลย', 'success', '🔄');
-            }
-        }
+        });
 
         window.onload = loadData;
     </script>
