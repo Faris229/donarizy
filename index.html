@@ -1,714 +1,341 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Science Pro: คลังความรู้วิทย์ ม.ต้น ฉบับสมบูรณ์</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สัมภาษณ์กีฬา t.sabila</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+            padding-bottom: 60px;
+        }
 
-<style>
-    :root {
-        /* Color Palette */
-        --bio-color: #059669;    /* เขียวชีวะ */
-        --chem-color: #0284c7;   /* ฟ้าเคมี */
-        --phy-color: #dc2626;    /* แดงฟิสิกส์ */
-        --earth-color: #d97706;  /* ส้มดาราศาสตร์ */
-        
-        --bg-main: #f8fafc;
-        --bg-paper: #ffffff;
-        --text-primary: #1e293b;
-        --text-secondary: #475569;
-        --border-color: #e2e8f0;
+        .container { max-width: 800px; margin: 0 auto; }
 
-        /* Highlighter Colors */
-        --hl-yellow: #fef08a;
-        --hl-green: #bbf7d0;
-        --hl-blue: #bfdbfe;
-        --hl-pink: #fbcfe8;
-    }
+        /* HEADER & CONTROLS */
+        header {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
 
-    * { box-sizing: border-box; }
+        .control-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-    body {
-        font-family: 'Sarabun', sans-serif;
-        background-color: var(--bg-main);
-        color: var(--text-primary);
-        margin: 0;
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-        line-height: 1.8;
-    }
+        .btn-role {
+            padding: 10px 25px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #64748b;
+            margin: 5px;
+            transition: all 0.2s;
+        }
 
-    h1, h2, h3, h4, .font-heading { font-family: 'Prompt', sans-serif; }
+        .btn-role.active-ask { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .btn-role.active-ans { background-color: var(--success); color: white; border-color: var(--success); }
 
-    /* --- Sidebar Navigation --- */
-    aside {
-        width: 280px;
-        background: #fff;
-        border-right: 1px solid var(--border-color);
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 0;
-        overflow-y: auto;
-    }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 15px;
+            font-family: 'Sarabun', sans-serif;
+        }
 
-    .brand {
-        padding: 25px;
-        font-size: 20px;
-        font-weight: 700;
-        color: #0f172a;
-        border-bottom: 1px solid var(--border-color);
-        background: #f1f5f9;
-    }
+        /* CARD STYLES */
+        .qa-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
 
-    .nav-group {
-        padding: 15px 0;
-    }
-    
-    .nav-header {
-        font-family: 'Prompt';
-        font-size: 13px;
-        font-weight: 600;
-        color: #94a3b8;
-        padding: 0 20px;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+        .section { padding: 15px 20px; position: relative; }
+        .section-q { background-color: #eff6ff; border-bottom: 1px solid #e2e8f0; }
+        .section-a { background-color: #f0fdf4; }
 
-    .nav-item {
-        display: block;
-        padding: 10px 20px;
-        color: var(--text-secondary);
-        text-decoration: none;
-        font-size: 14px;
-        border-left: 3px solid transparent;
-        transition: all 0.2s;
-    }
+        /* Fading logic */
+        .mode-ask .section-a { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
+        .mode-ans .section-q { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
 
-    .nav-item:hover { background: #f1f5f9; color: var(--text-primary); }
-    .nav-item.active { background: #eff6ff; color: var(--chem-color); border-left-color: var(--chem-color); font-weight: 600; }
+        /* Text Styles */
+        .label-badge { font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+        .badge-q { background: #dbeafe; color: #1e40af; }
+        .badge-a { background: #d1fae5; color: #065f46; }
 
-    /* --- Main Reading Area --- */
-    main {
-        flex: 1;
-        overflow-y: auto;
-        padding: 40px 60px; /* ขอบกว้างเหมือนอ่านหนังสือ */
-        scroll-behavior: smooth;
-        position: relative;
-    }
+        .eng-text { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
+        .thai-read { color: #d97706; font-size: 14px; font-style: italic; margin-bottom: 10px; }
 
-    /* Article Styling */
-    article {
-        max-width: 900px;
-        margin: 0 auto 60px auto;
-        background: var(--bg-paper);
-        padding: 50px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        border: 1px solid var(--border-color);
-    }
+        /* RECORDING UI */
+        .recorder-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5e1;
+        }
 
-    .subject-tag {
-        display: inline-block;
-        padding: 5px 12px;
-        border-radius: 50px;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 15px;
-        color: white;
-    }
-    .tag-bio { background: var(--bio-color); }
-    .tag-chem { background: var(--chem-color); }
-    .tag-phy { background: var(--phy-color); }
-    .tag-earth { background: var(--earth-color); }
+        .btn-rec-start {
+            background-color: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
 
-    article h2 { font-size: 28px; margin-bottom: 10px; color: #111827; }
-    article .subtitle { color: #64748b; margin-bottom: 30px; font-size: 16px; }
+        .btn-rec-start:hover { background-color: #eff6ff; }
 
-    article h3 { 
-        font-size: 20px; 
-        margin-top: 40px; 
-        margin-bottom: 20px; 
-        color: #334155; 
-        border-left: 5px solid #cbd5e1; 
-        padding-left: 15px; 
-    }
+        /* ปุ่มกำลังอัด (Pulsing) */
+        .btn-rec-start.recording {
+            background-color: #fee2e2;
+            color: var(--danger);
+            border-color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
 
-    p { margin-bottom: 20px; text-align: justify; }
+        .btn-rec-stop {
+            background-color: var(--danger);
+            border: 1px solid var(--danger);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: none; /* ซ่อนไว้ก่อน */
+            align-items: center;
+            gap: 5px;
+        }
 
-    /* Detailed List */
-    ul.detail-list { padding-left: 20px; }
-    ul.detail-list li { margin-bottom: 12px; }
-    
-    /* Comparison Table */
-    .compare-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 25px 0;
-        font-size: 15px;
-    }
-    .compare-table th, .compare-table td {
-        border: 1px solid #e2e8f0;
-        padding: 12px 15px;
-        text-align: left;
-    }
-    .compare-table th { background: #f8fafc; font-family: 'Prompt'; }
-    .compare-table tr:nth-child(even) { background: #fcfcfc; }
+        .btn-rec-stop:hover { background-color: #dc2626; }
 
-    /* Knowledge Box (สาระเน้นๆ) */
-    .knowledge-box {
-        background: #f0fdf4;
-        border-left: 4px solid var(--bio-color);
-        padding: 20px;
-        margin: 25px 0;
-        border-radius: 0 8px 8px 0;
-    }
-    .knowledge-box.chem { background: #f0f9ff; border-left-color: var(--chem-color); }
-    .knowledge-box.phy { background: #fef2f2; border-left-color: var(--phy-color); }
-    
-    .box-title { display: block; font-weight: 700; font-family: 'Prompt'; margin-bottom: 8px; }
+        .status-text { font-size: 12px; color: #64748b; margin-left: auto; }
 
-    /* Formula Block */
-    .formula-block {
-        background: #1e293b;
-        color: #fff;
-        padding: 25px;
-        border-radius: 8px;
-        text-align: center;
-        font-family: 'Courier New', monospace;
-        margin: 30px 0;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    }
-    .formula-eq { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #4ade80; }
-    .formula-desc { font-size: 14px; color: #94a3b8; font-family: 'Sarabun'; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
 
-    /* Note Taking Area */
-    .sticky-note {
-        margin-top: 40px;
-        background: #fffbeb;
-        padding: 20px;
-        border: 1px solid #fcd34d;
-        border-radius: 8px;
-    }
-    .note-label { font-size: 13px; font-weight: bold; color: #92400e; margin-bottom: 10px; display:block;}
-    textarea {
-        width: 100%;
-        min-height: 100px;
-        border: none;
-        background: transparent;
-        resize: vertical;
-        font-family: 'Sarabun';
-        outline: none;
-        font-size: 15px;
-        color: #451a03;
-    }
-
-    /* Highlighter Menu */
-    #highlighter-menu {
-        position: absolute;
-        display: none;
-        background: #0f172a;
-        padding: 8px;
-        border-radius: 50px;
-        gap: 8px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        z-index: 1000;
-    }
-    .pen-color {
-        width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; transition: transform 0.1s;
-    }
-    .pen-color:hover { transform: scale(1.2); }
-    .bg-y { background: var(--hl-yellow); }
-    .bg-g { background: var(--hl-green); }
-    .bg-b { background: var(--hl-blue); }
-    .bg-p { background: var(--hl-pink); }
-    
-    /* Highlight Classes */
-    span.hl-y { background: var(--hl-yellow); }
-    span.hl-g { background: var(--hl-green); }
-    span.hl-b { background: var(--hl-blue); }
-    span.hl-p { background: var(--hl-pink); }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    /* Floating Action Button */
-    .fab-wrapper {
-        position: fixed; bottom: 30px; right: 40px; display: flex; flex-direction: column; gap: 15px;
-    }
-    .fab {
-        width: 55px; height: 55px; border-radius: 50%; background: #2563eb; color: white;
-        border: none; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); font-size: 20px;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        transition: transform 0.2s;
-    }
-    .fab:hover { transform: translateY(-3px); }
-    .fab.danger { background: #fff; color: #ef4444; }
-
-</style>
+    </style>
 </head>
 <body>
 
-<aside>
-    <div class="brand">
-        <i class="fa-solid fa-book-open"></i> Science<span style="color:#2563eb">Pro</span>
-    </div>
-    
-    <div class="nav-group">
-        <div class="nav-header">มัธยมศึกษาปีที่ 1</div>
-        <a href="#m1-cell" class="nav-item"><i class="fa-solid fa-microscope" style="width:20px"></i> เซลล์และกล้องจุลทรรศน์</a>
-        <a href="#m1-transport" class="nav-item"><i class="fa-solid fa-arrows-left-right-to-line" style="width:20px"></i> การลำเลียงสาร</a>
-        <a href="#m1-matter" class="nav-item"><i class="fa-solid fa-flask" style="width:20px"></i> สารและสมบัติของสาร</a>
-        <a href="#m1-heat" class="nav-item"><i class="fa-solid fa-fire" style="width:20px"></i> พลังงานความร้อน</a>
-    </div>
+    <div class="container">
+        <header>
+            <h1>🎙️ สัมภาษณ์กีฬา t.sabila</h1>
+            <p style="font-size: 13px; color: #64748b;">(กด "หยุด" เพื่อบันทึกไฟล์ลงเครื่องทันที)</p>
+            <p style="font-size: 12px; color: red; margin-top:5px;">*บน iPhone ต้องเปิดผ่านลิงก์ HTTPS เท่านั้น (เปิดไฟล์โดยตรงจะอัดไม่ได้)</p>
+        </header>
 
-    <div class="nav-group">
-        <div class="nav-header">มัธยมศึกษาปีที่ 2</div>
-        <a href="#m2-body" class="nav-item"><i class="fa-solid fa-heart-pulse" style="width:20px"></i> ระบบร่างกายมนุษย์</a>
-        <a href="#m2-force" class="nav-item"><i class="fa-solid fa-weight-hanging" style="width:20px"></i> แรงและการเคลื่อนที่</a>
-        <a href="#m2-earth" class="nav-item"><i class="fa-solid fa-mountain" style="width:20px"></i> โลกและทรัพยากร</a>
-    </div>
+        <div class="control-box">
+            <span style="font-weight:bold; color:#334155; display:block; margin-bottom:10px;">1. เลือกบทบาท</span>
+            <button class="btn-role" id="btnAsk" onclick="setRole('ask')">🎤 คนถาม</button>
+            <button class="btn-role" id="btnAns" onclick="setRole('ans')">🏆 คนตอบ</button>
 
-    <div class="nav-group">
-        <div class="nav-header">มัธยมศึกษาปีที่ 3</div>
-        <a href="#m3-gene" class="nav-item"><i class="fa-solid fa-dna" style="width:20px"></i> พันธุศาสตร์</a>
-        <a href="#m3-elec" class="nav-item"><i class="fa-solid fa-bolt" style="width:20px"></i> ไฟฟ้าและอิเล็กทรอนิกส์</a>
-        <a href="#m3-space" class="nav-item"><i class="fa-solid fa-satellite" style="width:20px"></i> ดาราศาสตร์</a>
-    </div>
-</aside>
-
-<main id="content-container">
-
-    <article id="m1-cell">
-        <span class="subject-tag tag-bio">ชีววิทยา ม.1</span>
-        <h2>เซลล์: หน่วยพื้นฐานของสิ่งมีชีวิต (The Cell)</h2>
-        <p class="subtitle">เจาะลึกโครงสร้าง หน้าที่ และความแตกต่างระหว่างเซลล์พืชและเซลล์สัตว์</p>
-        
-        <p>เซลล์ (Cell) คือหน่วยที่เล็กที่สุดของสิ่งมีชีวิตที่สามารถแสดงคุณสมบัติของชีวิตได้ครบถ้วน ได้แก่ การกินอาหาร หายใจ ขับถ่าย เจริญเติบโต และสืบพันธุ์ โดยทฤษฎีเซลล์ (Cell Theory) กล่าวว่า "สิ่งมีชีวิตทุกชนิดประกอบด้วยเซลล์ และเซลล์ใหม่เกิดจากการแบ่งตัวของเซลล์เดิม"</p>
-
-        <h3>1. โครงสร้างหลักของเซลล์ (Cell Structure)</h3>
-        <ul class="detail-list">
-            <li><b>ผนังเซลล์ (Cell Wall):</b> พบเฉพาะในพืช แบคทีเรีย และเชื้อรา ประกอบด้วยสาร<i>เซลลูโลส</i>เป็นหลัก ทำหน้าที่เพิ่มความแข็งแรงและคงรูปร่างให้เซลล์ (เปรียบเสมือนกำแพงเมือง)</li>
-            <li><b>เยื่อหุ้มเซลล์ (Cell Membrane):</b> เป็นเยื่อเลือกผ่าน (Semi-permeable membrane) ประกอบด้วยฟอสโฟลิพิดและโปรตีน ทำหน้าที่คัดกรองสารที่จะผ่านเข้า-ออกเซลล์ รักษาสมดุลภายใน</li>
-            <li><b>นิวเคลียส (Nucleus):</b> เป็นศูนย์กลางควบคุมการทำงานทั้งหมด บรรจุสารพันธุกรรม (DNA/RNA) ภายในมีนิวคลีโอลัส (Nucleolus) ที่ทำหน้าที่สร้างไรโบโซม</li>
-            <li><b>ไซโทพลาซึม (Cytoplasm):</b> ของเหลวภายในเซลล์ เป็นที่อยู่ของออร์แกเนลล์ต่างๆ และเป็นบริเวณที่เกิดปฏิกิริยาเคมีส่วนใหญ่</li>
-        </ul>
-
-        <h3>2. เจาะลึกออร์แกเนลล์ (Organelles)</h3>
-        <table class="compare-table">
-            <thead>
-                <tr>
-                    <th>ออร์แกเนลล์</th>
-                    <th>หน้าที่หลัก</th>
-                    <th>ข้อควรจำพิเศษ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><b>Mitochondria</b></td>
-                    <td>แหล่งสร้างพลังงาน (ATP) ผ่านกระบวนการหายใจระดับเซลล์</td>
-                    <td>พบมากในเซลล์ที่ใช้พลังงานสูง เช่น กล้ามเนื้อหัวใจ, อสุจิ</td>
-                </tr>
-                <tr>
-                    <td><b>Chloroplast</b></td>
-                    <td>สังเคราะห์ด้วยแสง (Photosynthesis) สร้างอาหาร (น้ำตาล)</td>
-                    <td>ภายในมีสารสีเขียวชื่อ "คลอโรฟิลล์" พบเฉพาะในพืช</td>
-                </tr>
-                <tr>
-                    <td><b>Ribosome</b></td>
-                    <td>สังเคราะห์โปรตีน</td>
-                    <td>มีขนาดเล็กที่สุด ไม่มีเยื่อหุ้ม</td>
-                </tr>
-                <tr>
-                    <td><b>Vacuole</b></td>
-                    <td>ถุงเก็บสาร (น้ำ, อาหาร, ของเสีย)</td>
-                    <td>ในพืชจะมี Central Vacuole ขนาดใหญ่มาก</td>
-                </tr>
-                <tr>
-                    <td><b>Lysosome</b></td>
-                    <td>ย่อยสลายสิ่งแปลกปลอมและออร์แกเนลล์ที่หมดอายุ</td>
-                    <td>ฉายา "ถุงฆ่าตัวตาย" (Suicide bag)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำเรื่องเซลล์</span>
-            <textarea id="note-m1-cell" placeholder="จดสิ่งที่มักลืม หรือ เทคนิคการจำที่นี่..."></textarea>
-        </div>
-    </article>
-
-    <article id="m1-transport">
-        <span class="subject-tag tag-bio">ชีววิทยา ม.1</span>
-        <h2>การลำเลียงสารผ่านเซลล์ (Cell Transport)</h2>
-        <p>กลไกการเคลื่อนที่ของสารเข้าและออกจากเซลล์เพื่อรักษาสมดุล (Homeostasis)</p>
-
-        <div class="knowledge-box">
-            <span class="box-title">กฎทองของการลำเลียง</span>
-            ธรรมชาติต้องการความสมดุล สารจะพยายามกระจายตัวจากที่ที่ "แออัด" ไปยังที่ที่ "ว่าง" เสมอ ยกเว้นกรณีที่เซลล์ต้องการสะสมสารนั้นจริงๆ จึงต้องใช้พลังงานฝืนธรรมชาติ
-        </div>
-
-        <h3>1. การลำเลียงแบบไม่ใช้พลังงาน (Passive Transport)</h3>
-        <ul class="detail-list">
-            <li>
-                <b>การแพร่ (Diffusion):</b> การเคลื่อนที่ของโมเลกุลสารจากบริเวณที่มี <u>ความเข้มข้นสูง</u> ไปยัง <u>ความเข้มข้นต่ำ</u> จนกว่าจะสมดุล
-                <br><i>ตัวอย่าง:</i> การได้กลิ่นน้ำหอม, การแลกเปลี่ยนแก๊ส O₂ และ CO₂ ที่ถุงลมปอด
-            </li>
-            <li>
-                <b>ออสโมซิส (Osmosis):</b> การเคลื่อนที่ของ <u>น้ำ</u> ผ่านเยื่อเลือกผ่าน จากบริเวณที่มี <u>น้ำมาก (สารเจือจาง)</u> ไปยัง <u>น้ำน้อย (สารเข้มข้น)</u>
-                <br><i>ตัวอย่าง:</i> รากพืชดูดน้ำ, มือเหี่ยวเมื่อแช่น้ำนานๆ
-            </li>
-            <li>
-                <b>การแพร่แบบฟาซิลิเทต (Facilitated Diffusion):</b> การแพร่ของสารขนาดใหญ่ (เช่น กลูโคส) ผ่านช่องโปรตีนตัวพา (Carrier Protein) บนเยื่อหุ้มเซลล์ ไม่ใช้พลังงาน แต่เร็วกว่าการแพร่ธรรมดา
-            </li>
-        </ul>
-
-        <h3>2. การลำเลียงแบบใช้พลังงาน (Active Transport)</h3>
-        <p>การเคลื่อนที่ของสารจาก <u>ความเข้มข้นต่ำ</u> ไปยัง <u>ความเข้มข้นสูง</u> (ฝืนธรรมชาติ) จึงต้องใช้พลังงาน (ATP) เข้าช่วย เช่น การดูดแร่ธาตุของรากพืช, โซเดียม-โพแทสเซียมปั๊มในเซลล์ประสาท</p>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำการลำเลียง</span>
-            <textarea id="note-m1-transport"></textarea>
-        </div>
-    </article>
-
-    <article id="m1-heat">
-        <span class="subject-tag tag-phy">ฟิสิกส์ ม.1</span>
-        <h2>พลังงานความร้อน (Thermal Energy)</h2>
-        <p class="subtitle">การถ่ายโอนความร้อน การขยายตัวของสสาร และการคำนวณปริมาณความร้อน</p>
-
-        <h3>สูตรคำนวณปริมาณความร้อน (Calorimetry)</h3>
-        <p>เมื่อสสารได้รับความร้อน จะเกิดการเปลี่ยนแปลง 2 แบบ คือ 1. อุณหภูมิเปลี่ยน 2. สถานะเปลี่ยน</p>
-        
-        <div class="formula-block">
-            <div class="formula-eq">Q = mcΔt</div>
-            <div class="formula-desc">ใช้เมื่อ "อุณหภูมิเปลี่ยน" แต่สถานะเดิม</div>
-            <div style="margin-top:10px; font-size:13px; text-align:left; display:inline-block;">
-                Q = ปริมาณความร้อน (Cal หรือ Joule)<br>
-                m = มวลของสาร (g หรือ kg)<br>
-                c = ความจุความร้อนจำเพาะ (Specific Heat Capacity)<br>
-                Δt = อุณหภูมิที่เปลี่ยนแปลง (t<sub>ปลาย</sub> - t<sub>ต้น</sub>)
+            <div id="sport-selector-box" style="display:none; margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
+                <span style="font-weight:bold; color:#334155;">2. เลือกกีฬา</span><br>
+                <select id="sportSelect" onchange="renderContent()">
+                    <option value="">-- กรุณาเลือกกีฬา --</option>
+                    <option value="football">ฟุตบอล (Football)</option>
+                    <option value="badminton">แบดมินตัน (Badminton)</option>
+                    <option value="volleyball">วอลเลย์บอล (Volleyball)</option>
+                    <option value="basketball">บาสเกตบอล (Basketball)</option>
+                    <option value="swimming">ว่ายน้ำ (Swimming)</option>
+                    <option value="boxing">มวย (Boxing)</option>
+                </select>
             </div>
         </div>
 
-        <div class="formula-block">
-            <div class="formula-eq">Q = mL</div>
-            <div class="formula-desc">ใช้เมื่อ "เปลี่ยนสถานะ" แต่อุณหภูมิคงที่</div>
-            <div style="margin-top:10px; font-size:13px; text-align:left; display:inline-block;">
-                L = ความร้อนแฝงจำเพาะ (Latent Heat)<br>
-                - ความร้อนแฝงของการหลอมเหลว (น้ำแข็ง→น้ำ)<br>
-                - ความร้อนแฝงของการกลายเป็นไอ (น้ำ→ไอน้ำ)
-            </div>
-        </div>
-
-        <h3>การถ่ายโอนความร้อน 3 วิธี</h3>
-        <ul class="detail-list">
-            <li><b>การนำ (Conduction):</b> อาศัยตัวกลาง ตัวกลาง<i>ไม่เคลื่อนที่</i> (เกิดดีสุดในของแข็ง/โลหะ) -> โมเลกุลสั่นส่งต่อพลังงาน</li>
-            <li><b>การพา (Convection):</b> อาศัยตัวกลาง ตัวกลาง<i>เคลื่อนที่ไปด้วย</i> (เกิดในของเหลวและแก๊ส) -> อากาศร้อนลอยตัวขึ้น อากาศเย็นไหลเข้ามาแทนที่ (ลมบก/ลมทะเล)</li>
-            <li><b>การแผ่รังสี (Radiation):</b> <i>ไม่อาศัยตัวกลาง</i> มาในรูปคลื่นแม่เหล็กไฟฟ้า (Infrared) -> ความร้อนจากดวงอาทิตย์มายังโลก</li>
-        </ul>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำสูตรคำนวณ</span>
-            <textarea id="note-m1-heat"></textarea>
-        </div>
-    </article>
-
-    <article id="m2-body">
-        <span class="subject-tag tag-bio">ชีววิทยา ม.2</span>
-        <h2>ระบบร่างกายมนุษย์ (Human Body Systems)</h2>
-        <p class="subtitle">ความซับซ้อนของการทำงานร่วมกันระหว่างระบบอวัยวะต่างๆ</p>
-
-        <h3>1. ระบบหมุนเวียนเลือด (Circulatory System)</h3>
-        <p>ทำหน้าที่ขนส่งสารอาหาร แก๊ส และของเสีย หัวใจมนุษย์มี 4 ห้อง ทำงานประสานกันดังนี้:</p>
-        <div class="knowledge-box">
-            <span class="box-title">เส้นทางเดินเลือด (ท่องจำ!)</span>
-            1. ร่างกายส่งเลือดดำ → <b>บนขวา (Right Atrium)</b><br>
-            2. ลงสู่ → <b>ล่างขวา (Right Ventricle)</b><br>
-            3. ส่งไปฟอกที่ → <b>ปอด (Lungs)</b> (เปลี่ยนเลือดดำเป็นเลือดแดง)<br>
-            4. กลับเข้าสู่ → <b>บนซ้าย (Left Atrium)</b><br>
-            5. ลงสู่ → <b>ล่างซ้าย (Left Ventricle)</b> *ผนังหนาสุด*<br>
-            6. บีบตัวส่งไปเลี้ยง → <b>ทั่วร่างกาย</b> ผ่านหลอดเลือด Aorta
-        </div>
-
-        <h3>2. ระบบหายใจ (Respiratory System)</h3>
-        <p>กลไกการหายใจเข้า-ออก เกิดจากการทำงานของ <b>กะบังลม</b> และ <b>กระดูกซี่โครง</b> ในสภาวะตรงกันข้าม (Antagonism)</p>
-        <table class="compare-table">
-            <thead>
-                <tr>
-                    <th>สภาวะ</th>
-                    <th>กะบังลม (Diaphragm)</th>
-                    <th>กระดูกซี่โครง (Ribs)</th>
-                    <th>ผลลัพธ์ในปอด</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><b>หายใจเข้า</b></td>
-                    <td>หดตัว (เลื่อนต่ำลง)</td>
-                    <td>ยกตัวขึ้น</td>
-                    <td>ปริมาตรเพิ่ม / ความดันลด (อากาศไหลเข้า)</td>
-                </tr>
-                <tr>
-                    <td><b>หายใจออก</b></td>
-                    <td>คลายตัว (เลื่อนสูงขึ้น)</td>
-                    <td>ลดต่ำลง</td>
-                    <td>ปริมาตรลด / ความดันเพิ่ม (อากาศไหลออก)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3>3. ระบบขับถ่าย (Excretory System) - ไต</h3>
-        <p>หน่วยไต (Nephron) นับล้านหน่วยทำหน้าที่กรองของเสียออกจากเลือด
-        <br><b>ขั้นตอนการทำงาน:</b>
-        <br>1. <b>การกรอง (Filtration):</b> ที่โกลเมอรูลัส สารขนาดเล็ก (น้ำ, น้ำตาล, ยูเรีย) ผ่านได้ โปรตีนและเม็ดเลือดผ่านไม่ได้
-        <br>2. <b>การดูดกลับ (Reabsorption):</b> ที่ท่อหน่วยไต ดูดน้ำและน้ำตาลกลูโคสกลับคืนสู่เลือดจนหมด (ถ้าพบน้ำตาลในปัสสาวะ = เสี่ยงเบาหวาน)
-        <br>3. <b>การหลั่ง (Secretion):</b> ขับสารพิษและยาบางชนิดทิ้งมากับปัสสาวะ</p>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำระบบร่างกาย</span>
-            <textarea id="note-m2-body"></textarea>
-        </div>
-    </article>
-
-    <article id="m2-force">
-        <span class="subject-tag tag-phy">ฟิสิกส์ ม.2</span>
-        <h2>แรงและการเคลื่อนที่ (Force and Motion)</h2>
-        
-        <h3>กฎการเคลื่อนที่ของนิวตัน 3 ข้อ</h3>
-        <ul class="detail-list">
-            <li><b>ข้อที่ 1 (กฎของความเฉื่อย):</b> $\Sigma F = 0$ วัตถุจะคงสภาพการเคลื่อนที่เดิม (หยุดนิ่งก็หยุดต่อไป, เคลื่อนที่ก็เคลื่อนด้วย v คงที่) หากไม่มีแรงลัพธ์มากระทำ</li>
-            <li><b>ข้อที่ 2 (กฎของความเร่ง):</b> $\Sigma F = ma$ หากมีแรงลัพธ์มากระทำ วัตถุจะมีความเร่ง (a) ในทิศเดียวกับแรง และแปรผกผันกับมวล</li>
-            <li><b>ข้อที่ 3 (กฎของแรงกิริยา-ปฏิกิริยา):</b> Action = Reaction แรงกระทำเท่ากับแรงถูกกระทำเสมอ (ขนาดเท่ากัน ทิศตรงข้าม เกิดขึ้นบนวัตถุคนละก้อน)</li>
-        </ul>
-
-        <h3>แรงเสียดทาน (Friction - f)</h3>
-        <p>แรงต้านการเคลื่อนที่ เกิดขึ้นบริเวณผิวสัมผัส แบ่งเป็น 2 ชนิด:
-        <br>1. <b>แรงเสียดทานสถิต ($f_s$):</b> เกิดขณะวัตถุ <u>ยังไม่เคลื่อนที่</u> (ค่าสูงสุดคือตอนที่กำลังจะเริ่มเคลื่อนที่)
-        <br>2. <b>แรงเสียดทานจลน์ ($f_k$):</b> เกิดขณะวัตถุ <u>กำลังเคลื่อนที่</u> ($f_k$ จะน้อยกว่า $f_s$ สูงสุดเสมอ)</p>
-        <div class="formula-block">
-            <div class="formula-eq">f = μN</div>
-            <div class="formula-desc">สูตรคำนวณแรงเสียดทาน</div>
-            <div style="margin-top:10px; font-size:13px; text-align:left; display:inline-block;">
-                μ (มิว) = สัมประสิทธิ์ความเสียดทาน (ขึ้นกับชนิดผิวสัมผัส)<br>
-                N = แรงปฏิกิริยาตั้งฉาก (ปกติบนพื้นราบ N = mg)
-            </div>
-        </div>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำเรื่องแรง</span>
-            <textarea id="note-m2-force"></textarea>
-        </div>
-    </article>
-
-    <article id="m3-elec">
-        <span class="subject-tag tag-phy">ฟิสิกส์ ม.3</span>
-        <h2>ไฟฟ้า (Electricity)</h2>
-        <p class="subtitle">วงจรไฟฟ้า กฎของโอห์ม และพลังงานไฟฟ้า</p>
-
-        <h3>กฎของโอห์ม (Ohm's Law)</h3>
-        <p>หัวใจสำคัญของการคำนวณวงจรไฟฟ้า: "กระแสไฟฟ้า (I) แปรผันตรงกับความต่างศักย์ (V) และแปรผกผันกับความต้านทาน (R)"</p>
-        <div class="formula-block">
-            <div class="formula-eq">V = IR</div>
-            <div class="formula-eq" style="font-size:20px; color:#cbd5e1; margin-top:10px;">P = IV = I²R = V²/R</div>
-            <div class="formula-desc">สูตรกฎของโอห์ม และ กำลังไฟฟ้า (Power)</div>
-        </div>
-
-        <h3>การต่อตัวต้านทาน (Resistors)</h3>
-        <table class="compare-table">
-            <thead>
-                <tr>
-                    <th>แบบอนุกรม (Series)</th>
-                    <th>แบบขนาน (Parallel)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>ต่อเรียงกันเป็นเส้นเดียว</td>
-                    <td>ต่อคร่อมจุดเดียวกัน (แยกไหล)</td>
-                </tr>
-                <tr>
-                    <td><b>I เท่ากัน</b> (กระแสไหลทางเดียว)</td>
-                    <td><b>V เท่ากัน</b> (ความต่างศักย์เท่าแหล่งกำเนิด)</td>
-                </tr>
-                <tr>
-                    <td>V แบ่งกัน ($V_{total} = V_1 + V_2$)</td>
-                    <td>I แบ่งกัน ($I_{total} = I_1 + I_2$)</td>
-                </tr>
-                <tr>
-                    <td>$R_{รวม} = R_1 + R_2 + ...$ (ความต้านทานเพิ่มขึ้น)</td>
-                    <td>$1/R_{รวม} = 1/R_1 + 1/R_2 + ...$ (ความต้านทานลดลง)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3>การคิดค่าไฟ (Electrical Energy Calculation)</h3>
-        <p>ค่าไฟคิดเป็น "หน่วย" (Unit) หรือ กิโลวัตต์-ชั่วโมง (kWh)</p>
-        <div class="knowledge-box chem">
-            <span class="box-title">สูตรคำนวณหน่วยค่าไฟ</span>
-            <b>จำนวนหน่วย (Unit) = (กำลังไฟฟ้า(วัตต์) ÷ 1000) × จำนวนชั่วโมงที่ใช้</b>
-            <br><br><i>ตัวอย่าง:</i> เปิดแอร์ 2000 วัตต์ นาน 5 ชั่วโมง
-            <br>Unit = (2000/1000) × 5 = 2 × 5 = 10 หน่วย
-        </div>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำไฟฟ้า</span>
-            <textarea id="note-m3-elec"></textarea>
-        </div>
-    </article>
-
-    <article id="m3-gene">
-        <span class="subject-tag tag-bio">ชีววิทยา ม.3</span>
-        <h2>พันธุศาสตร์ (Genetics)</h2>
-        <p class="subtitle">การถ่ายทอดลักษณะทางพันธุกรรม DNA และโครโมโซม</p>
-
-        <h3>ลำดับขนาด (จากเล็กไปใหญ่)</h3>
-        <p style="text-align: center; font-weight: bold; font-size: 18px; color: #059669;">
-            Base Pair → Gene → DNA → Chromosome → Nucleus → Cell
-        </p>
-        <ul class="detail-list">
-            <li><b>โครโมโซม (Chromosome):</b> ร่างกายมนุษย์ปกติมี 46 แท่ง (23 คู่) แบ่งเป็น ออโตโซม (คู่ที่ 1-22) และ โครโมโซมเพศ (คู่ที่ 23 - XX หญิง, XY ชาย)</li>
-            <li><b>ยีน (Gene):</b> ช่วงหนึ่งของสาย DNA ที่กำหนดลักษณะทางพันธุกรรม</li>
-            <li><b>อัลลีล (Allele):</b> รูปแบบของยีนที่เข้าคู่กัน (เช่น T คู่กับ t)</li>
-        </ul>
-
-        <h3>กฎของเมนเดล (Mendel's Laws)</h3>
-        <p>บิดาแห่งพันธุศาสตร์ ผู้ค้นพบว่าลักษณะต่างๆ ถูกควบคุมโดยยีนที่เป็นคู่ๆ
-        <br>- <b>Genotype (จีโนไทป์):</b> รูปแบบคู่ยีน เช่น TT (เด่นแท้), Tt (พันทาง/พาหะ), tt (ด้อยแท้)
-        <br>- <b>Phenotype (ฟีโนไทป์):</b> ลักษณะที่แสดงออกมาให้เห็น เช่น สูง, เตี้ย, ผมหยิก</p>
-
-        <div class="knowledge-box phy">
-            <span class="box-title">โรคทางพันธุกรรมที่ควรรู้</span>
-            <ul>
-                <li><b>ตาบอดสี / ฮีโมฟีเลีย / G6PD:</b> ยีนด้อยบนโครโมโซม X (ผู้ชายเป็นโรคง่ายกว่าผู้หญิง เพราะมี X ตัวเดียว)</li>
-                <li><b>ธาลัสซีเมีย / ผิวเผือก:</b> ยีนด้อยบนออโตโซม (ชายหญิงโอกาสเป็นเท่ากัน)</li>
-                <li><b>ดาวน์ซินโดรม:</b> โครโมโซมคู่ที่ 21 เกินมา 1 แท่ง (Trisomy 21)</li>
-            </ul>
-        </div>
-
-        <div class="sticky-note">
-            <span class="note-label">📝 บันทึกช่วยจำพันธุศาสตร์</span>
-            <textarea id="note-m3-gene"></textarea>
-        </div>
-    </article>
-
-    <div style="height: 100px;"></div>
-</main>
-
-<div id="highlighter-menu">
-    <div class="pen-color bg-y" onclick="applyHighlight('hl-y')" title="สีเหลือง (ข้อควรจำ)"></div>
-    <div class="pen-color bg-g" onclick="applyHighlight('hl-g')" title="สีเขียว (นิยาม)"></div>
-    <div class="pen-color bg-b" onclick="applyHighlight('hl-b')" title="สีฟ้า (ตัวอย่าง)"></div>
-    <div class="pen-color bg-p" onclick="applyHighlight('hl-p')" title="สีชมพู (ออกสอบ)"></div>
-    <div style="color:white; cursor:pointer; padding:0 5px; font-size:14px; display:flex; align-items:center;" onclick="removeHighlight()">
-        <i class="fa-solid fa-eraser"></i>
+        <div id="qa-container"></div>
     </div>
-</div>
 
-<div class="fab-wrapper">
-    <button class="fab danger" onclick="resetData()" title="ล้างข้อมูล"><i class="fa-solid fa-rotate-right"></i></button>
-    <button class="fab" onclick="exportData()" title="บันทึกไฟล์"><i class="fa-solid fa-save"></i></button>
-</div>
+    <script>
+        let currentRole = '';
+        let recorders = {}; // เก็บตัวอัดเสียง
+        let audioChunks = {}; // เก็บข้อมูลเสียง
 
-<script>
-    // --- 1. Highlighter System ---
-    const contentArea = document.getElementById('content-container');
-    const menu = document.getElementById('highlighter-menu');
-    let currentRange = null;
+        const sportsDB = {
+            football: { name: "Football", read: "ฟุต-บอล", player: "Cristiano Ronaldo", readP: "คริส-เตีย-โน โร-นัล-โด" },
+            badminton: { name: "Badminton", read: "แบด-มิน-ตัน", player: "Ratchanok Intanon", readP: "รัช-ชะ-นก อิน-ทะ-นน" },
+            volleyball: { name: "Volleyball", read: "วอล-เลย์-บอล", player: "Nootsara Tomkom", readP: "นุศ-รา ต้อม-คำ" },
+            basketball: { name: "Basketball", read: "บาส-เกต-บอล", player: "LeBron James", readP: "เลอ-บรอน เจมส์" },
+            swimming: { name: "Swimming", read: "สวิม-มิ่ง", player: "Michael Phelps", readP: "ไม-เคิล เฟลป์ส" },
+            boxing: { name: "Boxing", read: "บ็อก-ซิ่ง", player: "Buakaw", readP: "บัว-ขาว" }
+        };
 
-    document.addEventListener('mouseup', (e) => {
-        const sel = window.getSelection();
-        if (sel.toString().length > 0 && contentArea.contains(sel.anchorNode)) {
-            const range = sel.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
+        const questions = [
+            { id: "Q1", q: "What sport do you play?", q_r: "วอท สปอร์ต ดู ยู เพลย์?", a: d => `I play ${d.name}.`, a_r: d => `ไอ เพลย์ ${d.read}` },
+            { id: "Q2", q: "Why do you like it?", q_r: "วาย ดู ยู ไลค์ อิท?", a: d => `Because it is fun.`, a_r: d => `บี-คอส อิท อีส ฟัน` },
+            { id: "Q3", q: "Have you ever competed?", q_r: "แฮฟ ยู เอเวอร์ คอม-พีท-เท็ด?", a: d => `Yes, I have.`, a_r: d => `เยส, ไอ แฮฟ` },
+            { id: "Q4", q: "Who is your favorite player?", q_r: "ฮู อีส ยัวร์ เฟ-เวอ-ริท เพลย์-เยอร์?", a: d => `My favorite player is ${d.player}.`, a_r: d => `มาย เฟ-เวอ-ริท เพลย์-เยอร์ อีส ${d.readP}` },
+            { id: "Q5", q: "What is the benefit?", q_r: "วอท อีส เดอะ เบ-เน-ฟิต?", a: d => `It keeps me healthy.`, a_r: d => `อิท คีพส์ มี เฮล-ตี้` }
+        ];
+
+        function setRole(role) {
+            currentRole = role;
+            document.getElementById('btnAsk').className = role === 'ask' ? 'btn-role active-ask' : 'btn-role';
+            document.getElementById('btnAns').className = role === 'ans' ? 'btn-role active-ans' : 'btn-role';
+            document.getElementById('sport-selector-box').style.display = 'block';
+            renderContent();
+        }
+
+        function renderContent() {
+            const sportKey = document.getElementById('sportSelect').value;
+            const container = document.getElementById('qa-container');
             
-            // Show menu above selection
-            menu.style.display = 'flex';
-            menu.style.top = (rect.top + window.scrollY - 45) + 'px';
-            menu.style.left = (rect.left + rect.width/2 - 50) + 'px';
-            currentRange = range;
-        } else if (!menu.contains(e.target)) {
-            menu.style.display = 'none';
-        }
-    });
+            if (!currentRole || !sportKey) { container.innerHTML = ''; return; }
 
-    function applyHighlight(colorClass) {
-        if (!currentRange) return;
-        try {
-            const span = document.createElement('span');
-            span.className = colorClass;
-            currentRange.surroundContents(span);
-            window.getSelection().removeAllRanges();
-            menu.style.display = 'none';
-            saveContent();
-        } catch (err) {
-            alert('ไม่สามารถไฮไลท์ข้ามย่อหน้าหรือบล็อกได้ กรุณาเลือกทีละส่วน');
-        }
-    }
+            container.innerHTML = '';
+            container.className = currentRole === 'ask' ? 'mode-ask' : 'mode-ans';
+            const data = sportsDB[sportKey];
 
-    function removeHighlight() {
-        // Simple removal: Need user to select the highlighted text again
-        // Or simpler for this demo: Command exec
-        document.execCommand('removeFormat');
-        menu.style.display = 'none';
-        saveContent();
-    }
+            questions.forEach((item, index) => {
+                const qText = item.q;
+                const aText = item.a(data);
 
-    // --- 2. Note System ---
-    function initNotes() {
-        document.querySelectorAll('textarea').forEach(area => {
-            // Load
-            const saved = localStorage.getItem(area.id);
-            if(saved) area.value = saved;
-            // Save on type
-            area.addEventListener('input', () => {
-                localStorage.setItem(area.id, area.value);
+                // สร้างชื่อไฟล์สำหรับการบันทึก (sanitize ตัดช่องว่างออก)
+                const fNameQ = `${item.id}_Question_${qText.replace(/[^a-zA-Z0-9]/g, '_')}`;
+                const fNameA = `${item.id}_Answer_${data.name}`;
+
+                const card = document.createElement('div');
+                card.className = 'qa-card';
+                card.innerHTML = `
+                    <div class="section section-q">
+                        <span class="label-badge badge-q">คำถามข้อที่ ${index + 1}</span>
+                        <div class="eng-text">${qText}</div>
+                        <div class="thai-read">อ่าน: ${item.q_r}</div>
+                        <div class="recorder-controls">
+                            <button class="btn-rec-start" id="btn-start-q-${index}" onclick="startRecord(${index}, 'q', '${fNameQ}')">
+                                🎙️ อัดเสียง
+                            </button>
+                            <button class="btn-rec-stop" id="btn-stop-q-${index}" onclick="stopRecord(${index}, 'q')">
+                                ⏹️ หยุดและบันทึก
+                            </button>
+                            <span class="status-text" id="status-q-${index}"></span>
+                        </div>
+                    </div>
+
+                    <div class="section section-a">
+                        <span class="label-badge badge-a">แนวทางคำตอบ</span>
+                        <div class="eng-text">${aText}</div>
+                        <div class="thai-read">อ่าน: ${item.a_r(data)}</div>
+                        <div class="recorder-controls">
+                            <button class="btn-rec-start" id="btn-start-a-${index}" onclick="startRecord(${index}, 'a', '${fNameA}')">
+                                🎙️ อัดเสียง
+                            </button>
+                            <button class="btn-rec-stop" id="btn-stop-a-${index}" onclick="stopRecord(${index}, 'a')">
+                                ⏹️ หยุดและบันทึก
+                            </button>
+                            <span class="status-text" id="status-a-${index}"></span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
             });
-        });
-    }
-
-    // --- 3. Data Persistence ---
-    function saveContent() {
-        localStorage.setItem('science_pro_html', contentArea.innerHTML);
-    }
-
-    function loadContent() {
-        const html = localStorage.getItem('science_pro_html');
-        if (html) {
-            contentArea.innerHTML = html;
-            initNotes(); // Re-bind events because HTML was replaced
         }
-    }
 
-    function resetData() {
-        if(confirm('ต้องการล้างไฮไลท์และโน้ตทั้งหมดหรือไม่? (กู้คืนไม่ได้)')) {
-            localStorage.clear();
-            location.reload();
+        // --- ระบบอัดเสียง ---
+
+        async function startRecord(index, type, filename) {
+            const id = `${index}-${type}`;
+            const btnStart = document.getElementById(`btn-start-${id}`);
+            const btnStop = document.getElementById(`btn-stop-${id}`);
+            const status = document.getElementById(`status-${id}`);
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                recorders[id] = new MediaRecorder(stream);
+                audioChunks[id] = [];
+                recorders[id].filename = filename; // ฝากชื่อไฟล์ไว้
+
+                recorders[id].ondataavailable = e => audioChunks[id].push(e.data);
+
+                recorders[id].onstop = () => {
+                    const blob = new Blob(audioChunks[id], { type: 'audio/wav' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // สร้าง Link เพื่อดาวน์โหลดอัตโนมัติ
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `${recorders[id].filename}.wav`;
+                    document.body.appendChild(a);
+                    a.click(); // สั่งกดโหลดทันที
+                    
+                    // Cleanup
+                    window.URL.revokeObjectURL(url);
+                    status.innerText = "✅ บันทึกแล้ว!";
+                    setTimeout(() => status.innerText = "", 3000);
+                };
+
+                recorders[id].start();
+
+                // UI Changes
+                btnStart.innerHTML = "กำลังอัด...";
+                btnStart.classList.add('recording');
+                btnStop.style.display = "flex"; // โชว์ปุ่มหยุด
+                status.innerText = "🔴 กำลังบันทึกเสียง...";
+
+            } catch (err) {
+                alert("ไม่สามารถใช้ไมค์ได้ (บน iPhone ต้องเปิดผ่านลิงก์เว็บ HTTPS เท่านั้น)");
+                console.error(err);
+            }
         }
-    }
 
-    function exportData() {
-        alert('ข้อมูลถูกบันทึกใน Browser อัตโนมัติแล้ว! \nหากต้องการเซฟเป็นไฟล์ ให้กด Ctrl+S เพื่อบันทึกหน้าเว็บนี้เก็บไว้');
-    }
+        function stopRecord(index, type) {
+            const id = `${index}-${type}`;
+            const btnStart = document.getElementById(`btn-start-${id}`);
+            const btnStop = document.getElementById(`btn-stop-${id}`);
 
-    // Initialize
-    window.addEventListener('DOMContentLoaded', () => {
-        loadContent();
-        initNotes();
-        
-        // Add note listeners in case of fresh load
-        document.querySelectorAll('textarea').forEach(area => {
-            area.addEventListener('input', () => localStorage.setItem(area.id, area.value));
-        });
-    });
-
-</script>
+            if (recorders[id] && recorders[id].state !== 'inactive') {
+                recorders[id].stop();
+                
+                // Reset UI
+                btnStart.innerHTML = "🎙️ อัดเสียงใหม่";
+                btnStart.classList.remove('recording');
+                btnStop.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>
