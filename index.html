@@ -3,380 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สัมภาษณ์กีฬา T.sabila </title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <title>Admin Panel - จัดการหลังบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        :root {
-            --primary: #2563eb; /* Blue */
-            --secondary: #059669; /* Green */
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-        }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-main);
-            padding-bottom: 80px;
-        }
-
-        .container { max-width: 700px; margin: 0 auto; }
-
-        /* HEADER */
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        h1 { font-family: 'Prompt', sans-serif; color: var(--primary); margin: 0; font-size: 24px; }
-        .subtitle { font-size: 14px; color: #64748b; margin-top: 5px; }
-
-        /* SCREENS TRANSITION */
-        .screen { display: none; animation: slideUp 0.4s ease-out; }
-        .screen.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* GRID BUTTONS (ROLE & SPORT) */
-        .grid-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .card-btn {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-
-        .card-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
-        .card-btn:active { transform: scale(0.98); }
-
-        .icon { font-size: 40px; display: block; margin-bottom: 10px; }
-        .label { font-size: 18px; font-weight: bold; font-family: 'Prompt', sans-serif; color: #334155; }
-
-        /* AUDIO CONTROLS (NEW) */
-        .audio-controls {
-            background: white;
-            padding: 10px;
-            border-radius: 50px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .speed-btn {
-            border: none;
-            background: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            color: #64748b;
-            transition: 0.2s;
-        }
-        .speed-btn.active {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-        }
-
-        /* QA CARDS (IMPROVED UI) */
-        .qa-card {
-            background: white;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .section {
-            padding: 20px;
-            position: relative;
-        }
-
-        /* แยกสีชัดเจน */
-        .section-q {
-            background: linear-gradient(to right, #eff6ff, #ffffff);
-            border-left: 6px solid var(--primary);
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .section-a {
-            background: linear-gradient(to right, #f0fdf4, #ffffff);
-            border-left: 6px solid var(--secondary);
-        }
-
-        /* Text Styling */
-        .role-badge {
-            font-size: 12px;
-            font-weight: bold;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            display: inline-block;
-            text-transform: uppercase;
-        }
-        .badge-q { background: #dbeafe; color: #1e40af; }
-        .badge-a { background: #d1fae5; color: #065f46; }
-
-        .eng-text {
-            font-family: 'Prompt', sans-serif;
-            font-size: 20px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 8px;
-            line-height: 1.5;
-            padding-right: 50px; /* เว้นที่ให้ปุ่ม copy */
-        }
-
-        .thai-read {
-            color: #d97706;
-            font-size: 16px;
-            font-style: italic;
-            margin-bottom: 5px;
-        }
-
-        /* Action Buttons (Sound & Copy) */
-        .action-area {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .btn-action {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            background: white;
-            cursor: pointer;
-            font-size: 14px;
-            color: #475569;
-            transition: 0.2s;
-        }
+        body { font-family: 'Prompt', sans-serif; background: #1e293b; color: white; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
         
-        .btn-action:hover { background: #f1f5f9; color: var(--primary); border-color: var(--primary); }
-        .btn-sound { font-weight: bold; }
-
-        /* Back Button */
-        .top-nav { display: flex; align-items: center; margin-bottom: 15px; }
-        .btn-back {
-            background: none; border: none; font-size: 16px; 
-            color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 5px;
-        }
-        .btn-back:hover { color: var(--primary); }
-
-        /* Fading logic for Roles */
-        .mode-ask .section-a { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
-        .mode-ans .section-q { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
-
+        .card { background: #334155; padding: 20px; border-radius: 12px; margin-bottom: 15px; }
+        .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; }
+        
+        .task-list { background: #0f172a; padding: 15px; border-radius: 8px; margin-top: 10px; }
+        .task-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+        .task-item:last-child { border-bottom: none; }
+        
+        .btn-del { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .bg-green { background: #10b981; }
+        .bg-red { background: #ef4444; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <header>
-            <h1>สัมภาษณ์กีฬา T.sabila</h1>
-            <div class="subtitle">พูดให้ชัด ลิ้นอย่าพัน</div>
-        </header>
-
-        <div id="screen-role" class="screen active">
-            <h3 style="text-align:center; color:#64748b;">เลือกบทบาท (Choose Role)</h3>
-            <div class="grid-box">
-                <div class="card-btn" onclick="selectRole('ask')" style="border-bottom: 5px solid var(--primary);">
-                    <span class="icon">🎤</span>
-                    <span class="label">คนถาม (Interviewer)</span>
-                </div>
-                <div class="card-btn" onclick="selectRole('ans')" style="border-bottom: 5px solid var(--secondary);">
-                    <span class="icon">🏆</span>
-                    <span class="label">คนตอบ (Interviewee)</span>
-                </div>
-            </div>
+        <div class="header">
+            <h2><i class="fa-solid fa-user-secret"></i> แอดมินคอนโซล</h2>
+            <button onclick="checkData()" style="padding:10px; border-radius:8px; cursor:pointer;">รีเฟรชข้อมูล</button>
         </div>
 
-        <div id="screen-sport" class="screen">
-            <div class="top-nav">
-                <button class="btn-back" onclick="goBack('role')">⬅ กลับไปเลือกบทบาท</button>
-            </div>
-            <h3 style="text-align:center; color:#64748b;">เลือกกีฬา (Select Sport)</h3>
-            <div class="grid-box" id="sport-grid">
-                </div>
-        </div>
-
-        <div id="screen-qa" class="screen">
-            <div class="top-nav" style="justify-content: space-between;">
-                <button class="btn-back" onclick="goBack('sport')">⬅ เปลี่ยนกีฬา</button>
-            </div>
-
-            <div class="audio-controls">
-                <span style="display:flex; align-items:center; font-size:14px; margin-right:5px;">ความเร็วเสียง:</span>
-                <button class="speed-btn" id="spd-slow" onclick="setSpeed(0.7)">🐢 ช้า (Slow)</button>
-                <button class="speed-btn active" id="spd-normal" onclick="setSpeed(1.0)">🐇 ปกติ (Normal)</button>
-            </div>
-            
-            <div id="qa-container"></div>
-        </div>
+        <div id="loading" style="text-align:center;">กำลังโหลดข้อมูลจาก Firebase...</div>
+        <div id="content-area"></div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
     <script>
-        // --- DATA ---
-        const sportsDB = {
-            football: { icon: "⚽", name: "Football", read: "ฟุต-บอล", athletes: [{n:"Cristiano Ronaldo",r:"คริส-เตีย-โน โร-นัล-โด"}, {n:"Lionel Messi",r:"ลิ-โอ-เนล เมส-ซี่"}] },
-            badminton: { icon: "🏸", name: "Badminton", read: "แบด-มิน-ตัน", athletes: [{n:"Ratchanok Intanon",r:"รัช-ชะ-นก อิน-ทะ-นน"}, {n:"Viktor Axelsen",r:"วิก-เตอร์ แอ็ก-เซล-เซน"}] },
-            volleyball: { icon: "🏐", name: "Volleyball", read: "วอล-เลย์-บอล", athletes: [{n:"Nootsara Tomkom",r:"นุศ-รา ต้อม-คำ"}, {n:"Gabi",r:"กา-บี้"}] },
-            basketball: { icon: "🏀", name: "Basketball", read: "บาส-เกต-บอล", athletes: [{n:"LeBron James",r:"เลอ-บรอน เจมส์"}, {n:"Stephen Curry",r:"สเต-เฟน เคอร์-รี่"}] },
-            swimming: { icon: "🏊", name: "Swimming", read: "สวิม-มิ่ง", athletes: [{n:"Michael Phelps",r:"ไม-เคิล เฟลป์ส"}, {n:"Katie Ledecky",r:"เค-ตี้ เล-เด็ค-กี้"}] },
-            boxing: { icon: "🥊", name: "Boxing", read: "บ็อก-ซิ่ง", athletes: [{n:"Buakaw",r:"บัว-ขาว"}, {n:"Manny Pacquiao",r:"แมน-นี่ ปา-เกียว"}] }
+        // --- 1. CONFIG (เอาอันเดิมของคุณมาใส่ตรงนี้นะครับ!!) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
+            authDomain: "chat-27f96.firebaseapp.com",
+            projectId: "chat-27f96",
+            storageBucket: "chat-27f96.firebasestorage.app",
+            messagingSenderId: "336686938010",
+            appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23",
+            measurementId: "G-GR38B5JHZZ"
         };
+        
+        // เริ่มต้น Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
-        // คำถามและคำตอบ (ปรับปรุงให้ยาวขึ้นตามคำขอ)
-        const questions = [
-            { 
-                q: "What sport do you play?", 
-                q_r: "วอท สปอร์ต ดู ยู เพลย์?", 
-                // A: I play [Sport]. It is my favorite sport.
-                a: d => `I play ${d.name}. It is my favorite sport.`, 
-                a_r: d => `ไอ เพลย์ ${d.read}. อิท อีส มาย เฟ-เวอ-ริท สปอร์ต.` 
-            },
-            { 
-                q: "Why do you like it?", 
-                q_r: "วาย ดู ยู ไลค์ อิท?", 
-                // A: Because it is fun and exciting to play with my friends.
-                a: d => `Because it is fun and exciting to play with my friends.`, 
-                a_r: d => `บี-คอส อิท อีส ฟัน แอนด์ เอ็ก-ไซ-ติ้ง ทู เพลย์ วิธ มาย เฟรนด์ส.` 
-            },
-            { 
-                q: "Have you ever competed in a match?", 
-                q_r: "แฮฟ ยู เอเวอร์ คอม-พีท-เท็ด อิน อะ แมทช์?", 
-                // A: Yes, I have joined the school team and competed last year.
-                a: d => `Yes, I have joined the school team and competed last year.`, 
-                a_r: d => `เยส, ไอ แฮฟ จอยด์ เดอะ สคูล ทีม แอนด์ คอม-พีท-เท็ด ลาสท์ เยียร์.` 
-            },
-            { 
-                q: "Who is your favorite player?", 
-                q_r: "ฮู อีส ยัวร์ เฟ-เวอ-ริท เพลย์-เยอร์?", 
-                // A: My idol is [Name]. They are very talented and inspiring.
-                a: d => `My idol is ${d.athName}. They are very talented and inspiring.`, 
-                a_r: d => `มาย ไอ-ดอล อีส ${d.athRead}. เดย์ อาร์ เว-รี่ ทา-เลน-เท็ด แอนด์ อิน-สไป-ริง.` 
-            },
-            { 
-                q: "What is the benefit of this sport?", 
-                q_r: "วอท อีส เดอะ เบ-เน-ฟิต ออฟ ดิส สปอร์ต?", 
-                // A: It helps me keep my body strong, healthy, and fit.
-                a: d => `It helps me keep my body strong, healthy, and fit.`, 
-                a_r: d => `อิท เฮลป์ส มี คีพ มาย บอดี้ สตรอง, เฮล-ตี้, แอนด์ ฟิต.` 
+        // --- Logic ดึงข้อมูลทั้งหมด ---
+        async function checkData() {
+            const content = document.getElementById('content-area');
+            const loading = document.getElementById('loading');
+            content.innerHTML = '';
+            loading.style.display = 'block';
+
+            try {
+                // 1. ดึงรายชื่อ User ทั้งหมด
+                const usersSnap = await db.collection('users').get();
+                
+                if (usersSnap.empty) {
+                    loading.style.display = 'none';
+                    content.innerHTML = '<p>ยังไม่มีผู้ใช้งาน</p>';
+                    return;
+                }
+
+                // 2. วนลูป User แต่ละคนเพื่อดึงงาน
+                for (const userDoc of usersSnap.docs) {
+                    const user = userDoc.data();
+                    const userId = userDoc.id;
+
+                    // ดึงงานของ User คนนี้
+                    const tasksSnap = await db.collection('homeworks').doc(userId).collection('items').get();
+                    
+                    let taskHTML = '<div class="task-list">';
+                    if(tasksSnap.empty) {
+                        taskHTML += '<div style="padding:10px; color:#64748b;">- ไม่มีรายการงาน -</div>';
+                    } else {
+                        tasksSnap.forEach(taskDoc => {
+                            const t = taskDoc.data();
+                            taskHTML += `
+                                <div class="task-item">
+                                    <span>${t.subject} (${t.content})</span>
+                                    <div>
+                                        <span class="badge ${t.isCompleted ? 'bg-green' : 'bg-red'}">
+                                            ${t.isCompleted ? 'เสร็จ' : 'ค้าง'}
+                                        </span>
+                                        <button class="btn-del" onclick="adminDelete('${userId}', '${taskDoc.id}')">ลบ</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    taskHTML += '</div>';
+
+                    // สร้าง Card ผู้ใช้
+                    const userCard = document.createElement('div');
+                    userCard.className = 'card';
+                    userCard.innerHTML = `
+                        <div class="user-header">
+                            <img src="${user.photoURL}" class="avatar">
+                            <div>
+                                <div style="font-weight:bold; font-size:1.1rem;">${user.username}</div>
+                                <div style="font-size:0.8rem; color:#94a3b8;">${user.email}</div>
+                            </div>
+                        </div>
+                        ${taskHTML}
+                    `;
+                    content.appendChild(userCard);
+                }
+                loading.style.display = 'none';
+
+            } catch (error) {
+                loading.innerText = 'เกิดข้อผิดพลาด: ' + error.message;
+                console.error(error);
             }
-        ];
-
-        let state = { role: null, sport: null, speed: 1.0 };
-
-        // --- SETUP ---
-        // สร้างปุ่มเลือกกีฬา
-        const grid = document.getElementById('sport-grid');
-        for (const k in sportsDB) {
-            grid.innerHTML += `
-                <div class="card-btn" onclick="selectSport('${k}')">
-                    <span class="icon">${sportsDB[k].icon}</span>
-                    <span class="label">${sportsDB[k].name}</span>
-                </div>`;
         }
 
-        // --- NAVIGATION ---
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        // ฟังก์ชันลบงาน (ในฐานะแอดมิน)
+        async function adminDelete(userId, taskId) {
+            if(confirm('แอดมินต้องการลบงานนี้ใช่ไหม?')) {
+                await db.collection('homeworks').doc(userId).collection('items').doc(taskId).delete();
+                alert('ลบเรียบร้อย');
+                checkData(); // รีโหลดหน้าจอ
+            }
         }
 
-        function selectRole(role) { state.role = role; switchScreen('screen-sport'); }
-        function goBack(target) { 
-            if(target==='role') switchScreen('screen-role');
-            if(target==='sport') switchScreen('screen-sport');
-        }
+        // เริ่มทำงานทันที
+        checkData();
 
-        function selectSport(key) {
-            state.sport = key;
-            renderQA();
-            switchScreen('screen-qa');
-        }
-
-        // --- RENDER CONTENT ---
-        function renderQA() {
-            const container = document.getElementById('qa-container');
-            container.innerHTML = '';
-            container.className = state.role === 'ask' ? 'mode-ask' : 'mode-ans'; // Class for fading
-
-            const sData = sportsDB[state.sport];
-            const randAth = sData.athletes[Math.floor(Math.random() * sData.athletes.length)];
-            const d = { name: sData.name, read: sData.read, athName: randAth.n, athRead: randAth.r };
-
-            questions.forEach((item, i) => {
-                const a_txt = item.a(d);
-                const a_rd = item.a_r(d);
-
-                container.innerHTML += `
-                    <div class="qa-card">
-                        <div class="section section-q">
-                            <span class="role-badge badge-q">คำถาม (Question)</span>
-                            <div class="eng-text" id="q-txt-${i}">${item.q}</div>
-                            <div class="thai-read">อ่าน: ${item.q_r}</div>
-                            <div class="action-area">
-                                <button class="btn-action btn-sound" onclick="speak('${item.q.replace(/'/g, "\\'")}')">🔊 ฟังเสียง</button>
-                                <button class="btn-action" onclick="copyText('q-txt-${i}')">📋 คัดลอก</button>
-                            </div>
-                        </div>
-                        <div class="section section-a">
-                            <span class="role-badge badge-a">คำตอบ (Answer)</span>
-                            <div class="eng-text" id="a-txt-${i}">${a_txt}</div>
-                            <div class="thai-read">อ่าน: ${a_rd}</div>
-                            <div class="action-area">
-                                <button class="btn-action btn-sound" onclick="speak('${a_txt.replace(/'/g, "\\'")}')">🔊 ฟังเสียง</button>
-                                <button class="btn-action" onclick="copyText('a-txt-${i}')">📋 คัดลอก</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // --- AUDIO & UTILS ---
-        function setSpeed(rate) {
-            state.speed = rate;
-            // Update UI buttons
-            document.getElementById('spd-slow').classList.toggle('active', rate === 0.7);
-            document.getElementById('spd-normal').classList.toggle('active', rate === 1.0);
-        }
-
-        function speak(text) {
-            window.speechSynthesis.cancel(); // Stop previous
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'en-US';
-            u.rate = state.speed; // Use selected speed
-            u.pitch = 1.0;
-            window.speechSynthesis.speak(u);
-        }
-
-        function copyText(id) {
-            const txt = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(txt).then(() => alert("คัดลอกแล้ว!"));
-        }
     </script>
 </body>
 </html>
