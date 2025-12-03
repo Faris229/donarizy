@@ -3,141 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Commander | ควบคุมระบบ</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin Command | จัดการคำร้อง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --sidebar-bg: #0f172a;
-            --main-bg: #f1f5f9;
-            --primary: #4f46e5;
-            --success: #10b981;
-            --danger: #ef4444;
-            --card-bg: #ffffff;
-        }
-        body { font-family: 'Prompt', sans-serif; background: var(--main-bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        * { box-sizing: border-box; }
-
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--sidebar-bg); color: #94a3b8; padding: 20px; display: flex; flex-direction: column; }
-        .brand { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .menu-item { padding: 12px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; }
-
-        /* Content */
-        .main { flex: 1; padding: 30px; overflow-y: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        body { font-family: 'Prompt', sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .req-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
+        .type-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; }
+        .type-reset { background: #fee2e2; color: #ef4444; } /* สีแดงสำหรับรีเซ็ตรหัส */
+        .type-issue { background: #e0f2fe; color: #0284c7; } /* สีฟ้าสำหรับแจ้งปัญหา */
         
-        /* Cards & Forms */
-        .card { background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; }
-        
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
-        .btn-primary { background: var(--primary); }
-        .btn-success { background: var(--success); }
-        .btn-danger { background: var(--danger); }
-        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        /* Table */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: 16px; max-height: 80vh; overflow-y: auto; }
-
-        /* Login */
-        #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+        .action-area { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+        button { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; color: white; }
+        .btn-reply { background: #4f46e5; }
+        .btn-reset { background: #10b981; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2 style="margin-bottom:20px; color:var(--sidebar-bg);">Admin Login</h2>
-            <input type="email" id="admin-email" placeholder="Email" style="margin-bottom:10px;">
-            <input type="password" id="admin-pass" placeholder="Password" style="margin-bottom:20px;">
-            <button class="btn btn-primary" style="width:100%;" onclick="adminLogin()">เข้าสู่ระบบ</button>
-        </div>
-    </div>
-
-    <div id="app-panel" style="display:none; width:100%; height:100%;">
-        <aside class="sidebar">
-            <div class="brand"><i class="fa-solid fa-user-secret"></i> Commander</div>
-            <div class="menu-item active" onclick="switchTab('users', this)"><i class="fa-solid fa-users"></i> จัดการผู้ใช้</div>
-            <div class="menu-item" onclick="switchTab('web', this)"><i class="fa-solid fa-globe"></i> ตั้งค่าเว็บไซต์</div>
-            <div style="margin-top:auto;">
-                <button class="btn btn-danger" style="width:100%;" onclick="auth.signOut()">ออกจากระบบ</button>
-            </div>
-        </aside>
-
-        <main class="main">
-            <div class="header">
-                <h2 id="page-title">จัดการผู้ใช้</h2>
-                <span id="admin-name" style="color:var(--primary);">...</span>
-            </div>
-
-            <div id="tab-users">
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                        <h3>รายชื่อสมาชิก</h3>
-                        <button class="btn btn-primary" onclick="loadUsers()">รีเฟรช</button>
-                    </div>
-                    <div style="overflow-x:auto;">
-                        <table id="user-table">
-                            <thead><tr><th>User</th><th>Email</th><th>Actions</th></tr></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-web" style="display:none;">
-                <div class="card">
-                    <h3>📢 ประกาศหน้าเว็บ (Announcement)</h3>
-                    <div class="input-group">
-                        <label>ข้อความประกาศ (แจ้งเตือนผู้ใช้ทุกคน)</label>
-                        <textarea id="web-announce" rows="3" placeholder="เช่น ปิดปรับปรุงระบบ, อย่าลืมส่งงาน..."></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>สถานะประกาศ</label>
-                        <select id="web-announce-active">
-                            <option value="true">เปิดใช้งาน</option>
-                            <option value="false">ปิด</option>
-                        </select>
-                    </div>
-                    <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
-                    <h3>🏠 ตั้งค่าหน้าแรก</h3>
-                    <div class="input-group">
-                        <label>ข้อความต้อนรับ (Header)</label>
-                        <input type="text" id="web-welcome" placeholder="เช่น ยินดีต้อนรับสู่...">
-                    </div>
-                    <button class="btn btn-success" onclick="saveWebConfig()">บันทึกการตั้งค่า</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="task-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <h3>งานของผู้ใช้</h3>
-                <button onclick="document.getElementById('task-modal').classList.remove('active')" style="background:none; border:none; font-size:1.5rem;">&times;</button>
-            </div>
-            <div id="task-list"></div>
-        </div>
+    <div class="container">
+        <h2>📥 กล่องข้อความ & คำร้องเรียน</h2>
+        <div id="request-list">กำลังโหลด...</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         const firebaseConfig = {
@@ -154,123 +49,70 @@
         const db = firebase.firestore();
 
         auth.onAuthStateChanged(user => {
-            if(user) {
-                document.getElementById('login-screen').style.display='none';
-                document.getElementById('app-panel').style.display='flex';
-                document.getElementById('admin-name').innerText = user.email;
-                loadUsers();
-                loadWebConfig();
-            } else {
-                document.getElementById('login-screen').style.display='flex';
-            }
+            if(!user) { alert('กรุณาล็อกอินหน้าบ้านก่อน'); window.location.href='index.html'; }
+            else loadRequests();
         });
 
-        async function adminLogin(){
-            try {
-                await auth.signInWithEmailAndPassword(document.getElementById('admin-email').value, document.getElementById('admin-pass').value);
-            } catch(e){ Swal.fire('Error', e.message, 'error'); }
-        }
+        function loadRequests() {
+            db.collection('reports').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                const div = document.getElementById('request-list');
+                div.innerHTML = '';
+                if(snap.empty) { div.innerHTML = 'ไม่มีรายการใหม่'; return; }
 
-        // --- USERS ---
-        async function loadUsers() {
-            const tbody = document.querySelector('#user-table tbody');
-            tbody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
-            try {
-                const snap = await db.collection('users').get();
-                tbody.innerHTML = '';
                 snap.forEach(doc => {
-                    const u = doc.data();
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${u.username || 'No Name'}</td>
-                        <td>${u.email}</td>
-                        <td>
-                            <button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="viewTasks('${doc.id}')">ดูงาน</button>
-                            <button class="btn btn-success" style="padding:5px 10px; font-size:0.8rem;" onclick="resetPass('${u.email}')">แก้รหัส</button>
-                            <button class="btn btn-danger" style="padding:5px 10px; font-size:0.8rem;" onclick="delUser('${doc.id}')">ลบ</button>
-                        </td>
+                    const r = doc.data();
+                    const isReset = r.type === 'reset_password';
+                    
+                    let actionHtml = '';
+                    if(isReset && r.status !== 'done') {
+                        actionHtml = `<button class="btn-reset" onclick="performReset('${doc.id}', '${r.email}')">📧 ส่งลิงก์รีเซ็ตให้ผู้ใช้</button>`;
+                    } else if (!isReset && r.status !== 'done') {
+                        actionHtml = `
+                            <input type="text" id="reply-${doc.id}" placeholder="พิมพ์ตอบกลับ...">
+                            <button class="btn-reply" onclick="sendReply('${doc.id}')">ตอบกลับ</button>
+                        `;
+                    } else {
+                        actionHtml = '<span style="color:green;">ดำเนินการเรียบร้อยแล้ว ✅</span>';
+                    }
+
+                    div.innerHTML += `
+                        <div class="card">
+                            <div class="req-header">
+                                <span class="type-badge ${isReset ? 'type-reset' : 'type-issue'}">${isReset ? 'ลืมรหัสผ่าน' : 'แจ้งปัญหา'}</span>
+                                <small>${r.timestamp ? new Date(r.timestamp.seconds*1000).toLocaleString() : ''}</small>
+                            </div>
+                            <div><b>User:</b> ${r.email}</div>
+                            <div style="margin-top:5px;"><b>รายละเอียด:</b> ${r.message}</div>
+                            <div class="action-area">
+                                ${actionHtml}
+                            </div>
+                        </div>
                     `;
-                    tbody.appendChild(tr);
                 });
-            } catch(e) { tbody.innerHTML = `<tr><td colspan="3" style="color:red;">Error: Check Rules</td></tr>`; }
-        }
-
-        async function viewTasks(uid) {
-            document.getElementById('task-modal').classList.add('active');
-            const box = document.getElementById('task-list');
-            box.innerHTML = 'Loading...';
-            const snap = await db.collection('homeworks').doc(uid).collection('items').get();
-            box.innerHTML = '';
-            if(snap.empty) box.innerHTML = 'ไม่มีงาน';
-            snap.forEach(doc => {
-                const t = doc.data();
-                box.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                    <span><b>${t.subject}</b>: ${t.content}</span>
-                    <span onclick="delTask('${uid}','${doc.id}')" style="color:red; cursor:pointer;">ลบ</span>
-                </div>`;
             });
         }
 
-        async function delTask(uid, tid) {
-            if(confirm('ลบงานนี้?')) {
-                await db.collection('homeworks').doc(uid).collection('items').doc(tid).delete();
-                viewTasks(uid); // refresh
-            }
-        }
-
-        async function resetPass(email) {
-            Swal.fire({
-                title: 'รีเซ็ตรหัสผ่าน', text: `ส่งลิงก์เปลี่ยนรหัสไปที่ ${email}?`, icon: 'warning', showCancelButton: true
-            }).then(async r => {
-                if(r.isConfirmed) {
+        // 1. แอดมินกดปุ่ม -> ระบบส่งเมลรีเซ็ตไปหา User
+        async function performReset(docId, email) {
+            if(confirm('ส่งลิงก์เปลี่ยนรหัสไปที่ ' + email + ' ?')) {
+                try {
                     await auth.sendPasswordResetEmail(email);
-                    Swal.fire('ส่งแล้ว', 'แจ้งผู้ใช้ให้เช็คเมล', 'success');
-                }
+                    // อัปเดตสถานะว่าจัดการแล้ว
+                    await db.collection('reports').doc(docId).update({ status: 'done', adminReply: 'แอดมินส่งลิงก์รีเซ็ตให้ทางอีเมลแล้ว' });
+                    Swal.fire('เรียบร้อย', 'ส่งอีเมลให้ผู้ใช้แล้ว', 'success');
+                } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            }
+        }
+
+        // 2. แอดมินตอบกลับข้อความ
+        async function sendReply(docId) {
+            const txt = document.getElementById('reply-'+docId).value;
+            if(!txt) return;
+            await db.collection('reports').doc(docId).update({
+                status: 'done',
+                adminReply: txt
             });
-        }
-
-        async function delUser(uid) {
-            if(confirm('ลบผู้ใช้นี้ออกจากระบบฐานข้อมูล?')) {
-                await db.collection('users').doc(uid).delete();
-                // Note: Auth user cannot be deleted by client SDK without logging in as them.
-                loadUsers();
-            }
-        }
-
-        // --- WEB CONFIG ---
-        async function loadWebConfig() {
-            const doc = await db.collection('site_config').doc('main').get();
-            if(doc.exists) {
-                const d = doc.data();
-                document.getElementById('web-announce').value = d.announcement || '';
-                document.getElementById('web-welcome').value = d.welcomeTitle || '';
-                document.getElementById('web-announce-active').value = d.showAnnouncement ? "true" : "false";
-            }
-        }
-
-        async function saveWebConfig() {
-            const data = {
-                announcement: document.getElementById('web-announce').value,
-                welcomeTitle: document.getElementById('web-welcome').value,
-                showAnnouncement: document.getElementById('web-announce-active').value === "true"
-            };
-            await db.collection('site_config').doc('main').set(data);
-            Swal.fire('Saved', 'อัปเดตหน้าเว็บหลักเรียบร้อย', 'success');
-        }
-
-        // --- UI Utils ---
-        function switchTab(tab, el) {
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            el.classList.add('active');
-            if(tab === 'users') {
-                document.getElementById('tab-users').style.display = 'block';
-                document.getElementById('tab-web').style.display = 'none';
-                document.getElementById('page-title').innerText = 'จัดการผู้ใช้';
-            } else {
-                document.getElementById('tab-users').style.display = 'none';
-                document.getElementById('tab-web').style.display = 'block';
-                document.getElementById('page-title').innerText = 'ตั้งค่าเว็บไซต์';
-            }
+            Swal.fire('ตอบกลับแล้ว', '', 'success');
         }
     </script>
 </body>
