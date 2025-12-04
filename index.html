@@ -3,61 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Score Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Admin Stadium Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #f1f5f9; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
+        :root { --bg: #f1f5f9; --dark: #1e293b; --primary: #3b82f6; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 8px; }
+        .login-overlay { position: fixed; inset: 0; background: var(--dark); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 300px; text-align: center; }
         
-        .btn { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; color: white; font-weight: bold; }
-        .btn-green { background: #10b981; } .btn-red { background: #ef4444; } .btn-blue { background: #3b82f6; } .btn-dark { background: #1e293b; }
-
-        .match-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding: 15px 0; }
-        .team-ctrl { text-align: center; flex: 1; }
-        .score-display { font-size: 2rem; font-weight: bold; margin: 0 10px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        .ctrl-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; color: white; font-weight: bold; }
-        .plus { background: #10b981; } .minus { background: #ef4444; }
-
-        #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 30px; border-radius: 15px; width: 300px; text-align: center; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* Match Control Row */
+        .match-row { border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; background: #fff; transition: 0.2s; }
+        .match-row:hover { box-shadow: 0 10px 15px rgba(0,0,0,0.05); transform: translateY(-2px); }
+        
+        .match-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        .teams-display { font-size: 1.2rem; font-weight: bold; color: var(--dark); }
+        .score-display { font-size: 1.5rem; background: var(--dark); color: white; padding: 2px 10px; border-radius: 6px; margin: 0 10px; }
+        
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .team-ctrl { text-align: center; background: #f8fafc; padding: 10px; border-radius: 8px; }
+        
+        .btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; margin: 2px; }
+        .btn:active { transform: scale(0.95); }
+        .btn-goal { background: #10b981; color: white; width: 100%; margin-bottom: 5px; }
+        .btn-red { background: #ef4444; color: white; }
+        .btn-time { background: #3b82f6; color: white; }
+        .btn-end { background: #1e293b; color: white; }
+        
+        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="login-screen" class="login-overlay">
         <div class="login-box">
-            <h3>Admin Login</h3>
-            <input id="email" value="farisxuma1@gmail.com" readonly>
+            <h2 style="margin-top:0;">Admin Access</h2>
+            <input id="email" value="farisxuma1@gmail.com" readonly style="background:#f1f5f9;">
             <input id="pass" type="password" placeholder="Password">
-            <button class="btn btn-blue" onclick="login()">Login</button>
+            <button class="btn btn-time" style="width:100%; padding:10px;" onclick="login()">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <div class="container" id="app" style="display:none;">
-        <h2>⚽ จัดการผลบอล</h2>
-        
-        <div class="card">
-            <h3>เพิ่มคู่แข่งขัน</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input id="new-home" placeholder="ทีมเหย้า (Home)">
-                <input id="new-away" placeholder="ทีมเยือน (Away)">
-            </div>
-            <input id="new-league" placeholder="ลีก (เช่น Premier League)">
-            <input id="new-time" placeholder="เวลาแข่ง (เช่น 19:30)">
-            <button class="btn btn-green" onclick="addMatch()">+ เพิ่มรายการ</button>
+    <div id="app" class="container" style="display:none;">
+        <div class="header">
+            <h2>🎛️ Stadium Control</h2>
+            <button class="btn btn-red" onclick="auth.signOut()">Logout</button>
         </div>
 
         <div class="card">
-            <h3>รายการแข่งขัน</h3>
-            <div id="match-list">Loading...</div>
+            <h3>+ สร้างแมตช์ใหม่</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input id="home" placeholder="ทีมเหย้า">
+                <input id="away" placeholder="ทีมเยือน">
+            </div>
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+                <input id="league" placeholder="ชื่อลีก / รายการ">
+                <input id="time" type="time">
+            </div>
+            <button class="btn btn-goal" onclick="addMatch()">สร้างการแข่งขัน</button>
         </div>
+
+        <div id="match-list">Loading...</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -83,6 +97,8 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
                 loadMatches();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
             }
         });
 
@@ -92,22 +108,22 @@
         }
 
         async function addMatch() {
-            const h = document.getElementById('new-home').value;
-            const a = document.getElementById('new-away').value;
-            const l = document.getElementById('new-league').value;
-            const t = document.getElementById('new-time').value;
+            const h = document.getElementById('home').value;
+            const a = document.getElementById('away').value;
+            const l = document.getElementById('league').value;
+            const t = document.getElementById('time').value;
 
-            if(!h || !a) return;
+            if(!h || !a) return Swal.fire('กรอกชื่อทีมด้วย','','warning');
 
             await db.collection('matches').add({
                 homeTeam: h, awayTeam: a, league: l || 'Friendly', time: t || '00:00',
                 homeScore: 0, awayScore: 0,
+                homeEvents: [], awayEvents: [], // Array เก็บชื่อคนยิง
                 isPlaying: false, isFinished: false,
                 startTime: firebase.firestore.FieldValue.serverTimestamp()
             });
-            Swal.fire('เพิ่มแล้ว','','success');
-            document.getElementById('new-home').value = '';
-            document.getElementById('new-away').value = '';
+            Swal.fire('สร้างสำเร็จ','','success');
+            document.getElementById('home').value = ''; document.getElementById('away').value = '';
         }
 
         function loadMatches() {
@@ -118,36 +134,39 @@
                 snap.forEach(doc => {
                     const m = doc.data();
                     const id = doc.id;
+                    const liveClass = m.isPlaying ? 'border:2px solid #22c55e;' : '';
                     
                     div.innerHTML += `
-                        <div class="match-row">
-                            <div class="team-ctrl">
-                                <b>${m.homeTeam}</b><br>
-                                <button class="ctrl-btn minus" onclick="updateScore('${id}', 'home', -1)">-</button>
-                                <span class="score-display">${m.homeScore}</span>
-                                <button class="ctrl-btn plus" onclick="updateScore('${id}', 'home', 1)">+</button>
-                            </div>
-                            
-                            <div style="text-align:center; flex:1;">
-                                <div style="font-size:0.8rem; color:grey;">${m.league}</div>
-                                <input id="time-${id}" value="${m.time}" style="width:60px; text-align:center; padding:5px; margin:5px 0;">
-                                <br>
-                                <button class="btn btn-sm ${m.isPlaying?'btn-red':'btn-green'}" onclick="toggleStatus('${id}', ${m.isPlaying})">
-                                    ${m.isPlaying ? '🔴 หยุดเวลา' : '▶️ เริ่มแข่ง'}
-                                </button>
-                                <button class="btn btn-sm btn-dark" onclick="endMatch('${id}')">🏁 จบเกม</button>
+                        <div class="match-row" style="${liveClass}">
+                            <div class="match-info">
+                                <span style="font-size:0.8rem; color:gray;">${m.league}</span>
+                                <div class="teams-display">${m.homeTeam} <span class="score-display">${m.homeScore} - ${m.awayScore}</span> ${m.awayTeam}</div>
+                                <div>
+                                    <input id="tm-${id}" value="${m.time}" style="width:60px; text-align:center; padding:5px; margin:0;">
+                                    <button class="btn btn-time" onclick="updateTime('${id}')">💾</button>
+                                </div>
                             </div>
 
-                            <div class="team-ctrl">
-                                <b>${m.awayTeam}</b><br>
-                                <button class="ctrl-btn minus" onclick="updateScore('${id}', 'away', -1)">-</button>
-                                <span class="score-display">${m.awayScore}</span>
-                                <button class="ctrl-btn plus" onclick="updateScore('${id}', 'away', 1)">+</button>
+                            <div class="controls">
+                                <div class="team-ctrl">
+                                    <b>🏠 ${m.homeTeam}</b>
+                                    <button class="btn btn-goal" onclick="addGoal('${id}','home',${m.homeScore})">⚽ GOAL (+1)</button>
+                                    <button class="btn btn-red" onclick="addCard('${id}','home','red')">🟥 ใบแดง</button>
+                                </div>
+                                <div class="team-ctrl">
+                                    <b>✈️ ${m.awayTeam}</b>
+                                    <button class="btn btn-goal" onclick="addGoal('${id}','away',${m.awayScore})">⚽ GOAL (+1)</button>
+                                    <button class="btn btn-red" onclick="addCard('${id}','away','red')">🟥 ใบแดง</button>
+                                </div>
                             </div>
-                            
-                            <div style="margin-left:10px;">
-                                <button class="btn btn-red" onclick="del('${id}')"><i class="fa-solid fa-trash"></i></button>
-                                <button class="btn btn-blue" onclick="saveTime('${id}')">💾</button>
+
+                            <div style="margin-top:15px; display:flex; gap:5px; border-top:1px solid #eee; padding-top:10px;">
+                                <button class="btn ${m.isPlaying?'btn-red':'btn-green'}" onclick="setStatus('${id}',${!m.isPlaying},false)">
+                                    ${m.isPlaying ? '⏸ หยุดเวลา' : '▶️ เริ่มแข่ง'}
+                                </button>
+                                <button class="btn btn-time" onclick="quickTime('${id}','HT')">พักครึ่ง (HT)</button>
+                                <button class="btn btn-end" onclick="setStatus('${id}',false,true)">🏁 จบเกม (FT)</button>
+                                <button class="btn btn-red" style="margin-left:auto;" onclick="delMatch('${id}')"><i class="fa-solid fa-trash"></i> ลบ</button>
                             </div>
                         </div>
                     `;
@@ -155,34 +174,59 @@
             });
         }
 
-        async function updateScore(id, side, val) {
-            await db.runTransaction(async t => {
-                const ref = db.collection('matches').doc(id);
-                const doc = await t.get(ref);
-                const old = doc.data()[side + 'Score'];
-                const newVal = old + val;
-                if(newVal < 0) return;
-                t.update(ref, { [side + 'Score']: newVal });
+        // ⚽ ระบบเพิ่มประตู + ถามชื่อคนยิง
+        async function addGoal(id, side, currentScore) {
+            const { value: player } = await Swal.fire({
+                title: '⚽ ใครยิงประตู?',
+                input: 'text',
+                inputPlaceholder: 'ชื่อนักเตะ (เช่น Messi 10\')',
+                showCancelButton: true
             });
+
+            if(player) {
+                const newScore = currentScore + 1;
+                // อัปเดต 2 อย่าง: คะแนน + ข้อความ events
+                await db.runTransaction(async t => {
+                    const ref = db.collection('matches').doc(id);
+                    const doc = await t.get(ref);
+                    const events = doc.data()[side + 'Events'] || [];
+                    events.push(`⚽ ${player}`);
+                    
+                    t.update(ref, {
+                        [side + 'Score']: newScore,
+                        [side + 'Events']: events
+                    });
+                });
+            }
         }
 
-        async function toggleStatus(id, current) {
-            await db.collection('matches').doc(id).update({ isPlaying: !current, isFinished: false });
+        // 🟥 ระบบใบแดง
+        async function addCard(id, side, type) {
+            const { value: player } = await Swal.fire({title: '🟥 ใครโดนแดง?', input: 'text', showCancelButton:true});
+            if(player) {
+                const ref = db.collection('matches').doc(id);
+                const doc = await ref.get();
+                const events = doc.data()[side + 'Events'] || [];
+                events.push(`🟥 ${player}`);
+                await ref.update({ [side + 'Events']: events });
+            }
         }
 
-        async function endMatch(id) {
-            if(confirm('จบเกม?')) await db.collection('matches').doc(id).update({ isPlaying: false, isFinished: true, time: 'FT' });
-        }
-        
-        async function saveTime(id) {
-            const t = document.getElementById('time-'+id).value;
+        // ⏱️ ระบบจัดการเวลา
+        async function updateTime(id) {
+            const t = document.getElementById('tm-'+id).value;
             await db.collection('matches').doc(id).update({ time: t });
-            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1000});
-            Toast.fire({icon: 'success', title: 'เวลาอัปเดต'});
         }
-
-        async function del(id) {
-            if(confirm('ลบคู่นี้?')) await db.collection('matches').doc(id).delete();
+        async function quickTime(id, val) {
+            await db.collection('matches').doc(id).update({ time: val });
+        }
+        async function setStatus(id, playing, finished) {
+            let update = { isPlaying: playing, isFinished: finished };
+            if(finished) update.time = 'FT';
+            await db.collection('matches').doc(id).update(update);
+        }
+        async function delMatch(id) {
+            if(confirm('ลบรายการนี้?')) await db.collection('matches').doc(id).delete();
         }
     </script>
 </body>
