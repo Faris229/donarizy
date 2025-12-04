@@ -3,62 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Bank | ระบบจัดการเงิน</title>
+    <title>Admin System | ระบบจัดการ</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #dfe6e9; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .stat-val { font-size: 2rem; font-weight: bold; color: #2d3436; }
+        :root {
+            --bg-body: #f3f4f6;
+            --primary: #4f46e5;
+            --sidebar-bg: #1e293b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg-body); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+        /* Login */
+        #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; }
+
+        /* Layout */
+        .sidebar { width: 250px; background: var(--sidebar-bg); color: #94a3b8; padding: 20px; display: flex; flex-direction: column; }
+        .brand { color: white; font-size: 1.5rem; font-weight: bold; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .menu-item { padding: 12px; margin-bottom: 5px; cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; }
         
+        .main { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-val { font-size: 2rem; font-weight: bold; color: var(--primary); }
+
+        /* Table & Lists */
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 10px; background: #f1f2f6; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
+        th { text-align: left; padding: 10px; color: #64748b; background: #f8fafc; }
+        td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
         
-        .btn-sm { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; color: white; margin-right: 5px; }
-        .btn-approve { background: #00b894; }
-        .btn-reject { background: #d63031; }
-        .btn-slip { background: #0984e3; }
+        /* Tickets */
+        .ticket-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; }
+        .bg-pending { background: #fff7ed; color: #c2410c; }
+        .bg-done { background: #f0fdf4; color: #15803d; }
         
-        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: #eee; font-weight: bold; }
-        .tab-btn.active { background: white; border-top: 3px solid #00b894; }
+        .btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; color: white; font-size: 0.9rem; }
+        .btn-green { background: var(--success); }
+        .btn-red { background: var(--danger); }
+        .btn-blue { background: var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h2>🏦 Admin Money Control</h2>
-            <button class="btn-sm btn-reject" onclick="auth.signOut()">Logout</button>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="margin-bottom:20px;">Admin Login</h2>
+            <input type="email" id="admin-email" placeholder="Email (farisxuma1@gmail.com)">
+            <input type="password" id="admin-pass" placeholder="Password">
+            <button class="btn btn-blue" style="width:100%; padding:12px;" onclick="adminLogin()">เข้าสู่ระบบ</button>
         </div>
+    </div>
 
-        <div class="stat-grid">
-            <div class="card">
-                <div>ผู้ใช้ทั้งหมด</div>
-                <div class="stat-val" id="stat-users">0</div>
-            </div>
-            <div class="card">
-                <div>เงินในระบบรวม</div>
-                <div class="stat-val" id="stat-money">0 ฿</div>
-            </div>
-        </div>
+    <div id="app-panel" style="display:none; width:100%; height:100%;">
+        <aside class="sidebar">
+            <div class="brand"><i class="fa-solid fa-shield-cat"></i> Manager</div>
+            <div class="menu-item active" onclick="switchTab('dash', this)"><i class="fa-solid fa-chart-pie"></i> ภาพรวม</div>
+            <div class="menu-item" onclick="switchTab('tx', this)"><i class="fa-solid fa-money-bill-transfer"></i> รายการฝาก-ถอน</div>
+            <div class="menu-item" onclick="switchTab('chat', this)"><i class="fa-solid fa-comments"></i> แชท/แจ้งปัญหา</div>
+            <div class="menu-item" onclick="switchTab('users', this)"><i class="fa-solid fa-users"></i> สมาชิก</div>
+            <div style="margin-top:auto;"><button class="btn btn-red" style="width:100%;" onclick="auth.signOut()">Logout</button></div>
+        </aside>
 
-        <div class="card">
-            <div style="margin-bottom:15px;">
-                <button class="tab-btn active" onclick="loadTx('deposit')">รายการฝาก (รออนุมัติ)</button>
-                <button class="tab-btn" onclick="loadTx('withdraw')">รายการถอน (รออนุมัติ)</button>
+        <main class="main">
+            <div class="header">
+                <h2 id="page-title">ภาพรวมระบบ</h2>
+                <div style="font-weight:bold; color:var(--primary);">Admin: farisxuma1</div>
             </div>
-            <div id="tx-table">Loading...</div>
-        </div>
-        
-        <div class="card">
-            <h3>จัดการผู้ใช้</h3>
-            <div id="user-list"></div>
-        </div>
+
+            <div id="tab-dash">
+                <div class="stats-grid">
+                    <div class="card">
+                        <div>เงินในระบบรวม</div>
+                        <div class="stat-val" id="st-money">0 ฿</div>
+                    </div>
+                    <div class="card">
+                        <div>สมาชิกทั้งหมด</div>
+                        <div class="stat-val" id="st-users">0</div>
+                    </div>
+                    <div class="card">
+                        <div>รออนุมัติ</div>
+                        <div class="stat-val" id="st-pending" style="color:#f59e0b;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-tx" style="display:none;">
+                <div class="card">
+                    <h3>รายการรออนุมัติ (Pending)</h3>
+                    <div id="tx-pending-list">Loading...</div>
+                </div>
+            </div>
+
+            <div id="tab-chat" style="display:none;">
+                <div class="card">
+                    <h3>ข้อความจากลูกค้า</h3>
+                    <div id="chat-list">Loading...</div>
+                </div>
+            </div>
+
+            <div id="tab-users" style="display:none;">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3>รายชื่อสมาชิก</h3>
+                        <button class="btn btn-blue" onclick="loadUsers()">รีเฟรช</button>
+                    </div>
+                    <div style="overflow-x:auto; margin-top:15px;">
+                        <table id="user-table">
+                            <thead><tr><th>Username</th><th>Email</th><th>Balance</th><th>Action</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -73,110 +146,210 @@
             projectId: "chat-27f96",
             storageBucket: "chat-27f96.firebasestorage.app",
             messagingSenderId: "336686938010",
-            appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23",
-            measurementId: "G-GR38B5JHZZ"
+            appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // AUTH
         auth.onAuthStateChanged(user => {
-            if(!user) { alert('Login First!'); window.location.href='index.html'; }
-            else { loadStats(); loadTx('deposit'); }
+            if(user) {
+                // เช็คว่าเป็นอีเมลแอดมินหรือไม่ (เพื่อความชัวร์ทาง UI)
+                if(user.email !== 'farisxuma1@gmail.com') {
+                    Swal.fire('Access Denied','คุณไม่ใช่แอดมิน','error').then(()=>auth.signOut());
+                    return;
+                }
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-panel').style.display = 'flex';
+                initData();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+            }
         });
 
-        async function loadStats() {
-            const snap = await db.collection('users').get();
-            document.getElementById('stat-users').innerText = snap.size;
-            let total = 0;
-            let userHtml = '<table><tr><th>User</th><th>Email</th><th>Balance</th><th>Action</th></tr>';
-            snap.forEach(doc => {
-                const u = doc.data();
-                total += (u.balance || 0);
-                userHtml += `<tr><td>${u.username}</td><td>${u.email}</td><td>${(u.balance||0).toFixed(2)}</td><td><button class="btn-sm btn-reject" onclick="resetPass('${u.email}')">Reset Pass</button></td></tr>`;
-            });
-            document.getElementById('stat-money').innerText = total.toFixed(2) + ' ฿';
-            document.getElementById('user-list').innerHTML = userHtml + '</table>';
+        async function adminLogin() {
+            try {
+                await auth.signInWithEmailAndPassword(
+                    document.getElementById('admin-email').value,
+                    document.getElementById('admin-pass').value
+                );
+            } catch(e) { Swal.fire('Error', 'รหัสผิด', 'error'); }
         }
 
-        function loadTx(type) {
-            // Update Tab UI
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+        function initData() {
+            loadUsers();
+            loadTransactions();
+            loadChats();
+        }
 
-            db.collection('transactions')
-                .where('type', '==', type)
-                .where('status', '==', 'pending')
-                .onSnapshot(snap => {
-                    let html = '<table><tr><th>User</th><th>Amount</th><th>Time</th><th>Action</th></tr>';
-                    if(snap.empty) html = '<div style="padding:20px;text-align:center;">ไม่มีรายการค้าง</div>';
-                    else {
-                        snap.forEach(doc => {
-                            const t = doc.data();
-                            let extra = t.type === 'deposit' 
-                                ? `<button class="btn-sm btn-slip" onclick="window.open('${t.slipURL}')">ดูสลิป</button>`
-                                : `<span style="color:red; font-size:0.8rem;">(หัก ${t.totalDeduct})</span>`;
-                            
-                            html += `
-                                <tr>
-                                    <td>${t.email}</td>
-                                    <td>${t.amount} ${extra}</td>
-                                    <td>${new Date(t.timestamp.seconds*1000).toLocaleString()}</td>
-                                    <td>
-                                        <button class="btn-sm btn-approve" onclick="processTx('${doc.id}', '${t.uid}', ${t.amount}, '${t.type}', ${t.totalDeduct})">อนุมัติ</button>
-                                        <button class="btn-sm btn-reject" onclick="rejectTx('${doc.id}')">ปฏิเสธ</button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                        html += '</table>';
-                    }
-                    document.getElementById('tx-table').innerHTML = html;
+        // --- 1. USERS & STATS ---
+        async function loadUsers() {
+            const tbody = document.querySelector('#user-table tbody');
+            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            
+            try {
+                const snap = await db.collection('users').get();
+                document.getElementById('st-users').innerText = snap.size;
+                
+                let totalMoney = 0;
+                tbody.innerHTML = '';
+
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    totalMoney += (u.balance || 0);
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.username}</td>
+                        <td>${u.email}</td>
+                        <td style="font-weight:bold; color:${u.balance>0?'green':'black'}">${(u.balance||0).toLocaleString()} ฿</td>
+                        <td>
+                            <button class="btn btn-red" onclick="resetPass('${u.email}')">แก้รหัส</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
                 });
+                document.getElementById('st-money').innerText = totalMoney.toLocaleString() + ' ฿';
+            } catch(e) { console.log(e); }
         }
 
+        // --- 2. TRANSACTIONS (Approval) ---
+        function loadTransactions() {
+            // ดึงเฉพาะสถานะ Pending
+            db.collection('transactions').where('status', '==', 'pending').onSnapshot(snap => {
+                const div = document.getElementById('tx-pending-list');
+                div.innerHTML = '';
+                document.getElementById('st-pending').innerText = snap.size;
+
+                if(snap.empty) { div.innerHTML = '<p style="color:#ccc;">ไม่มีรายการรออนุมัติ</p>'; return; }
+
+                // โหลดมาแล้วเรียงใน JS
+                let items = [];
+                snap.forEach(doc => items.push({id: doc.id, ...doc.data()}));
+                items.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0)); // เก่า -> ใหม่ (งานค้างต้องรีบทำ)
+
+                items.forEach(t => {
+                    let typeTxt = t.type === 'deposit' ? 'ฝากเงิน (ตรวจสอบสลิปในแชท)' : `ถอนเงิน (หักยอด ${t.totalDeduct})`;
+                    let color = t.type === 'deposit' ? '#00b4d8' : '#ef4444';
+                    let action = t.type === 'deposit' ? 'deposit' : 'withdraw';
+                    let amountToProcess = t.type === 'withdraw' ? t.totalDeduct : t.amount;
+
+                    div.innerHTML += `
+                        <div class="ticket-item">
+                            <div style="display:flex; justify-content:space-between;">
+                                <div>
+                                    <div style="font-weight:bold; color:${color}">${typeTxt}</div>
+                                    <div style="font-size:0.9rem;">User: ${t.email}</div>
+                                    <div style="font-size:0.8rem; color:#888;">${new Date(t.timestamp.seconds*1000).toLocaleString()}</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:1.5rem; font-weight:bold;">${t.amount.toLocaleString()} ฿</div>
+                                </div>
+                            </div>
+                            <div style="margin-top:10px;">
+                                <button class="btn btn-green" onclick="processTx('${t.id}', '${t.uid}', ${t.amount}, '${t.type}', ${t.totalDeduct || 0})">อนุมัติ</button>
+                                <button class="btn btn-red" onclick="rejectTx('${t.id}')">ปฏิเสธ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // ฟังก์ชันอนุมัติเงิน (หัวใจสำคัญ)
         async function processTx(txId, uid, amount, type, withdrawTotal) {
-            if(!confirm('ยืนยันอนุมัติ?')) return;
+            if(!confirm('ยืนยันอนุมัติรายการนี้?')) return;
 
             try {
                 await db.runTransaction(async (transaction) => {
                     const userRef = db.collection('users').doc(uid);
                     const txRef = db.collection('transactions').doc(txId);
-                    
+
                     const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists) throw "User does not exist!";
-                    
-                    let newBalance = userDoc.data().balance || 0;
+                    if (!userDoc.exists) throw "User not found";
+
+                    let currentBal = userDoc.data().balance || 0;
+                    let newBal = currentBal;
 
                     if (type === 'deposit') {
-                        newBalance += amount;
+                        newBal += amount; // เพิ่มเงิน
                     } else if (type === 'withdraw') {
-                        if (newBalance < withdrawTotal) throw "เงินไม่พอให้ถอน!";
-                        newBalance -= withdrawTotal;
+                        if (currentBal < withdrawTotal) throw "เงินลูกค้าไม่พอถอน!";
+                        newBal -= withdrawTotal; // ลดเงิน (รวมค่าธรรมเนียม)
                     }
 
-                    transaction.update(userRef, { balance: newBalance });
+                    transaction.update(userRef, { balance: newBal });
                     transaction.update(txRef, { status: 'approved' });
                 });
+
+                Swal.fire('สำเร็จ', 'อนุมัติเรียบร้อย', 'success');
+                loadUsers(); // อัปเดตตาราง user
+            } catch(e) {
+                Swal.fire('ผิดพลาด', e.toString(), 'error');
+            }
+        }
+
+        async function rejectTx(id) {
+            if(confirm('ปฏิเสธรายการนี้?')) {
+                await db.collection('transactions').doc(id).update({ status: 'rejected' });
+            }
+        }
+
+        // --- 3. CHAT / SUPPORT ---
+        function loadChats() {
+            // โหลดแชททั้งหมด (อาจจะเยอะ ถ้าเยอะมากต้อง limit)
+            db.collection('reports').where('status', '==', 'pending').onSnapshot(snap => {
+                const div = document.getElementById('chat-list');
+                div.innerHTML = '';
                 
-                Swal.fire('สำเร็จ', 'อนุมัติและปรับยอดเงินแล้ว', 'success');
-                loadStats(); // Refresh stats
-            } catch (e) {
-                Swal.fire('Error', e.toString(), 'error');
-            }
+                if(snap.empty) { div.innerHTML = '<p style="color:#ccc;">ไม่มีข้อความใหม่</p>'; return; }
+
+                let items = [];
+                snap.forEach(doc => items.push({id: doc.id, ...doc.data()}));
+                items.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+                items.forEach(t => {
+                    div.innerHTML += `
+                        <div class="ticket-item">
+                            <div style="display:flex; justify-content:space-between;">
+                                <b>${t.email}</b>
+                                <small>${new Date(t.timestamp.seconds*1000).toLocaleString()}</small>
+                            </div>
+                            <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin:5px 0;">${t.message}</div>
+                            <div style="display:flex; gap:5px;">
+                                <input type="text" id="reply-${t.id}" placeholder="พิมพ์ตอบกลับ..." style="margin:0; padding:5px;">
+                                <button class="btn btn-blue" onclick="sendReply('${t.id}')">ส่ง</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
         }
 
-        async function rejectTx(txId) {
-            if(confirm('ยืนยันปฏิเสธรายการ?')) {
-                await db.collection('transactions').doc(txId).update({ status: 'rejected' });
-            }
+        async function sendReply(id) {
+            const msg = document.getElementById('reply-'+id).value;
+            if(!msg) return;
+            await db.collection('reports').doc(id).update({ status: 'done', adminReply: msg });
+            Swal.fire('ตอบกลับแล้ว', '', 'success');
         }
 
+        // Utils
         async function resetPass(email) {
-            if(confirm(`รีเซ็ตรหัสให้ ${email}?`)) {
-                await auth.sendPasswordResetEmail(email);
-                alert('ส่งลิงก์รีเซ็ตแล้ว');
+            if(confirm('ส่งลิงก์รีเซ็ตรหัสให้ '+email+'?')) {
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    Swal.fire('ส่งแล้ว','','success');
+                } catch(e) { Swal.fire('Error',e.message,'error'); }
             }
+        }
+
+        function switchTab(t, el) {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+            ['dash','tx','chat','users'].forEach(k => document.getElementById('tab-'+k).style.display = 'none');
+            document.getElementById('tab-'+t).style.display = 'block';
+            document.getElementById('page-title').innerText = el.innerText;
         }
     </script>
 </body>
