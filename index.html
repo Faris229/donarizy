@@ -3,142 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Manager | ระบบจัดการ</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Score Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
+    
     <style>
-        :root { --bg: #f3f4f6; --dark: #1e293b; --primary: #4f46e5; --white: #ffffff; }
-        * { box-sizing: border-box; outline: none; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; overflow: hidden; }
-
-        /* Login */
-        #login-screen { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; }
+        body { font-family: 'Prompt', sans-serif; background: #f1f5f9; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 8px; }
-
-        /* Sidebar */
-        .sidebar { width: 250px; background: var(--dark); color: #94a3b8; padding: 20px; display: flex; flex-direction: column; }
-        .menu-item { padding: 12px; cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; transition: 0.2s; }
-        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; }
-        .badge { background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: auto; }
-
-        /* Main Content */
-        .main { flex: 1; padding: 20px; overflow: hidden; display: flex; flex-direction: column; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        /* Chat Layout (Fixed Buggy UI) */
-        .chat-wrapper { display: flex; height: 100%; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .chat-list { width: 30%; border-right: 1px solid #e2e8f0; overflow-y: auto; background: #f8fafc; }
-        .chat-user { padding: 15px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
-        .chat-user:hover { background: #eef2ff; }
-        .chat-user.active { background: #e0e7ff; border-left: 4px solid var(--primary); }
-        .user-email { font-weight: bold; font-size: 0.9rem; color: #334155; }
-        .last-msg { font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .unread-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; float: right; }
+        .btn { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; color: white; font-weight: bold; }
+        .btn-green { background: #10b981; } .btn-red { background: #ef4444; } .btn-blue { background: #3b82f6; } .btn-dark { background: #1e293b; }
 
-        .chat-room { flex: 1; display: flex; flex-direction: column; background: white; }
-        .chat-header { padding: 15px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #fff; color: var(--primary); }
-        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
-        .chat-input { padding: 15px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; background: white; }
-
-        /* Bubbles */
-        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; position: relative; word-wrap: break-word; }
-        .b-user { align-self: flex-start; background: #e2e8f0; color: #334155; border-bottom-left-radius: 2px; }
-        .b-admin { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
-        .b-time { font-size: 0.65rem; opacity: 0.7; margin-top: 4px; display: block; text-align: right; }
-
-        /* Common UI */
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; color: white; font-weight: bold; }
-        .btn-blue { background: var(--primary); }
-        .btn-red { background: #ef4444; }
-        .btn-green { background: #10b981; }
+        .match-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding: 15px 0; }
+        .team-ctrl { text-align: center; flex: 1; }
+        .score-display { font-size: 2rem; font-weight: bold; margin: 0 10px; }
         
-        /* Table */
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 10px; background: #f1f5f9; color: #64748b; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .ctrl-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; color: white; font-weight: bold; }
+        .plus { background: #10b981; } .minus { background: #ef4444; }
 
-        /* Stats Grid */
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
-        .stat-n { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        #login-screen { position: fixed; inset: 0; background: #0f172a; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 30px; border-radius: 15px; width: 300px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h2>Admin Login</h2>
-            <input type="email" id="admin-email" placeholder="Email (farisxuma1@gmail.com)">
-            <input type="password" id="admin-pass" placeholder="Password">
-            <button class="btn btn-blue" style="width:100%;" onclick="adminLogin()">เข้าสู่ระบบ</button>
+            <h3>Admin Login</h3>
+            <input id="email" value="farisxuma1@gmail.com" readonly>
+            <input id="pass" type="password" placeholder="Password">
+            <button class="btn btn-blue" onclick="login()">Login</button>
         </div>
     </div>
 
-    <div id="app-panel" style="display:none; width:100%; height:100%;">
-        <aside class="sidebar">
-            <h3 style="color:white; margin-bottom:30px;">Admin Panel</h3>
-            <div class="menu-item active" onclick="switchTab('dash', this)"><i class="fa-solid fa-chart-pie"></i> แดชบอร์ด</div>
-            <div class="menu-item" onclick="switchTab('chat', this)">
-                <i class="fa-solid fa-comments"></i> แชทลูกค้า 
-                <span id="badge-chat" class="badge hidden">0</span>
+    <div class="container" id="app" style="display:none;">
+        <h2>⚽ จัดการผลบอล</h2>
+        
+        <div class="card">
+            <h3>เพิ่มคู่แข่งขัน</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input id="new-home" placeholder="ทีมเหย้า (Home)">
+                <input id="new-away" placeholder="ทีมเยือน (Away)">
             </div>
-            <div class="menu-item" onclick="switchTab('tx', this)"><i class="fa-solid fa-money-bill-transfer"></i> อนุมัติการเงิน</div>
-            <div class="menu-item" onclick="switchTab('users', this)"><i class="fa-solid fa-users"></i> สมาชิก</div>
-            <div style="margin-top:auto;">
-                <button class="btn btn-red" style="width:100%;" onclick="auth.signOut()">ออกจากระบบ</button>
-            </div>
-        </aside>
+            <input id="new-league" placeholder="ลีก (เช่น Premier League)">
+            <input id="new-time" placeholder="เวลาแข่ง (เช่น 19:30)">
+            <button class="btn btn-green" onclick="addMatch()">+ เพิ่มรายการ</button>
+        </div>
 
-        <main class="main">
-            <div class="header">
-                <h2 id="page-title">แดชบอร์ด</h2>
-                <span style="color:#64748b;">Admin Mode</span>
-            </div>
-
-            <div id="tab-dash">
-                <div class="stats">
-                    <div class="stat-box"><div>เงินรวม</div><div class="stat-n" id="st-money">0</div></div>
-                    <div class="stat-box"><div>สมาชิก</div><div class="stat-n" id="st-users">0</div></div>
-                    <div class="stat-box"><div>รออนุมัติ</div><div class="stat-n" id="st-tx" style="color:orange;">0</div></div>
-                    <div class="stat-box"><div>แชทใหม่</div><div class="stat-n" id="st-msg" style="color:red;">0</div></div>
-                </div>
-            </div>
-
-            <div id="tab-chat" style="display:none; height:100%;">
-                <div class="chat-wrapper">
-                    <div class="chat-list" id="user-list-area">
-                        <div style="padding:20px; text-align:center; color:#999;">Loading...</div>
-                    </div>
-                    <div class="chat-room">
-                        <div class="chat-header" id="chat-title">กรุณาเลือกแชท</div>
-                        <div class="chat-body" id="chat-body"></div>
-                        <div class="chat-input" id="chat-input-area" style="display:none;">
-                            <input type="text" id="reply-msg" placeholder="พิมพ์ข้อความ..." style="flex:1; margin:0;">
-                            <button class="btn btn-blue" onclick="sendReply()">ส่ง</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-tx" style="display:none;">
-                <div class="card">
-                    <h3>รายการรออนุมัติ</h3>
-                    <div id="tx-list">Loading...</div>
-                </div>
-            </div>
-
-            <div id="tab-users" style="display:none;">
-                <div class="card">
-                    <h3>สมาชิกทั้งหมด</h3>
-                    <div id="users-list">Loading...</div>
-                </div>
-            </div>
-        </main>
+        <div class="card">
+            <h3>รายการแข่งขัน</h3>
+            <div id="match-list">Loading...</div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -159,157 +78,76 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let allChats = {}; 
-        let currentChatUid = null;
-
         auth.onAuthStateChanged(user => {
             if(user && user.email === 'farisxuma1@gmail.com') {
                 document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-panel').style.display = 'flex';
-                initData();
-            } else {
-                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('app').style.display = 'block';
+                loadMatches();
             }
         });
 
-        async function adminLogin() {
-            try { await auth.signInWithEmailAndPassword(document.getElementById('admin-email').value, document.getElementById('admin-pass').value); }
+        async function login() {
+            try { await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value); }
             catch(e) { Swal.fire('Error','รหัสผิด','error'); }
         }
 
-        function initData() {
-            loadStats();
-            loadChatSystem();
-            loadTransactions();
-            loadUsersTable();
-        }
+        async function addMatch() {
+            const h = document.getElementById('new-home').value;
+            const a = document.getElementById('new-away').value;
+            const l = document.getElementById('new-league').value;
+            const t = document.getElementById('new-time').value;
 
-        // --- 1. CHAT SYSTEM (FIXED) ---
-        function loadChatSystem() {
-            db.collection('reports').orderBy('timestamp', 'asc').onSnapshot(snap => {
-                allChats = {}; // Reset
-                let unreadTotal = 0;
+            if(!h || !a) return;
 
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const uid = d.uid;
-                    if(!allChats[uid]) allChats[uid] = { email: d.email, msgs: [], unread: 0 };
-                    
-                    allChats[uid].msgs.push({ id: doc.id, ...d });
-                    
-                    // นับข้อความที่ User ส่งมาและยังไม่มี adminReply
-                    if(d.status === 'pending' && !d.adminReply) {
-                        allChats[uid].unread++;
-                        unreadTotal++;
-                    }
-                });
-
-                renderUserList();
-                document.getElementById('st-msg').innerText = unreadTotal;
-                const b = document.getElementById('badge-chat');
-                if(unreadTotal>0) { b.innerText=unreadTotal; b.classList.remove('hidden'); } else b.classList.add('hidden');
-
-                // Update Active Chat
-                if(currentChatUid) openChat(currentChatUid, allChats[currentChatUid].email);
+            await db.collection('matches').add({
+                homeTeam: h, awayTeam: a, league: l || 'Friendly', time: t || '00:00',
+                homeScore: 0, awayScore: 0,
+                isPlaying: false, isFinished: false,
+                startTime: firebase.firestore.FieldValue.serverTimestamp()
             });
+            Swal.fire('เพิ่มแล้ว','','success');
+            document.getElementById('new-home').value = '';
+            document.getElementById('new-away').value = '';
         }
 
-        function renderUserList() {
-            const div = document.getElementById('user-list-area');
-            div.innerHTML = '';
-            // เรียงตามคนที่มี Unread ขึ้นก่อน
-            const uids = Object.keys(allChats).sort((a,b) => allChats[b].unread - allChats[a].unread);
-            
-            if(uids.length === 0) { div.innerHTML = '<div style="padding:20px; text-align:center;">ไม่มีแชท</div>'; return; }
-
-            uids.forEach(uid => {
-                const c = allChats[uid];
-                const lastMsg = c.msgs[c.msgs.length-1].message;
-                const active = uid === currentChatUid ? 'active' : '';
-                const dot = c.unread > 0 ? '<div class="unread-dot"></div>' : '';
-                
-                div.innerHTML += `
-                    <div class="chat-user ${active}" onclick="openChat('${uid}', '${c.email}')">
-                        <div class="user-email">${c.email} ${dot}</div>
-                        <div class="last-msg">${lastMsg}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function openChat(uid, email) {
-            currentChatUid = uid;
-            document.getElementById('chat-title').innerText = email;
-            document.getElementById('chat-input-area').style.display = 'flex';
-            
-            const body = document.getElementById('chat-body');
-            body.innerHTML = '';
-            
-            const msgs = allChats[uid].msgs;
-            msgs.forEach(m => {
-                const time = m.timestamp ? new Date(m.timestamp.seconds*1000).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '';
-                
-                // User Msg
-                body.innerHTML += `
-                    <div class="bubble b-user">
-                        ${m.message}
-                        <span class="b-time">${time}</span>
-                    </div>
-                `;
-                
-                // Admin Reply
-                if(m.adminReply) {
-                    body.innerHTML += `
-                        <div class="bubble b-admin">
-                            ${m.adminReply}
-                            <span class="b-time">Admin</span>
-                        </div>
-                    `;
-                }
-            });
-            body.scrollTop = body.scrollHeight;
-            renderUserList(); // Update active class
-        }
-
-        async function sendReply() {
-            const txt = document.getElementById('reply-msg').value;
-            if(!txt || !currentChatUid) return;
-
-            // หาข้อความล่าสุดของ User นี้ที่ยังไม่ตอบ (หรือตอบตัวล่าสุดก็ได้)
-            const msgs = allChats[currentChatUid].msgs;
-            // หาตัวที่เป็น pending ตัวสุดท้าย
-            let target = msgs.filter(m => m.status === 'pending').pop(); 
-            
-            // ถ้าไม่มี pending ให้เอาตัวล่าสุดเลย
-            if(!target) target = msgs[msgs.length - 1];
-
-            try {
-                await db.collection('reports').doc(target.id).update({
-                    status: 'done',
-                    adminReply: txt
-                });
-                document.getElementById('reply-msg').value = '';
-            } catch(e) { Swal.fire('Error', e.message, 'error'); }
-        }
-
-        // --- 2. TRANSACTIONS ---
-        function loadTransactions() {
-            db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
-                document.getElementById('st-tx').innerText = snap.size;
-                const div = document.getElementById('tx-list');
+        function loadMatches() {
+            db.collection('matches').orderBy('startTime', 'desc').onSnapshot(snap => {
+                const div = document.getElementById('match-list');
                 div.innerHTML = '';
-                if(snap.empty) { div.innerHTML='<p style="color:#ccc;text-align:center;">ไม่มีรายการ</p>'; return; }
                 
                 snap.forEach(doc => {
-                    const t = doc.data();
-                    const color = t.type==='deposit'?'#10b981':'#ef4444';
-                    const txt = t.type==='deposit'?'ฝาก':'ถอน';
+                    const m = doc.data();
+                    const id = doc.id;
+                    
                     div.innerHTML += `
-                        <div class="tx-item">
-                            <div><b style="color:${color}">${txt}</b> ${t.amount} ฿<br><small>${t.email}</small></div>
-                            <div>
-                                <button class="btn btn-green" onclick="processTx('${doc.id}','${t.uid}',${t.amount},'${t.type}',${t.totalDeduct||0},'${t.email}')">อนุมัติ</button>
-                                <button class="btn btn-red" onclick="rejectTx('${doc.id}')">ปฏิเสธ</button>
+                        <div class="match-row">
+                            <div class="team-ctrl">
+                                <b>${m.homeTeam}</b><br>
+                                <button class="ctrl-btn minus" onclick="updateScore('${id}', 'home', -1)">-</button>
+                                <span class="score-display">${m.homeScore}</span>
+                                <button class="ctrl-btn plus" onclick="updateScore('${id}', 'home', 1)">+</button>
+                            </div>
+                            
+                            <div style="text-align:center; flex:1;">
+                                <div style="font-size:0.8rem; color:grey;">${m.league}</div>
+                                <input id="time-${id}" value="${m.time}" style="width:60px; text-align:center; padding:5px; margin:5px 0;">
+                                <br>
+                                <button class="btn btn-sm ${m.isPlaying?'btn-red':'btn-green'}" onclick="toggleStatus('${id}', ${m.isPlaying})">
+                                    ${m.isPlaying ? '🔴 หยุดเวลา' : '▶️ เริ่มแข่ง'}
+                                </button>
+                                <button class="btn btn-sm btn-dark" onclick="endMatch('${id}')">🏁 จบเกม</button>
+                            </div>
+
+                            <div class="team-ctrl">
+                                <b>${m.awayTeam}</b><br>
+                                <button class="ctrl-btn minus" onclick="updateScore('${id}', 'away', -1)">-</button>
+                                <span class="score-display">${m.awayScore}</span>
+                                <button class="ctrl-btn plus" onclick="updateScore('${id}', 'away', 1)">+</button>
+                            </div>
+                            
+                            <div style="margin-left:10px;">
+                                <button class="btn btn-red" onclick="del('${id}')"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-blue" onclick="saveTime('${id}')">💾</button>
                             </div>
                         </div>
                     `;
@@ -317,65 +155,34 @@
             });
         }
 
-        async function processTx(id,uid,amt,type,deduct,email) {
-            if(!confirm('ยืนยันอนุมัติ?')) return;
-            try {
-                await db.runTransaction(async t => {
-                    const uRef = db.collection('users').doc(uid);
-                    const txRef = db.collection('transactions').doc(id);
-                    const uDoc = await t.get(uRef);
-                    let bal=0;
-                    if(!uDoc.exists) {
-                         if(type==='withdraw') throw "ไม่พบ User";
-                         t.set(uRef, {email, username:'Recovered', balance:0});
-                    } else bal = uDoc.data().balance||0;
-
-                    let nBal = bal;
-                    if(type==='deposit') nBal+=amt; else { if(bal<deduct) throw "เงินไม่พอ"; nBal-=deduct; }
-                    
-                    t.update(uRef,{balance:nBal}); t.update(txRef,{status:'approved'});
-                });
-                Swal.fire('สำเร็จ','','success');
-            } catch(e){ Swal.fire('Error',e.toString(),'error'); }
-        }
-
-        async function rejectTx(id) {
-            if(confirm('ปฏิเสธ?')) await db.collection('transactions').doc(id).update({status:'rejected'});
-        }
-
-        // --- 3. USERS & STATS ---
-        function loadStats() {
-            db.collection('users').onSnapshot(s => {
-                document.getElementById('st-users').innerText = s.size;
-                let m=0; s.forEach(d=>m+=(d.data().balance||0));
-                document.getElementById('st-money').innerText = m.toLocaleString() + ' ฿';
+        async function updateScore(id, side, val) {
+            await db.runTransaction(async t => {
+                const ref = db.collection('matches').doc(id);
+                const doc = await t.get(ref);
+                const old = doc.data()[side + 'Score'];
+                const newVal = old + val;
+                if(newVal < 0) return;
+                t.update(ref, { [side + 'Score']: newVal });
             });
         }
 
-        function loadUsersTable() {
-            db.collection('users').onSnapshot(snap => {
-                let html = '<table style="width:100%"><tr><th>User</th><th>Email</th><th>Balance</th><th>Action</th></tr>';
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    html += `<tr>
-                        <td>${u.username}</td><td>${u.email}</td><td>${(u.balance||0).toFixed(2)}</td>
-                        <td><button class="btn btn-red" style="font-size:0.8rem;" onclick="delUser('${doc.id}')">ลบ</button></td>
-                    </tr>`;
-                });
-                document.getElementById('users-list').innerHTML = html + '</table>';
-            });
+        async function toggleStatus(id, current) {
+            await db.collection('matches').doc(id).update({ isPlaying: !current, isFinished: false });
+        }
+
+        async function endMatch(id) {
+            if(confirm('จบเกม?')) await db.collection('matches').doc(id).update({ isPlaying: false, isFinished: true, time: 'FT' });
         }
         
-        async function delUser(uid) {
-            if(confirm('ลบผู้ใช้นี้ถาวร?')) await db.collection('users').doc(uid).delete();
+        async function saveTime(id) {
+            const t = document.getElementById('time-'+id).value;
+            await db.collection('matches').doc(id).update({ time: t });
+            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1000});
+            Toast.fire({icon: 'success', title: 'เวลาอัปเดต'});
         }
 
-        function switchTab(t,el){
-            document.querySelectorAll('.menu-item').forEach(e=>e.classList.remove('active'));
-            el.classList.add('active');
-            ['dash','tx','users','chat'].forEach(k=>document.getElementById('tab-'+k).style.display='none');
-            document.getElementById('tab-'+t).style.display='block';
-            document.getElementById('page-title').innerText = el.innerText;
+        async function del(id) {
+            if(confirm('ลบคู่นี้?')) await db.collection('matches').doc(id).delete();
         }
     </script>
 </body>
