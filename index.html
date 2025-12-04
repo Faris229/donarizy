@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Supreme | ระบบจัดการขั้นสูง</title>
+    <title>Admin Messenger | ระบบจัดการ</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -50,13 +50,34 @@
         .modal-box { background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: 16px; max-height: 90vh; overflow-y: auto; }
 
         .tx-item { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* 🔥 NEW CHAT STYLES (MESSENGER STYLE) */
+        .messenger-layout { display: grid; grid-template-columns: 280px 1fr; height: 600px; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: white; }
+        
+        /* Left: User List */
+        .chat-users { background: #f8fafc; border-right: 1px solid #e2e8f0; overflow-y: auto; }
+        .user-chat-item { padding: 15px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .user-chat-item:hover { background: #f1f5f9; }
+        .user-chat-item.active { background: #e0e7ff; border-left: 4px solid var(--primary); }
+        .unread-dot { width: 10px; height: 10px; background: var(--danger); border-radius: 50%; display: inline-block; }
+
+        /* Right: Chat Box */
+        .chat-area { display: flex; flex-direction: column; height: 100%; background: #fff; }
+        .chat-header { padding: 15px; border-bottom: 1px solid #e2e8f0; font-weight: bold; background: #fff; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input-area { padding: 15px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; background: #fff; }
+        
+        .msg-bubble { padding: 10px 15px; border-radius: 15px; max-width: 70%; font-size: 0.95rem; line-height: 1.4; position: relative; }
+        .msg-left { background: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-right { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-time { font-size: 0.7rem; opacity: 0.7; display: block; margin-top: 5px; text-align: right; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="margin-bottom:20px;">Admin Commander</h2>
+            <h2 style="margin-bottom:20px;">Admin Login</h2>
             <input type="email" id="admin-email" value="farisxuma1@gmail.com" readonly style="background:#f1f5f9;">
             <input type="password" id="admin-pass" placeholder="รหัสผ่าน">
             <button class="btn btn-blue" style="width:100%; padding:12px;" onclick="adminLogin()">เข้าสู่ระบบ</button>
@@ -65,11 +86,11 @@
 
     <div id="app-panel" style="display:none; width:100%; height:100%;">
         <aside class="sidebar">
-            <h2 style="color:white; margin-bottom:30px;">SUPREME</h2>
+            <h2 style="color:white; margin-bottom:30px;">MESSENGER</h2>
             <div class="menu-item active" onclick="switchTab('dash', this)"><i class="fa-solid fa-chart-pie"></i> แดชบอร์ด</div>
             <div class="menu-item" onclick="switchTab('tx', this)"><i class="fa-solid fa-money-bill-transfer"></i> อนุมัติการเงิน</div>
             <div class="menu-item" onclick="switchTab('users', this)"><i class="fa-solid fa-users-gear"></i> จัดการลูกค้า</div>
-            <div class="menu-item" onclick="switchTab('chat', this)"><i class="fa-solid fa-comments"></i> ศูนย์ช่วยเหลือ</div>
+            <div class="menu-item" onclick="switchTab('chat', this)"><i class="fa-solid fa-comments"></i> แชท (Admin) <span id="badge-chat" class="badge-count hidden">0</span></div>
             <div class="menu-item" onclick="switchTab('settings', this)"><i class="fa-solid fa-palette"></i> แต่งเว็บ</div>
             <div style="margin-top:auto;"><button class="btn btn-red" style="width:100%;" onclick="auth.signOut()">ออก</button></div>
         </aside>
@@ -82,7 +103,7 @@
                     <div class="card"><div>เงินรวม</div><div class="stat-val" id="st-money">0 ฿</div></div>
                     <div class="card"><div>สมาชิก</div><div class="stat-val" id="st-users">0</div></div>
                     <div class="card"><div>รออนุมัติ</div><div class="stat-val" id="st-pending" style="color:orange;">0</div></div>
-                    <div class="card"><div>คำร้อง</div><div class="stat-val" id="st-chat">0</div></div>
+                    <div class="card"><div>ข้อความใหม่</div><div class="stat-val" id="st-chat">0</div></div>
                 </div>
             </div>
 
@@ -97,7 +118,7 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
                         <h3>รายชื่อลูกค้า</h3>
-                        <input type="text" id="search-user" placeholder="🔍 ค้นหาชื่อ..." style="width:200px; margin:0;" onkeyup="searchUser()">
+                        <input type="text" id="search-user" placeholder="🔍 ค้นหา..." style="width:200px; margin:0;" onkeyup="searchUser()">
                     </div>
                     <div style="overflow-x:auto;">
                         <table id="user-table">
@@ -109,13 +130,33 @@
             </div>
 
             <div id="tab-chat" style="display:none;">
-                <div class="card"><h3>ข้อความจากลูกค้า</h3><div id="chat-list">Loading...</div></div>
+                <div class="card" style="padding:0; overflow:hidden;">
+                    <div class="messenger-layout">
+                        <div class="chat-users" id="chat-users-list">
+                            <div style="padding:20px; text-align:center; color:#999;">Loading...</div>
+                        </div>
+                        
+                        <div class="chat-area">
+                            <div class="chat-header" id="chat-header-name">เลือกผู้ใช้เพื่อเริ่มแชท</div>
+                            <div class="chat-messages" id="chat-messages-area">
+                                <div style="text-align:center; color:#ccc; margin-top:50px;">
+                                    <i class="fa-solid fa-comments" style="font-size:3rem; margin-bottom:10px;"></i><br>
+                                    เลือกรายชื่อทางซ้ายเพื่อดูข้อความ
+                                </div>
+                            </div>
+                            <div class="chat-input-area" id="chat-input-box" style="display:none;">
+                                <input type="text" id="admin-reply-input" placeholder="พิมพ์ข้อความ..." style="margin:0; flex:1;">
+                                <button class="btn btn-blue" onclick="sendAdminReply()">ส่ง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="tab-settings" style="display:none;">
                 <div class="card">
                     <h3>🎨 ตั้งค่าหน้าเว็บ</h3>
-                    <label>ประกาศ (Announcement)</label><textarea id="set-announce" rows="2"></textarea>
+                    <label>ประกาศ</label><textarea id="set-announce" rows="2"></textarea>
                     <label>ชื่อเว็บ</label><input type="text" id="set-title">
                     <label>สีธีม</label><input type="color" id="set-color" style="height:40px;">
                     <button class="btn btn-blue" onclick="saveSettings()">บันทึก</button>
@@ -128,8 +169,8 @@
         <div class="modal-box">
             <h3>✏️ แก้ไขข้อมูลลูกค้า</h3>
             <input type="hidden" id="edit-uid">
-            <label>ชื่อผู้ใช้</label><input type="text" id="edit-name">
-            <label>ยอดเงิน (แก้เท่าที่จำเป็น)</label><input type="number" id="edit-balance">
+            <label>ชื่อ</label><input type="text" id="edit-name">
+            <label>ยอดเงิน</label><input type="number" id="edit-balance">
             <label>ธนาคาร</label><input type="text" id="edit-bank">
             <label>เลขบัญชี</label><input type="text" id="edit-bankno">
             <div style="text-align:right;">
@@ -158,6 +199,9 @@
         const db = firebase.firestore();
 
         let allUsers = [];
+        let groupedChats = {}; // เก็บแชทแยกตาม UID
+        let currentChatUid = null;
+        let currentChatEmail = '';
 
         auth.onAuthStateChanged(user => {
             if(user && user.email === 'farisxuma1@gmail.com') {
@@ -177,22 +221,21 @@
         function initData() {
             loadUsers();
             loadTransactions();
-            loadChats();
+            loadChats(); // โหลดแชทแบบใหม่
             loadSettings();
         }
 
-        // --- 1. USER MANAGEMENT (UPGRADED) ---
+        // --- 1. USER MANAGEMENT ---
         function loadUsers() {
-            const tbody = document.querySelector('#user-table tbody');
             db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snap => {
                 document.getElementById('st-users').innerText = snap.size;
                 allUsers = [];
                 let totalMoney = 0;
-                tbody.innerHTML = '';
+                document.querySelector('#user-table tbody').innerHTML = '';
 
                 snap.forEach(doc => {
                     const u = doc.data();
-                    u.id = doc.id; // เก็บ UID ไว้ใช้
+                    u.id = doc.id;
                     allUsers.push(u);
                     totalMoney += (u.balance || 0);
                 });
@@ -205,28 +248,24 @@
             const tbody = document.querySelector('#user-table tbody');
             tbody.innerHTML = '';
             users.forEach(u => {
-                let bank = u.bankName ? `${u.bankName} (${u.bankNo})` : '<span style="color:#ccc">ไม่ระบุ</span>';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${u.username}</b><br><small>${u.email}</small></td>
-                        <td>${bank}</td>
-                        <td style="font-weight:bold; color:${u.balance>0?'green':'black'}">${(u.balance||0).toLocaleString()} ฿</td>
-                        <td>
-                            <button class="btn btn-orange" onclick="openEditUser('${u.id}')">✏️ แก้ไข</button>
-                            <button class="btn btn-blue" onclick="resetPass('${u.email}')">🔑 รีเซ็ต</button>
-                            <button class="btn btn-red" onclick="deleteUser('${u.id}')">🗑️ ลบ</button>
-                        </td>
-                    </tr>`;
+                let bank = u.bankName ? `${u.bankName} (${u.bankNo})` : '-';
+                tbody.innerHTML += `<tr>
+                    <td><b>${u.username}</b><br><small>${u.email}</small></td>
+                    <td>${bank}</td>
+                    <td style="color:${u.balance>0?'green':'black'}">${(u.balance||0).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-orange" onclick="openEditUser('${u.id}')">✏️</button>
+                        <button class="btn btn-red" onclick="deleteUser('${u.id}')">🗑️</button>
+                    </td>
+                </tr>`;
             });
         }
-
         function searchUser() {
             const txt = document.getElementById('search-user').value.toLowerCase();
-            const filtered = allUsers.filter(u => u.username.toLowerCase().includes(txt) || u.email.toLowerCase().includes(txt));
-            renderUserTable(filtered);
+            renderUserTable(allUsers.filter(u => u.username.toLowerCase().includes(txt) || u.email.toLowerCase().includes(txt)));
         }
 
-        // --- EDIT & DELETE USER ---
+        // Edit User
         function openEditUser(uid) {
             const u = allUsers.find(user => user.id === uid);
             document.getElementById('edit-uid').value = uid;
@@ -236,64 +275,41 @@
             document.getElementById('edit-bankno').value = u.bankNo || '';
             document.getElementById('edit-modal').classList.add('active');
         }
-
         async function saveEditUser() {
             const uid = document.getElementById('edit-uid').value;
-            const data = {
+            await db.collection('users').doc(uid).update({
                 username: document.getElementById('edit-name').value,
                 balance: parseFloat(document.getElementById('edit-balance').value),
                 bankName: document.getElementById('edit-bank').value,
                 bankNo: document.getElementById('edit-bankno').value
-            };
-            await db.collection('users').doc(uid).update(data);
-            document.getElementById('edit-modal').classList.remove('active');
-            Swal.fire('บันทึกแล้ว','แก้ไขข้อมูลสำเร็จ','success');
-        }
-
-        async function deleteUser(uid) {
-            const { isConfirmed } = await Swal.fire({
-                title: 'ลบผู้ใช้คนนี้?', text: "ข้อมูลทั้งหมดจะหายไป กู้คืนไม่ได้!", icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ยืนยันลบ'
             });
-            if(isConfirmed) {
-                try {
-                    await db.collection('users').doc(uid).delete();
-                    // ลบธุรกรรมและงาน (Optional: ปกติลบแค่ User ก็พอเข้าระบบไม่ได้แล้ว)
-                    Swal.fire('ลบสำเร็จ', 'ผู้ใช้ถูกลบออกจากระบบแล้ว', 'success');
-                } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            document.getElementById('edit-modal').classList.remove('active');
+            Swal.fire('บันทึกแล้ว','','success');
+        }
+        async function deleteUser(uid) {
+            if(confirm('ลบผู้ใช้คนนี้ถาวร?')) {
+                await db.collection('users').doc(uid).delete();
+                Swal.fire('ลบแล้ว','','success');
             }
         }
 
-        async function resetPass(email) {
-            if(confirm('ส่งลิงก์รีเซ็ตให้ '+email+'?')) {
-                await auth.sendPasswordResetEmail(email); Swal.fire('ส่งแล้ว','','success');
-            }
-        }
-
-        // --- 2. TRANSACTIONS (Approval) ---
+        // --- 2. TRANSACTIONS ---
         function loadTransactions() {
             db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
+                document.getElementById('st-pending').innerText = snap.size;
                 const div = document.getElementById('tx-list');
                 div.innerHTML = '';
-                document.getElementById('st-pending').innerText = snap.size;
-
                 if(snap.empty) { div.innerHTML = '<p style="color:#ccc;">ไม่มีรายการรออนุมัติ</p>'; return; }
-
-                let items = [];
-                snap.forEach(doc => items.push({id:doc.id, ...doc.data()}));
-                items.sort((a,b) => (a.timestamp?.seconds||0) - (b.timestamp?.seconds||0));
+                
+                let items=[]; snap.forEach(d=>items.push({id:d.id, ...d.data()}));
+                items.sort((a,b)=>(a.timestamp?.seconds||0)-(b.timestamp?.seconds||0));
 
                 items.forEach(t => {
-                    let typeTxt = t.type === 'deposit' ? 'ฝากเงิน' : `ถอนเงิน (หัก ${t.totalDeduct})`;
-                    let color = t.type === 'deposit' ? '#10b981' : '#ef4444';
-                    let details = t.type === 'withdraw' ? `<br><small style="background:#eff6ff; padding:3px;">🏦 ${t.bankName} ${t.bankNo} (${t.bankAccName})</small>` : '';
-
+                    let type = t.type==='deposit'?'ฝากเงิน':'ถอนเงิน';
+                    let color = t.type==='deposit'?'#10b981':'#ef4444';
                     div.innerHTML += `
                         <div class="tx-item">
-                            <div>
-                                <b style="color:${color}">${typeTxt}</b> : ${t.amount.toLocaleString()} ฿<br>
-                                <small>${t.email}</small>${details}
-                            </div>
+                            <div><b style="color:${color}">${type}</b> : ${t.amount.toLocaleString()} ฿<br><small>${t.email}</small></div>
                             <div>
                                 <button class="btn btn-green" onclick="processTx('${t.id}','${t.uid}',${t.amount},'${t.type}',${t.totalDeduct||0},'${t.email}')">อนุมัติ</button>
                                 <button class="btn btn-red" onclick="rejectTx('${t.id}')">ปฏิเสธ</button>
@@ -302,27 +318,21 @@
                 });
             });
         }
-
-        async function processTx(txId, uid, amount, type, deduct, email) {
+        async function processTx(id,uid,amt,type,deduct,email) {
             if(!confirm('ยืนยันอนุมัติ?')) return;
             try {
-                await db.runTransaction(async (t) => {
+                await db.runTransaction(async t=>{
                     const uRef = db.collection('users').doc(uid);
-                    const txRef = db.collection('transactions').doc(txId);
+                    const txRef = db.collection('transactions').doc(id);
                     const uDoc = await t.get(uRef);
+                    let bal=0;
+                    if(!uDoc.exists) { if(type==='withdraw') throw "Error"; t.set(uRef,{email,username:'Recovered',balance:0}); }
+                    else bal=uDoc.data().balance||0;
                     
-                    let bal = 0;
-                    if(!uDoc.exists) { // Auto-Fix Missing User
-                        if(type==='withdraw') throw "หาบัญชีไม่เจอ";
-                        t.set(uRef, {email:email, username:'Recovered', balance:0, createdAt:new Date()});
-                    } else bal = uDoc.data().balance||0;
-
-                    let newBal = bal;
-                    if(type==='deposit') newBal += amount;
-                    else { if(bal<deduct) throw "เงินไม่พอ"; newBal -= deduct; }
-
-                    t.update(uRef, {balance:newBal});
-                    t.update(txRef, {status:'approved'});
+                    let nBal=bal;
+                    if(type==='deposit') nBal+=amt; else { if(bal<deduct) throw "เงินไม่พอ"; nBal-=deduct; }
+                    
+                    t.update(uRef,{balance:nBal}); t.update(txRef,{status:'approved'});
                 });
                 Swal.fire('สำเร็จ','','success');
             } catch(e) { Swal.fire('Error',e.toString(),'error'); }
@@ -331,32 +341,135 @@
             if(confirm('ปฏิเสธ?')) await db.collection('transactions').doc(id).update({status:'rejected'});
         }
 
-        // --- 3. CHAT & SETTINGS ---
+        // --- 3. CHAT MESSENGER (NEW LOGIC) ---
         function loadChats() {
-            db.collection('reports').where('status','==','pending').onSnapshot(snap => {
-                document.getElementById('st-chat').innerText = snap.size;
-                const div = document.getElementById('chat-list');
-                div.innerHTML = '';
-                if(snap.empty) { div.innerHTML='<p style="color:#ccc">ไม่มีข้อความใหม่</p>'; return; }
+            // ฟังข้อความทั้งหมด
+            db.collection('reports').orderBy('timestamp', 'asc').onSnapshot(snap => {
+                groupedChats = {}; // Reset Grouping
+                let unreadTotal = 0;
+
                 snap.forEach(doc => {
-                    const t = doc.data();
-                    div.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;">
-                        <b>${t.email}</b>: ${t.message}
-                        <div style="display:flex; gap:5px; margin-top:5px;"><input id="rep-${doc.id}" placeholder="ตอบกลับ..." style="margin:0; flex:1;"><button class="btn btn-blue" onclick="reply('${doc.id}')">ส่ง</button></div>
-                    </div>`;
+                    const msg = doc.data();
+                    const uid = msg.uid;
+                    if(!groupedChats[uid]) {
+                        groupedChats[uid] = { email: msg.email, msgs: [], unread: 0, lastTime: 0 };
+                    }
+                    
+                    groupedChats[uid].msgs.push({ id: doc.id, ...msg });
+                    groupedChats[uid].lastTime = msg.timestamp?.seconds || 0;
+                    
+                    // นับ Unread (ถ้า status pending และไม่มี adminReply)
+                    if(msg.status === 'pending' && !msg.adminReply) {
+                        groupedChats[uid].unread++;
+                        unreadTotal++;
+                    }
                 });
+
+                // Update UI Left Side
+                renderChatList();
+                
+                // Update Badges
+                document.getElementById('st-chat').innerText = unreadTotal;
+                const b = document.getElementById('badge-chat');
+                if(unreadTotal>0) { b.innerText=unreadTotal; b.classList.remove('hidden'); } else b.classList.add('hidden');
+
+                // Update Right Side (ถ้าเปิดแชทอยู่)
+                if(currentChatUid) openChat(currentChatUid, currentChatEmail);
             });
         }
-        async function reply(id) {
-            const msg = document.getElementById('rep-'+id).value;
-            if(!msg) return;
-            await db.collection('reports').doc(id).update({status:'done', adminReply:msg});
+
+        function renderChatList() {
+            const listDiv = document.getElementById('chat-users-list');
+            listDiv.innerHTML = '';
+
+            // แปลง Object เป็น Array แล้วเรียงตามเวลาล่าสุด (ใครทักมาล่าสุดอยู่บน)
+            const sortedUids = Object.keys(groupedChats).sort((a,b) => groupedChats[b].lastTime - groupedChats[a].lastTime);
+
+            if(sortedUids.length === 0) {
+                listDiv.innerHTML = '<div style="padding:20px;text-align:center;color:#ccc;">ไม่มีประวัติแชท</div>';
+                return;
+            }
+
+            sortedUids.forEach(uid => {
+                const chat = groupedChats[uid];
+                const activeClass = (uid === currentChatUid) ? 'active' : '';
+                const unreadHtml = chat.unread > 0 ? `<div class="unread-dot"></div>` : '';
+                const lastMsg = chat.msgs[chat.msgs.length-1].message;
+                
+                listDiv.innerHTML += `
+                    <div class="user-chat-item ${activeClass}" onclick="openChat('${uid}', '${chat.email}')">
+                        <div style="flex:1; overflow:hidden;">
+                            <div style="font-weight:bold; font-size:0.9rem;">${chat.email}</div>
+                            <div style="font-size:0.8rem; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${lastMsg}</div>
+                        </div>
+                        ${unreadHtml}
+                    </div>
+                `;
+            });
         }
 
+        function openChat(uid, email) {
+            currentChatUid = uid;
+            currentChatEmail = email;
+            
+            document.getElementById('chat-header-name').innerText = email;
+            document.getElementById('chat-input-box').style.display = 'flex';
+            
+            const area = document.getElementById('chat-messages-area');
+            area.innerHTML = '';
+
+            const chats = groupedChats[uid];
+            if(!chats) return;
+
+            chats.msgs.forEach(m => {
+                // User Msg
+                const time = m.timestamp ? new Date(m.timestamp.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
+                area.innerHTML += `<div class="msg-bubble msg-left">${m.message}<span class="msg-time">${time}</span></div>`;
+                
+                // Admin Reply (ถ้ามี)
+                if(m.adminReply) {
+                    area.innerHTML += `<div class="msg-bubble msg-right">${m.adminReply}<span class="msg-time">Admin</span></div>`;
+                }
+            });
+
+            // Scroll to bottom
+            area.scrollTop = area.scrollHeight;
+            renderChatList(); // Re-render to update active state
+        }
+
+        async function sendAdminReply() {
+            const txt = document.getElementById('admin-reply-input').value;
+            if(!txt || !currentChatUid) return;
+
+            // หาข้อความล่าสุดของ User นี้ที่ยังไม่มี reply (หรือจะสร้าง doc ใหม่ก็ได้ แต่วิธีนี้ง่ายกว่าสำหรับโปรเจกต์นี้)
+            // ในที่นี้เราจะ Reply ใส่ข้อความล่าสุดของลูกค้าที่เป็น Pending
+            const chats = groupedChats[currentChatUid];
+            if(!chats || chats.msgs.length === 0) return;
+
+            // Logic: Reply ใส่ข้อความล่าสุดของลูกค้า
+            const lastMsg = chats.msgs[chats.msgs.length-1];
+            
+            try {
+                // ถ้าอยากให้เป็นการตอบโต้แบบใหม่ แนะนำให้สร้าง doc ใหม่ที่มี type: 'admin'
+                // แต่เพื่อความง่ายกับโค้ดเดิม เราจะ Update doc ล่าสุดของลูกค้า
+                // หรือถ้า doc นั้นตอบไปแล้ว ก็ตอบซ้ำได้ (Edit reply) หรือสร้างใหม่
+                // *วิธีที่ดีที่สุดสำหรับโค้ดชุดนี้คือ: Update doc ล่าสุด*
+                
+                await db.collection('reports').doc(lastMsg.id).update({
+                    status: 'done',
+                    adminReply: txt // *ข้อจำกัด: 1 user msg = 1 admin reply*
+                    // ถ้าอยากได้แชทแบบ Facebook จริงๆ ต้องเปลี่ยนโครงสร้าง DB เยอะมาก
+                    // แต่วิธีนี้เพียงพอสำหรับงานส่งสลิป/แจ้งปัญหาครับ
+                });
+                
+                document.getElementById('admin-reply-input').value = '';
+            } catch(e) { Swal.fire('Error',e.message,'error'); }
+        }
+
+        // --- 5. SETTINGS ---
         async function loadSettings() {
-            const doc = await db.collection('site_config').doc('main').get();
-            if(doc.exists) {
-                const d = doc.data();
+            const d = (await db.collection('site_config').doc('main').get()).data();
+            if(d) {
                 document.getElementById('set-announce').value = d.announcement||'';
                 document.getElementById('set-title').value = d.title||'';
                 document.getElementById('set-color').value = d.color||'#4f46e5';
