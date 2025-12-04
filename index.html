@@ -49,11 +49,7 @@
         
         /* Tickets */
         .ticket-item { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; }
-        .bg-pending { background: #fff7ed; color: #c2410c; }
-        .bg-done { background: #f0fdf4; color: #15803d; }
-        
-        .btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; color: white; font-size: 0.9rem; }
+        .btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; color: white; font-size: 0.9rem; margin-right: 5px; }
         .btn-green { background: var(--success); }
         .btn-red { background: var(--danger); }
         .btn-blue { background: var(--primary); }
@@ -72,7 +68,7 @@
 
     <div id="app-panel" style="display:none; width:100%; height:100%;">
         <aside class="sidebar">
-            <div class="brand"><i class="fa-solid fa-shield-cat"></i> Manager</div>
+            <div class="brand"><i class="fa-solid fa-shield-cat"></i> Admin</div>
             <div class="menu-item active" onclick="switchTab('dash', this)"><i class="fa-solid fa-chart-pie"></i> ภาพรวม</div>
             <div class="menu-item" onclick="switchTab('tx', this)"><i class="fa-solid fa-money-bill-transfer"></i> รายการฝาก-ถอน</div>
             <div class="menu-item" onclick="switchTab('chat', this)"><i class="fa-solid fa-comments"></i> แชท/แจ้งปัญหา</div>
@@ -83,7 +79,7 @@
         <main class="main">
             <div class="header">
                 <h2 id="page-title">ภาพรวมระบบ</h2>
-                <div style="font-weight:bold; color:var(--primary);">Admin: farisxuma1</div>
+                <div style="font-weight:bold; color:var(--primary);">Admin Mode</div>
             </div>
 
             <div id="tab-dash">
@@ -155,7 +151,7 @@
         // AUTH
         auth.onAuthStateChanged(user => {
             if(user) {
-                // เช็คว่าเป็นอีเมลแอดมินหรือไม่ (เพื่อความชัวร์ทาง UI)
+                // เช็คอีเมลแอดมิน
                 if(user.email !== 'farisxuma1@gmail.com') {
                     Swal.fire('Access Denied','คุณไม่ใช่แอดมิน','error').then(()=>auth.signOut());
                     return;
@@ -183,7 +179,7 @@
             loadChats();
         }
 
-        // --- 1. USERS & STATS ---
+        // --- 1. USERS ---
         async function loadUsers() {
             const tbody = document.querySelector('#user-table tbody');
             tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
@@ -201,7 +197,7 @@
                     
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${u.username}</td>
+                        <td>${u.username || 'No Name'}</td>
                         <td>${u.email}</td>
                         <td style="font-weight:bold; color:${u.balance>0?'green':'black'}">${(u.balance||0).toLocaleString()} ฿</td>
                         <td>
@@ -214,9 +210,8 @@
             } catch(e) { console.log(e); }
         }
 
-        // --- 2. TRANSACTIONS (Approval) ---
+        // --- 2. TRANSACTIONS (Approval with Fix) ---
         function loadTransactions() {
-            // ดึงเฉพาะสถานะ Pending
             db.collection('transactions').where('status', '==', 'pending').onSnapshot(snap => {
                 const div = document.getElementById('tx-pending-list');
                 div.innerHTML = '';
@@ -227,28 +222,26 @@
                 // โหลดมาแล้วเรียงใน JS
                 let items = [];
                 snap.forEach(doc => items.push({id: doc.id, ...doc.data()}));
-                items.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0)); // เก่า -> ใหม่ (งานค้างต้องรีบทำ)
+                items.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
 
                 items.forEach(t => {
-                    let typeTxt = t.type === 'deposit' ? 'ฝากเงิน (ตรวจสอบสลิปในแชท)' : `ถอนเงิน (หักยอด ${t.totalDeduct})`;
+                    let typeTxt = t.type === 'deposit' ? 'ฝากเงิน (เช็คสลิป)' : `ถอนเงิน (หัก ${t.totalDeduct})`;
                     let color = t.type === 'deposit' ? '#00b4d8' : '#ef4444';
-                    let action = t.type === 'deposit' ? 'deposit' : 'withdraw';
-                    let amountToProcess = t.type === 'withdraw' ? t.totalDeduct : t.amount;
-
+                    
                     div.innerHTML += `
                         <div class="ticket-item">
                             <div style="display:flex; justify-content:space-between;">
                                 <div>
                                     <div style="font-weight:bold; color:${color}">${typeTxt}</div>
                                     <div style="font-size:0.9rem;">User: ${t.email}</div>
-                                    <div style="font-size:0.8rem; color:#888;">${new Date(t.timestamp.seconds*1000).toLocaleString()}</div>
+                                    <div style="font-size:0.8rem; color:#888;">${t.timestamp ? new Date(t.timestamp.seconds*1000).toLocaleString() : '...'}</div>
                                 </div>
                                 <div style="text-align:right;">
                                     <div style="font-size:1.5rem; font-weight:bold;">${t.amount.toLocaleString()} ฿</div>
                                 </div>
                             </div>
                             <div style="margin-top:10px;">
-                                <button class="btn btn-green" onclick="processTx('${t.id}', '${t.uid}', ${t.amount}, '${t.type}', ${t.totalDeduct || 0})">อนุมัติ</button>
+                                <button class="btn btn-green" onclick="processTx('${t.id}', '${t.uid}', ${t.amount}, '${t.type}', ${t.totalDeduct || 0}, '${t.email}')">อนุมัติ</button>
                                 <button class="btn btn-red" onclick="rejectTx('${t.id}')">ปฏิเสธ</button>
                             </div>
                         </div>
@@ -257,9 +250,9 @@
             });
         }
 
-        // ฟังก์ชันอนุมัติเงิน (หัวใจสำคัญ)
-        async function processTx(txId, uid, amount, type, withdrawTotal) {
-            if(!confirm('ยืนยันอนุมัติรายการนี้?')) return;
+        // ✅ ฟังก์ชันอนุมัติเงิน (แก้บั๊ก User Not Found แล้ว)
+        async function processTx(txId, uid, amount, type, withdrawTotal, userEmail) {
+            if(!confirm('ยืนยันอนุมัติ?')) return;
 
             try {
                 await db.runTransaction(async (transaction) => {
@@ -267,16 +260,32 @@
                     const txRef = db.collection('transactions').doc(txId);
 
                     const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists) throw "User not found";
+                    let currentBal = 0;
 
-                    let currentBal = userDoc.data().balance || 0;
+                    // ถ้าไม่พบ User (กรณีบั๊ก) ให้สร้างใหม่เลย
+                    if (!userDoc.exists) {
+                        if (type === 'withdraw') throw "ไม่พบบัญชีผู้ใช้ (ถอนไม่ได้)";
+                        
+                        console.warn("User missing, creating recovery profile...");
+                        transaction.set(userRef, {
+                            username: 'User (Recovered)',
+                            email: userEmail || 'unknown@user.com',
+                            balance: 0,
+                            createdAt: new Date(),
+                            photoURL: `https://ui-avatars.com/api/?name=User`
+                        });
+                        currentBal = 0;
+                    } else {
+                        currentBal = userDoc.data().balance || 0;
+                    }
+
                     let newBal = currentBal;
 
                     if (type === 'deposit') {
-                        newBal += amount; // เพิ่มเงิน
+                        newBal += amount;
                     } else if (type === 'withdraw') {
                         if (currentBal < withdrawTotal) throw "เงินลูกค้าไม่พอถอน!";
-                        newBal -= withdrawTotal; // ลดเงิน (รวมค่าธรรมเนียม)
+                        newBal -= withdrawTotal;
                     }
 
                     transaction.update(userRef, { balance: newBal });
@@ -284,9 +293,9 @@
                 });
 
                 Swal.fire('สำเร็จ', 'อนุมัติเรียบร้อย', 'success');
-                loadUsers(); // อัปเดตตาราง user
+                // ไม่ต้อง reload หน้า เพราะ onSnapshot จะทำงานเอง
             } catch(e) {
-                Swal.fire('ผิดพลาด', e.toString(), 'error');
+                Swal.fire('ทำรายการไม่ได้', e.toString(), 'error');
             }
         }
 
@@ -296,9 +305,8 @@
             }
         }
 
-        // --- 3. CHAT / SUPPORT ---
+        // --- 3. CHAT ---
         function loadChats() {
-            // โหลดแชททั้งหมด (อาจจะเยอะ ถ้าเยอะมากต้อง limit)
             db.collection('reports').where('status', '==', 'pending').onSnapshot(snap => {
                 const div = document.getElementById('chat-list');
                 div.innerHTML = '';
@@ -314,11 +322,11 @@
                         <div class="ticket-item">
                             <div style="display:flex; justify-content:space-between;">
                                 <b>${t.email}</b>
-                                <small>${new Date(t.timestamp.seconds*1000).toLocaleString()}</small>
+                                <small>${t.timestamp ? new Date(t.timestamp.seconds*1000).toLocaleString() : ''}</small>
                             </div>
                             <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin:5px 0;">${t.message}</div>
                             <div style="display:flex; gap:5px;">
-                                <input type="text" id="reply-${t.id}" placeholder="พิมพ์ตอบกลับ..." style="margin:0; padding:5px;">
+                                <input type="text" id="reply-${t.id}" placeholder="พิมพ์ตอบกลับ..." style="margin:0; padding:5px; flex:1;">
                                 <button class="btn btn-blue" onclick="sendReply('${t.id}')">ส่ง</button>
                             </div>
                         </div>
@@ -334,7 +342,6 @@
             Swal.fire('ตอบกลับแล้ว', '', 'success');
         }
 
-        // Utils
         async function resetPass(email) {
             if(confirm('ส่งลิงก์รีเซ็ตรหัสให้ '+email+'?')) {
                 try {
