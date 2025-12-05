@@ -2,56 +2,31 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Middleman</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Admin - FoodRunner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #f3f4f6; margin: 0; display: flex; }
-        .sidebar { width: 250px; background: #1e293b; color: white; height: 100vh; padding: 20px; }
+        body { font-family: 'Prompt', sans-serif; background: #f8f9fa; display: flex; }
+        .sidebar { width: 250px; background: #2f3542; color: white; height: 100vh; padding: 20px; }
         .main { flex: 1; padding: 20px; overflow-y: auto; height: 100vh; }
-        .menu-item { padding: 15px; cursor: pointer; border-bottom: 1px solid #334155; }
-        .menu-item:hover { background: #334155; }
-        
-        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
-        
-        .btn-sm { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; color: white; margin-right: 5px; }
-        .bg-green { background: #10b981; } .bg-red { background: #ef4444; } .bg-blue { background: #3b82f6; }
+        .menu-item { padding: 15px; cursor: pointer; border-bottom: 1px solid #57606f; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn { padding: 5px 10px; cursor: pointer; color: white; border: none; border-radius: 5px; margin-right: 5px; }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
-        <h2>Admin Panel</h2>
+        <h3>Admin Panel</h3>
+        <div class="menu-item" onclick="show('tx')">ธุรกรรมการเงิน</div>
         <div class="menu-item" onclick="show('users')">จัดการผู้ใช้</div>
-        <div class="menu-item" onclick="show('tx')">อนุมัติการเงิน</div>
-        <div class="menu-item" onclick="show('rooms')">ส่องห้องแชท</div>
         <div class="menu-item" onclick="show('support')">Support Chat</div>
     </div>
-
+    
     <div class="main">
-        <div id="tab-users" class="card">
-            <h3>รายชื่อผู้ใช้</h3>
-            <div id="user-list">Loading...</div>
-        </div>
-
-        <div id="tab-tx" class="card" style="display:none;">
-            <h3>รายการรออนุมัติ (ฝาก/ถอน)</h3>
-            <div id="tx-list">Loading...</div>
-        </div>
-
-        <div id="tab-rooms" class="card" style="display:none;">
-            <h3>ห้องสนทนาทั้งหมด (Spy Mode)</h3>
-            <div id="room-list">Loading...</div>
-        </div>
-
-        <div id="tab-support" class="card" style="display:none;">
-            <h3>ข้อความช่วยเหลือ</h3>
-            <div id="support-list">Loading...</div>
-        </div>
+        <div id="p-tx" class="card"><h3>รายการรออนุมัติ</h3><div id="tx-list"></div></div>
+        <div id="p-users" class="card" style="display:none;"><h3>ผู้ใช้ทั้งหมด</h3><div id="user-list"></div></div>
+        <div id="p-support" class="card" style="display:none;"><h3>แจ้งปัญหา</h3><div id="support-list"></div></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -71,136 +46,90 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Admin Auth Check (Simple)
-        auth.onAuthStateChanged(user => {
-            if(!user) {
-                // Prompt Login
-                const email = prompt("Admin Email");
-                const pass = prompt("Password");
-                auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
-            } else {
-                initAdmin();
-            }
+        auth.onAuthStateChanged(u => {
+            if(!u) {
+                const e = prompt("Admin Email"); const p = prompt("Password");
+                auth.signInWithEmailAndPassword(e, p);
+            } else init();
         });
 
-        function initAdmin() {
-            // Load Users
-            db.collection('users').onSnapshot(snap => {
-                let html = '<table class="table"><tr><th>Name</th><th>Email</th><th>Balance</th><th>Status</th><th>Action</th></tr>';
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    const statusColor = u.status === 'banned' ? 'red' : 'green';
-                    html += `<tr>
-                        <td>${u.username}</td>
-                        <td>${u.email}</td>
-                        <td>${u.balance}</td>
-                        <td style="color:${statusColor}">${u.status}</td>
-                        <td>
-                            <button class="btn-sm bg-blue" onclick="editUser('${doc.id}')">Edit</button>
-                            <button class="btn-sm bg-red" onclick="banUser('${doc.id}', '${u.status}')">${u.status==='active'?'Ban':'Unban'}</button>
-                        </td>
-                    </tr>`;
-                });
-                document.getElementById('user-list').innerHTML = html + '</table>';
-            });
-
-            // Load Tx
+        function init() {
+            // Transactions
             db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
-                let html = '<table class="table"><tr><th>User</th><th>Type</th><th>Amount</th><th>Action</th></tr>';
-                if(snap.empty) html = 'ไม่มีรายการค้าง';
-                else snap.forEach(doc => {
-                    const t = doc.data();
-                    html += `<tr>
-                        <td>${t.uid}</td>
+                let h = '<table width="100%"><tr><th>Type</th><th>Amount</th><th>User</th><th>Action</th></tr>';
+                snap.forEach(d => {
+                    const t = d.data();
+                    h += `<tr>
                         <td>${t.type}</td>
-                        <td>${t.amount}</td>
+                        <td>${t.amount} (Fee: ${t.fee||0})</td>
+                        <td>${t.uid}</td>
                         <td>
-                            <button class="btn-sm bg-green" onclick="approveTx('${doc.id}', '${t.uid}', ${t.amount}, '${t.type}')">อนุมัติ</button>
-                            <button class="btn-sm bg-red" onclick="rejectTx('${doc.id}')">ปฏิเสธ</button>
+                            <button class="btn" style="background:green" onclick="approveTx('${d.id}','${t.uid}',${t.amount},'${t.type}',${t.total||t.amount})">✔</button>
+                            <button class="btn" style="background:red" onclick="rejectTx('${d.id}')">✘</button>
                         </td>
                     </tr>`;
                 });
-                document.getElementById('tx-list').innerHTML = html + '</table>';
+                document.getElementById('tx-list').innerHTML = h + '</table>';
             });
 
-            // Load Rooms
-            db.collection('rooms').onSnapshot(snap => {
-                let html = '';
-                snap.forEach(doc => {
-                    const r = doc.data();
-                    html += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                        <b>${r.name}</b>
-                        <button class="btn-sm bg-blue" onclick="spyRoom('${doc.id}', '${r.name}')">แอบส่อง</button>
+            // Users
+            db.collection('users').onSnapshot(snap => {
+                let h = '<table width="100%"><tr><th>Name</th><th>Phone</th><th>Balance</th><th>Edit</th></tr>';
+                snap.forEach(d => {
+                    const u = d.data();
+                    h += `<tr>
+                        <td>${u.username}</td><td>${u.phone}</td><td>${u.balance}</td>
+                        <td><button class="btn" style="background:blue" onclick="editBal('${d.id}', ${u.balance})">Edit Bal</button></td>
+                    </tr>`;
+                });
+                document.getElementById('user-list').innerHTML = h + '</table>';
+            });
+
+            // Support
+            db.collection('support').orderBy('timestamp','desc').onSnapshot(snap => {
+                let h = '';
+                snap.forEach(d => {
+                    const s = d.data();
+                    h += `<div style="border-bottom:1px solid #eee; padding:10px;">
+                        <b>User:</b> ${s.message}<br>
+                        ${s.reply ? `<b style="color:blue">Admin: ${s.reply}</b>` : `<button class="btn" style="background:#ffa502" onclick="reply('${d.id}')">ตอบกลับ</button>`}
                     </div>`;
                 });
-                document.getElementById('room-list').innerHTML = html;
-            });
-
-            // Load Support
-            db.collection('support_chats').where('status','==','pending').onSnapshot(snap => {
-                let html = '';
-                snap.forEach(doc => {
-                    const s = doc.data();
-                    html += `<div style="padding:10px; border:1px solid #ddd; margin-bottom:5px;">
-                        <b>${s.email}:</b> ${s.message}
-                        <button class="btn-sm bg-green" onclick="replySupport('${doc.id}')">ตอบรับ (Done)</button>
-                    </div>`;
-                });
-                document.getElementById('support-list').innerHTML = html;
+                document.getElementById('support-list').innerHTML = h;
             });
         }
 
-        // Actions
-        async function editUser(uid) {
-            const {value:name} = await Swal.fire({title:'แก้ชื่อใหม่', input:'text'});
-            if(name) await db.collection('users').doc(uid).update({username: name});
-        }
+        async function approveTx(id, uid, amt, type, totalDeduct) {
+            if(!confirm('ยืนยัน?')) return;
+            await db.runTransaction(async t => {
+                const uRef = db.collection('users').doc(uid);
+                const txRef = db.collection('transactions').doc(id);
+                const uDoc = await t.get(uRef);
+                let bal = uDoc.data().balance;
 
-        async function banUser(uid, currentStatus) {
-            const newStatus = currentStatus === 'active' ? 'banned' : 'active';
-            await db.collection('users').doc(uid).update({status: newStatus});
-        }
+                if(type === 'deposit') bal += amt;
+                else bal -= totalDeduct;
 
-        async function approveTx(txId, uid, amount, type) {
-            if(!confirm('ยืนยันอนุมัติ?')) return;
-            try {
-                await db.runTransaction(async (t) => {
-                    const userRef = db.collection('users').doc(uid);
-                    const txRef = db.collection('transactions').doc(txId);
-                    const userDoc = await t.get(userRef);
-                    let newBal = userDoc.data().balance;
-                    
-                    if(type === 'deposit') newBal += amount;
-                    else newBal -= amount;
-
-                    t.update(userRef, {balance: newBal});
-                    t.update(txRef, {status: 'approved'});
-                });
-                alert('สำเร็จ');
-            } catch(e) { alert(e); }
-        }
-
-        async function rejectTx(txId) {
-            await db.collection('transactions').doc(txId).update({status: 'rejected'});
-        }
-
-        async function spyRoom(roomId, roomName) {
-            // ดึงข้อความล่าสุดมาโชว์ (แบบง่าย)
-            const snap = await db.collection('rooms').doc(roomId).collection('messages').orderBy('timestamp','desc').limit(5).get();
-            let msgHtml = `<b>${roomName} (Latest 5 msgs):</b><br><br>`;
-            snap.forEach(doc => {
-                msgHtml += `${doc.data().text}<br><hr>`;
+                t.update(uRef, {balance: bal});
+                t.update(txRef, {status: 'approved'});
             });
-            Swal.fire({html: msgHtml});
         }
+
+        async function rejectTx(id) { await db.collection('transactions').doc(id).update({status:'rejected'}); }
         
-        async function replySupport(id) {
-            await db.collection('support_chats').doc(id).update({status: 'done'});
+        async function editBal(uid, old) {
+            const {value: n} = await Swal.fire({title:'แก้เงิน', input:'number', inputValue:old});
+            if(n) await db.collection('users').doc(uid).update({balance: parseFloat(n)});
         }
 
-        function show(tab) {
-            ['users','tx','rooms','support'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
-            document.getElementById('tab-'+tab).style.display = 'block';
+        async function reply(id) {
+            const {value: txt} = await Swal.fire({title:'ตอบกลับ', input:'text'});
+            if(txt) await db.collection('support').doc(id).update({reply: txt, status:'replied'});
+        }
+
+        function show(id) {
+            ['p-tx','p-users','p-support'].forEach(e => document.getElementById(e).style.display='none');
+            document.getElementById('p-'+id).style.display='block';
         }
     </script>
 </body>
