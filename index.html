@@ -2,12 +2,12 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel</title>
+    <title>Admin Panel | FoodRunner</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Prompt', sans-serif; display: flex; margin: 0; background: #f0f2f5; height: 100vh; }
+        body { font-family: 'Prompt', sans-serif; display: flex; margin: 0; background: #f3f4f6; height: 100vh; }
         .sidebar { width: 250px; background: #1f2937; color: white; padding: 20px; }
         .main { flex: 1; padding: 20px; overflow-y: auto; }
         .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -23,7 +23,7 @@
 <div id="login">
     <div style="background:white; padding:30px; border-radius:10px; width:300px; text-align:center;">
         <h2>Admin Login</h2>
-        <input id="a-email" placeholder="Email (farisxuma1@gmail.com)">
+        <input id="a-email" value="farisxuma1@gmail.com" readonly style="background:#eee">
         <input id="a-pass" type="password" placeholder="Password">
         <button onclick="doLogin()" style="width:100%; padding:10px; background:#3b82f6; color:white; border:none; cursor:pointer;">Login</button>
     </div>
@@ -31,9 +31,9 @@
 
 <div class="sidebar">
     <h3>Admin Control</h3>
-    <p onclick="show('users')" style="cursor:pointer">👥 ผู้ใช้งาน</p>
-    <p onclick="show('tx')" style="cursor:pointer">💰 การเงิน</p>
-    <button onclick="auth.signOut()" style="margin-top:20px; background:red; color:white; border:none; padding:5px;">Logout</button>
+    <p onclick="show('users')" style="cursor:pointer">👥 ผู้ใช้งาน (Users)</p>
+    <p onclick="show('tx')" style="cursor:pointer">💰 ธุรกรรม (Transactions)</p>
+    <button onclick="firebase.auth().signOut()" style="margin-top:20px; background:red; color:white; border:none; padding:5px;">Logout</button>
 </div>
 
 <div class="main">
@@ -42,7 +42,7 @@
         <div id="u-list">Loading...</div>
     </div>
     <div id="p-tx" class="card" style="display:none;">
-        <h3>อนุมัติการเงิน</h3>
+        <h3>รายการรออนุมัติ</h3>
         <div id="tx-list">Loading...</div>
     </div>
 </div>
@@ -51,8 +51,17 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 <script>
-    const config = { apiKey: "AIzaSy...", authDomain: "...", projectId: "..." }; // ⚠️ ใส่ Config
-    try { firebase.initializeApp(config); } catch(e){}
+    // ✅ Config ของคุณ
+    const config = {
+        apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
+        authDomain: "chat-27f96.firebaseapp.com",
+        databaseURL: "https://chat-27f96-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "chat-27f96",
+        storageBucket: "chat-27f96.firebasestorage.app",
+        messagingSenderId: "336686938010",
+        appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
+    };
+    firebase.initializeApp(config);
     const auth = firebase.auth(), db = firebase.firestore();
     let users = {};
 
@@ -67,10 +76,16 @@
 
     function init() {
         db.collection('users').onSnapshot(snap => {
-            let h = '<table><tr><th>Name</th><th>Role</th><th>Bank</th><th>Balance</th><th>Edit</th></tr>';
+            let h = '<table><tr><th>Name</th><th>Role</th><th>Bank Info</th><th>Balance</th><th>Action</th></tr>';
             snap.forEach(d => {
                 const u = d.data(); users[d.id] = u;
-                h += `<tr><td>${u.username}</td><td>${u.role}</td><td>${u.bankName||'-'} ${u.bankNo||''}</td><td>${u.balance.toFixed(2)}</td><td><button class="btn" style="background:blue" onclick="edit('${d.id}')">Edit</button></td></tr>`;
+                h += `<tr>
+                    <td>${u.username}<br><small>${u.email}</small></td>
+                    <td>${u.role}</td>
+                    <td>${u.bankName||'-'} ${u.bankNo||''}</td>
+                    <td>${u.balance.toFixed(2)}</td>
+                    <td><button class="btn" style="background:#3b82f6" onclick="edit('${d.id}')">แก้เงิน</button></td>
+                </tr>`;
             });
             document.getElementById('u-list').innerHTML = h+'</table>';
         });
@@ -79,20 +94,28 @@
             let h = '<table><tr><th>Type</th><th>User</th><th>Amount</th><th>Action</th></tr>';
             snap.forEach(d => {
                 const t = d.data();
-                h += `<tr><td>${t.type}</td><td>${users[t.uid]?.username||t.uid}</td><td>${t.amount}</td>
-                <td><button class="btn" style="background:green" onclick="ok('${d.id}','${t.uid}',${t.amount},'${t.type}')">✔</button> <button class="btn" style="background:red" onclick="no('${d.id}')">✘</button></td></tr>`;
+                const uName = users[t.uid]?.username || t.uid;
+                h += `<tr>
+                    <td style="color:${t.type==='deposit'?'green':'red'}">${t.type}</td>
+                    <td>${uName}</td>
+                    <td>${t.amount}</td>
+                    <td>
+                        <button class="btn" style="background:green" onclick="ok('${d.id}','${t.uid}',${t.amount},'${t.type}')">✔</button> 
+                        <button class="btn" style="background:red" onclick="no('${d.id}')">✘</button>
+                    </td>
+                </tr>`;
             });
             document.getElementById('tx-list').innerHTML = h+'</table>';
         });
     }
 
     async function edit(uid) {
-        const n = prompt("ยอดเงินใหม่:");
+        const n = prompt("กรอกยอดเงินใหม่:");
         if(n) await db.collection('users').doc(uid).update({balance:parseFloat(n)});
     }
 
     async function ok(id, uid, amt, type) {
-        if(!confirm('ยืนยัน?')) return;
+        if(!confirm('ยืนยันอนุมัติ?')) return;
         await db.runTransaction(async t => {
             const uRef = db.collection('users').doc(uid);
             const bal = (await t.get(uRef)).data().balance;
@@ -102,7 +125,11 @@
         });
     }
     async function no(id) { await db.collection('transactions').doc(id).update({status:'rejected'}); }
-    function show(p) { document.getElementById('p-users').style.display=p==='users'?'block':'none'; document.getElementById('p-tx').style.display=p==='tx'?'block':'none'; }
+    
+    function show(p) { 
+        document.getElementById('p-users').style.display = p==='users'?'block':'none'; 
+        document.getElementById('p-tx').style.display = p==='tx'?'block':'none'; 
+    }
 </script>
 </body>
 </html>
