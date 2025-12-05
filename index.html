@@ -2,31 +2,30 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - FoodRunner</title>
+    <title>Admin Food</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #f8f9fa; display: flex; }
-        .sidebar { width: 250px; background: #2f3542; color: white; height: 100vh; padding: 20px; }
-        .main { flex: 1; padding: 20px; overflow-y: auto; height: 100vh; }
-        .menu-item { padding: 15px; cursor: pointer; border-bottom: 1px solid #57606f; }
+        body { font-family: 'Prompt', sans-serif; background: #f8f9fa; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn { padding: 5px 10px; cursor: pointer; color: white; border: none; border-radius: 5px; margin-right: 5px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .btn { padding: 5px 10px; border-radius: 5px; border: none; color: white; cursor: pointer; }
+        .btn-green { background: #2ed573; } .btn-red { background: #ff4757; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h3>Admin Panel</h3>
-        <div class="menu-item" onclick="show('tx')">ธุรกรรมการเงิน</div>
-        <div class="menu-item" onclick="show('users')">จัดการผู้ใช้</div>
-        <div class="menu-item" onclick="show('support')">Support Chat</div>
-    </div>
+    <h2>Admin Panel</h2>
     
-    <div class="main">
-        <div id="p-tx" class="card"><h3>รายการรออนุมัติ</h3><div id="tx-list"></div></div>
-        <div id="p-users" class="card" style="display:none;"><h3>ผู้ใช้ทั้งหมด</h3><div id="user-list"></div></div>
-        <div id="p-support" class="card" style="display:none;"><h3>แจ้งปัญหา</h3><div id="support-list"></div></div>
+    <div class="card">
+        <h3>ธุรกรรมการเงิน (รออนุมัติ)</h3>
+        <div id="tx-list"></div>
+    </div>
+
+    <div class="card">
+        <h3>รายชื่อผู้ใช้ & ข้อมูลธนาคาร</h3>
+        <div id="user-list"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -47,89 +46,74 @@
         const auth = firebase.auth();
 
         auth.onAuthStateChanged(u => {
-            if(!u) {
-                const e = prompt("Admin Email"); const p = prompt("Password");
-                auth.signInWithEmailAndPassword(e, p);
-            } else init();
+            if(u && u.email === 'admin@food.com') init();
+            else {
+                const p = prompt("Admin Password");
+                auth.signInWithEmailAndPassword('admin@food.com', p);
+            }
         });
 
         function init() {
-            // Transactions
-            db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
-                let h = '<table width="100%"><tr><th>Type</th><th>Amount</th><th>User</th><th>Action</th></tr>';
-                snap.forEach(d => {
-                    const t = d.data();
-                    h += `<tr>
-                        <td>${t.type}</td>
-                        <td>${t.amount} (Fee: ${t.fee||0})</td>
-                        <td>${t.uid}</td>
-                        <td>
-                            <button class="btn" style="background:green" onclick="approveTx('${d.id}','${t.uid}',${t.amount},'${t.type}',${t.total||t.amount})">✔</button>
-                            <button class="btn" style="background:red" onclick="rejectTx('${d.id}')">✘</button>
-                        </td>
-                    </tr>`;
-                });
-                document.getElementById('tx-list').innerHTML = h + '</table>';
-            });
-
             // Users
             db.collection('users').onSnapshot(snap => {
-                let h = '<table width="100%"><tr><th>Name</th><th>Phone</th><th>Balance</th><th>Edit</th></tr>';
+                let h = '<table><tr><th>Name</th><th>Role</th><th>Bank</th><th>Account No.</th><th>Balance</th></tr>';
                 snap.forEach(d => {
                     const u = d.data();
                     h += `<tr>
-                        <td>${u.username}</td><td>${u.phone}</td><td>${u.balance}</td>
-                        <td><button class="btn" style="background:blue" onclick="editBal('${d.id}', ${u.balance})">Edit Bal</button></td>
+                        <td>${u.username}<br><small>${u.email}</small></td>
+                        <td>${u.role}</td>
+                        <td>${u.bankName || '-'}</td>
+                        <td>${u.bankNo || '-'}</td>
+                        <td>${u.balance.toFixed(2)}</td>
                     </tr>`;
                 });
                 document.getElementById('user-list').innerHTML = h + '</table>';
             });
 
-            // Support
-            db.collection('support').orderBy('timestamp','desc').onSnapshot(snap => {
-                let h = '';
-                snap.forEach(d => {
-                    const s = d.data();
-                    h += `<div style="border-bottom:1px solid #eee; padding:10px;">
-                        <b>User:</b> ${s.message}<br>
-                        ${s.reply ? `<b style="color:blue">Admin: ${s.reply}</b>` : `<button class="btn" style="background:#ffa502" onclick="reply('${d.id}')">ตอบกลับ</button>`}
-                    </div>`;
+            // Transactions
+            db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
+                let h = '<table><tr><th>Type</th><th>User ID</th><th>Amount</th><th>Bank Info</th><th>Action</th></tr>';
+                snap.forEach(async d => {
+                    const t = d.data();
+                    const uDoc = await db.collection('users').doc(t.uid).get();
+                    const u = uDoc.data();
+                    const bankInfo = t.type==='withdraw' ? `${u.bankName} - ${u.bankNo}` : '-';
+                    
+                    h += `<tr>
+                        <td>${t.type}</td>
+                        <td>${u.username}</td>
+                        <td>${t.amount}</td>
+                        <td>${bankInfo}</td>
+                        <td>
+                            <button class="btn btn-green" onclick="approve('${d.id}','${t.uid}',${t.amount},'${t.type}',${t.fee||0})">Approve</button>
+                            <button class="btn btn-red" onclick="reject('${d.id}')">Reject</button>
+                        </td>
+                    </tr>`;
+                    document.getElementById('tx-list').innerHTML = h + '</table>';
                 });
-                document.getElementById('support-list').innerHTML = h;
             });
         }
 
-        async function approveTx(id, uid, amt, type, totalDeduct) {
+        async function approve(txId, uid, amt, type, fee) {
             if(!confirm('ยืนยัน?')) return;
             await db.runTransaction(async t => {
                 const uRef = db.collection('users').doc(uid);
-                const txRef = db.collection('transactions').doc(id);
                 const uDoc = await t.get(uRef);
                 let bal = uDoc.data().balance;
-
+                
                 if(type === 'deposit') bal += amt;
-                else bal -= totalDeduct;
-
+                else {
+                    if(bal < amt + fee) throw "เงินไม่พอ";
+                    bal -= (amt + fee);
+                }
+                
                 t.update(uRef, {balance: bal});
-                t.update(txRef, {status: 'approved'});
+                t.update(db.collection('transactions').doc(txId), {status: 'approved'});
             });
         }
-
-        async function rejectTx(id) { await db.collection('transactions').doc(id).update({status:'rejected'}); }
         
-        async function editBal(uid, old) {
-            const {value: n} = await Swal.fire({title:'แก้เงิน', input:'number', inputValue:old});
-            if(n) await db.collection('users').doc(uid).update({balance: parseFloat(n)});
-        }
-
-        async function reply(id) {
-            const {value: txt} = await Swal.fire({title:'ตอบกลับ', input:'text'});
-            if(txt) await db.collection('support').doc(id).update({reply: txt, status:'replied'});
-        }
-
-        function show(id) {
-            ['p-tx','p-users','p-support'].forEach(e => document.getElementById(e).style.display='none');
-            document.getElementById('p-'+id).style.display='block';
+        async function reject(id) {
+            await db.collection('transactions').doc(id).update({status:'rejected'});
         }
     </script>
 </body>
