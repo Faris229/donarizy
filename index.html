@@ -2,245 +2,111 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Monitor (Fixed)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #f0f2f5; display: flex; margin: 0; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 250px; background: #1e293b; color: white; padding: 20px; display: flex; flex-direction: column; }
-        .menu-item { padding: 12px; margin-bottom: 5px; cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .menu-item:hover, .menu-item.active { background: #334155; }
-        
-        /* Main */
+        body { font-family: 'Prompt', sans-serif; background: #f3f4f6; display: flex; margin: 0; height: 100vh; }
+        .sidebar { width: 250px; background: #1f2937; color: white; padding: 20px; }
         .main { flex: 1; padding: 20px; overflow-y: auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
-        /* Login */
-        #login-screen { position: fixed; inset: 0; background: #1e293b; z-index: 2000; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; background: #f8f9fa; padding: 10px; border-bottom: 2px solid #eee; }
-        td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        
-        .btn { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; color: white; }
-        .btn-green { background: #2ed573; } .btn-red { background: #ff4757; } .btn-blue { background: #3742fa; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .menu { padding: 10px; cursor: pointer; color: #9ca3af; }
+        .menu.active { color: white; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        input { padding: 8px; border: 1px solid #ccc; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
+    <div id="login-screen" style="position:fixed; inset:0; background:#1f2937; display:flex; justify-content:center; align-items:center; z-index:999;">
+        <div style="background:white; padding:30px; border-radius:10px; width:300px; text-align:center;">
             <h2>Admin Login</h2>
-            <p style="color:red; font-size:0.8rem;">*ต้องใช้อีเมล farisxuma1@gmail.com เท่านั้น</p>
-            <input id="adm-email" value="farisxuma1@gmail.com" readonly style="background:#eee;">
-            <input id="adm-pass" type="password" placeholder="รหัสผ่าน">
-            <button class="btn btn-blue" style="width:100%; padding:10px;" onclick="doLogin()">เข้าสู่ระบบ</button>
+            <input id="adm-email" placeholder="Email (farisxuma1@gmail.com)">
+            <input id="adm-pass" type="password" placeholder="Password">
+            <button onclick="doLogin()" style="padding:10px; width:100%; background:#3b82f6; color:white; border:none; cursor:pointer;">Login</button>
         </div>
     </div>
 
-    <div id="app" style="display:none; width:100%;">
-        <div class="sidebar">
-            <h3>FoodRunner Admin</h3>
-            <div class="menu-item active" onclick="show('users')"><i class="fa-solid fa-users"></i> ผู้ใช้ & ไรเดอร์</div>
-            <div class="menu-item" onclick="show('tx')"><i class="fa-solid fa-money-bill"></i> ธุรกรรมการเงิน</div>
-            <div style="margin-top:auto;">
-                <button class="btn btn-red" style="width:100%;" onclick="auth.signOut()">Logout</button>
-            </div>
+    <div class="sidebar">
+        <h3>Food Admin</h3>
+        <div class="menu active" onclick="show('users')">จัดการผู้ใช้</div>
+        <div class="menu" onclick="show('tx')">ธุรกรรมการเงิน</div>
+    </div>
+
+    <div class="main">
+        <div id="p-users" class="card">
+            <h3>รายชื่อผู้ใช้</h3>
+            <div id="u-list">Loading...</div>
         </div>
-
-        <div class="main">
-            <div id="page-users">
-                <div class="card">
-                    <h3>👥 รายชื่อผู้ใช้งาน (ลูกค้า & ไรเดอร์)</h3>
-                    <div id="user-list">กำลังโหลดข้อมูล... (ถ้าค้างนานแสดงว่า Config ผิด)</div>
-                </div>
-            </div>
-
-            <div id="page-tx" style="display:none;">
-                <div class="card">
-                    <h3>💰 รายการรออนุมัติ (ฝาก / ถอน)</h3>
-                    <div id="tx-list">กำลังโหลด...</div>
-                </div>
-            </div>
+        <div id="p-tx" class="card" style="display:none;">
+            <h3>รายการรออนุมัติ</h3>
+            <div id="tx-list">Loading...</div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
     <script>
-        // ⚠️⚠️⚠️ ใส่ Config ของคุณตรงนี้ให้ครบ ไม่งั้นโหลดไม่ขึ้นแน่นอน ⚠️⚠️⚠️
-        const firebaseConfig = {
-            apiKey: "AIzaSy..... (ใส่ของตัวเอง)",
-            authDomain: "......firebaseapp.com",
-            projectId: "......",
-            storageBucket: "......appspot.com",
-            messagingSenderId: "......",
-            appId: "......"
-        };
-        
-        // เริ่มต้น Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch(e) {
-            alert("Error: ใส่ Firebase Config ไม่ครบ หรือผิดพลาด!");
+        const config = { apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI", authDomain: "chat-27f96.firebaseapp.com", projectId: "chat-27f96" };
+        firebase.initializeApp(config);
+        const auth = firebase.auth(), db = firebase.firestore();
+        let users = {};
+
+        function doLogin() {
+            auth.signInWithEmailAndPassword(document.getElementById('adm-email').value, document.getElementById('adm-pass').value)
+                .then(() => document.getElementById('login-screen').style.display = 'none')
+                .catch(e => alert(e.message));
         }
 
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        let allUsers = {}; // ตัวแปรช่วยจำชื่อคน
-
-        // ตรวจสอบสถานะการล็อกอิน
-        auth.onAuthStateChanged(user => {
-            if(user && user.email === 'farisxuma1@gmail.com') {
+        auth.onAuthStateChanged(u => {
+            if(u && u.email === 'farisxuma1@gmail.com') {
                 document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app').style.display = 'flex';
-                startApp();
-            } else {
-                if(user) {
-                    Swal.fire('เข้าไม่ได้','อีเมลนี้ไม่ใช่แอดมิน','error').then(()=>auth.signOut());
-                }
-                document.getElementById('login-screen').style.display = 'flex';
+                loadData();
             }
         });
 
-        function doLogin() {
-            const e = document.getElementById('adm-email').value;
-            const p = document.getElementById('adm-pass').value;
-            auth.signInWithEmailAndPassword(e, p).catch(err => Swal.fire('Login Error', err.message, 'error'));
-        }
-
-        function startApp() {
-            loadUsers();
-            loadTransactions();
-        }
-
-        // 1. ดึงข้อมูล User (ถ้าฟังก์ชันนี้ Error แสดงว่า Rules ผิด)
-        function loadUsers() {
+        function loadData() {
             db.collection('users').onSnapshot(snap => {
-                let html = '<table width="100%"><thead><tr><th>ชื่อ</th><th>บทบาท</th><th>เบอร์โทร</th><th>ธนาคาร</th><th>เงิน</th><th>จัดการ</th></tr></thead><tbody>';
-                
-                if(snap.empty) {
-                    document.getElementById('user-list').innerHTML = "ไม่พบผู้ใช้งานในระบบ";
-                    return;
-                }
-
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    allUsers[doc.id] = u; // จำค่าไว้ใช้หน้าอื่น
-
-                    const roleBadge = u.role === 'rider' 
-                        ? '<span style="background:black; color:white; padding:2px 6px; border-radius:4px;">Rider</span>' 
-                        : '<span style="background:#eee; padding:2px 6px; border-radius:4px;">User</span>';
-
-                    const bankTxt = u.bankName ? `${u.bankName} (${u.bankNo})` : '-';
-
-                    html += `<tr>
-                        <td>${u.username}<br><small style="color:grey">${u.email}</small></td>
-                        <td>${roleBadge}</td>
-                        <td>${u.phone || '-'}</td>
-                        <td>${bankTxt}</td>
-                        <td style="font-weight:bold; color:${u.balance>0?'green':'red'}">${(u.balance||0).toFixed(2)}</td>
-                        <td><button class="btn btn-blue" onclick="editBal('${doc.id}', ${u.balance})">แก้เงิน</button></td>
-                    </tr>`;
+                let h = '<table><tr><th>Name</th><th>Role</th><th>Balance</th><th>Action</th></tr>';
+                snap.forEach(d => {
+                    const u = d.data(); users[d.id] = u;
+                    h += `<tr><td>${u.username}</td><td>${u.role}</td><td>${u.balance.toFixed(2)}</td><td><button onclick="editBal('${d.id}')">แก้เงิน</button></td></tr>`;
                 });
-                
-                document.getElementById('user-list').innerHTML = html + '</tbody></table>';
-            }, error => {
-                console.error(error);
-                document.getElementById('user-list').innerHTML = `<p style="color:red">โหลดข้อมูลไม่ได้: ${error.message}<br>เช็ค Rules ด่วน!</p>`;
+                document.getElementById('u-list').innerHTML = h+'</table>';
             });
-        }
 
-        async function editBal(uid, old) {
-            const {value:n} = await Swal.fire({title:'แก้ไขยอดเงิน', input:'number', inputValue:old});
-            if(n) {
-                await db.collection('users').doc(uid).update({balance: parseFloat(n)});
-                Swal.fire('บันทึกแล้ว','','success');
-            }
-        }
-
-        // 2. ดึงข้อมูลธุรกรรม
-        function loadTransactions() {
             db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
-                const div = document.getElementById('tx-list');
-                
-                if(snap.empty) {
-                    div.innerHTML = '<div style="padding:20px; text-align:center; color:#ccc;">ไม่มีรายการค้าง</div>';
-                    return;
-                }
-
-                let html = '<table width="100%"><thead><tr><th>ประเภท</th><th>ผู้ใช้</th><th>จำนวน</th><th>ต้องโอนคืน?</th><th>จัดการ</th></tr></thead><tbody>';
-                
-                snap.forEach(doc => {
-                    const t = doc.data();
-                    const user = allUsers[t.uid] || {username: 'Unknown', bankName:'-', bankNo:'-'};
-                    
-                    const isDep = t.type === 'deposit';
-                    const typeTxt = isDep ? '<b style="color:green">ฝากเงิน</b>' : '<b style="color:red">ถอนเงิน</b>';
-                    
-                    // ถ้าถอนเงิน ให้โชว์เลขบัญชีลูกค้า
-                    const refundInfo = !isDep ? `<span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:5px;">🏦 ${user.bankName} - ${user.bankNo}</span>` : '-';
-
-                    html += `<tr>
-                        <td>${typeTxt}</td>
-                        <td>${user.username}</td>
-                        <td>${t.amount} บาท</td>
-                        <td>${refundInfo}</td>
-                        <td>
-                            <button class="btn btn-green" onclick="processTx('${doc.id}', '${t.uid}', ${t.amount}, '${t.type}', ${t.fee||0})">✔ อนุมัติ</button>
-                            <button class="btn btn-red" onclick="rejectTx('${doc.id}')">✘ ปฏิเสธ</button>
-                        </td>
-                    </tr>`;
+                let h = '<table><tr><th>Type</th><th>User</th><th>Amount</th><th>Action</th></tr>';
+                snap.forEach(d => {
+                    const t = d.data();
+                    h += `<tr><td>${t.type}</td><td>${users[t.uid]?.username}</td><td>${t.amount}</td>
+                    <td><button onclick="approve('${d.id}','${t.uid}',${t.amount},'${t.type}')">✔</button> <button onclick="reject('${d.id}')">✘</button></td></tr>`;
                 });
-                div.innerHTML = html + '</tbody></table>';
+                document.getElementById('tx-list').innerHTML = h+'</table>';
             });
         }
 
-        async function processTx(txId, uid, amount, type, fee) {
-            if(!confirm('ยืนยันอนุมัติ?')) return;
-            
-            try {
-                await db.runTransaction(async t => {
-                    const uRef = db.collection('users').doc(uid);
-                    const txRef = db.collection('transactions').doc(txId);
-                    const uDoc = await t.get(uRef);
-                    
-                    if(!uDoc.exists) throw "หา User ไม่เจอ";
-                    let bal = uDoc.data().balance || 0;
-
-                    if(type === 'deposit') {
-                        bal += amount;
-                    } else {
-                        // ถอนเงิน (หักยอด)
-                        if(bal < (amount + fee)) throw "เงินลูกค้าไม่พอให้หัก";
-                        bal -= (amount + fee);
-                    }
-
-                    t.update(uRef, {balance: bal});
-                    t.update(txRef, {status: 'approved'});
-                });
-                Swal.fire('สำเร็จ','','success');
-            } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+        async function editBal(uid) {
+            const n = prompt("ยอดเงินใหม่:");
+            if(n) await db.collection('users').doc(uid).update({balance:parseFloat(n)});
         }
 
-        async function rejectTx(id) {
-            if(confirm('ปฏิเสธรายการนี้?')) await db.collection('transactions').doc(id).update({status:'rejected'});
+        async function approve(id, uid, amt, type) {
+            if(!confirm('ยืนยัน?')) return;
+            await db.runTransaction(async t => {
+                const uRef = db.collection('users').doc(uid);
+                const bal = (await t.get(uRef)).data().balance;
+                if(type==='withdraw' && bal<amt) throw "เงินไม่พอ";
+                t.update(uRef, {balance: type==='deposit' ? bal+amt : bal-amt});
+                t.update(db.collection('transactions').doc(id), {status:'approved'});
+            });
         }
 
-        function show(page) {
-            document.querySelectorAll('.menu-item').forEach(e=>e.classList.remove('active'));
-            document.getElementById('page-users').style.display = page==='users'?'block':'none';
-            document.getElementById('page-tx').style.display = page==='tx'?'block':'none';
-        }
+        async function reject(id) { await db.collection('transactions').doc(id).update({status:'rejected'}); }
+        function show(p) { document.getElementById('p-users').style.display=p==='users'?'block':'none'; document.getElementById('p-tx').style.display=p==='tx'?'block':'none'; }
     </script>
 </body>
 </html>
