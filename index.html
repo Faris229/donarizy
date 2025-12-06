@@ -3,47 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Space Admin</title>
+    <title>Q-Space Admin Pro</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; }
-        .nav-link.active { background: #e0e7ff; color: #3730a3; font-weight: bold; border-right: 4px solid #4f46e5; }
-        .input-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
-        .btn { padding: 8px 16px; border-radius: 8px; font-weight: bold; transition: all 0.2s; }
-        .btn:active { transform: scale(0.97); }
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; color: #1f2937; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; z-index: 20; }
+        .nav-btn {
+            display: flex; align-items: center; padding: 14px 20px; color: #64748b;
+            font-weight: 500; transition: all 0.2s; border-radius: 12px; margin-bottom: 4px;
+        }
+        .nav-btn:hover { background: #f8fafc; color: #0f172a; }
+        .nav-btn.active { background: #eff6ff; color: #2563eb; font-weight: 700; }
+        .nav-btn i { width: 24px; }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table th { text-align: left; padding: 16px; background: #f9fafb; font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; }
+        .data-table td { padding: 16px; background: white; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .data-table tr:hover td { background: #f8fafc; }
+
+        /* Action Buttons */
+        .action-btn { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; transition: all 0.2s; }
+        .btn-call { background: #eff6ff; color: #2563eb; } .btn-call:hover { background: #2563eb; color: white; }
+        .btn-done { background: #ecfdf5; color: #059669; } .btn-done:hover { background: #059669; color: white; }
+        .btn-info { background: #f3f4f6; color: #4b5563; } .btn-info:hover { background: #4b5563; color: white; }
+        .btn-del  { background: #fef2f2; color: #dc2626; } .btn-del:hover { background: #dc2626; color: white; }
+
+        /* Detail Modal */
+        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e5e7eb; }
+        .detail-label { color: #6b7280; font-size: 0.9rem; }
+        .detail-val { font-weight: 600; color: #1f2937; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden text-slate-700">
+<body class="flex h-screen overflow-hidden">
 
-    <aside class="w-64 bg-white border-r flex flex-col z-20">
-        <div class="h-16 flex items-center px-6 font-bold text-xl text-indigo-700 border-b">
-            ADMIN PANEL
+    <aside class="sidebar">
+        <div class="h-20 flex items-center px-8 border-b border-gray-100">
+            <div class="text-xl font-bold text-slate-800">Q-Space <span class="text-blue-600">Pro</span></div>
         </div>
-        <nav class="flex-1 p-4 space-y-1">
-            <button onclick="Router('live')" id="nav-live" class="nav-link w-full text-left p-3 rounded hover:bg-slate-50 flex gap-3"><i class="fa-solid fa-list-ol w-5"></i> จัดการคิวสด</button>
-            <button onclick="Router('history')" id="nav-history" class="nav-link w-full text-left p-3 rounded hover:bg-slate-50 flex gap-3"><i class="fa-solid fa-clock-rotate-left w-5"></i> ประวัติ</button>
-            <button onclick="Router('setting')" id="nav-setting" class="nav-link w-full text-left p-3 rounded hover:bg-slate-50 flex gap-3"><i class="fa-solid fa-gear w-5"></i> ตั้งค่าร้านค้า</button>
-        </nav>
+        <div class="p-4 flex-1 overflow-y-auto">
+            <div class="text-xs font-bold text-gray-400 uppercase px-4 mb-2 mt-2">Main Menu</div>
+            <button onclick="Router('live')" id="nav-live" class="nav-btn active"><i class="fa-solid fa-list-ol"></i> รายการคิวสด</button>
+            <button onclick="Router('history')" id="nav-history" class="nav-btn"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติวันนี้</button>
+            <button onclick="Router('setting')" id="nav-setting" class="nav-btn"><i class="fa-solid fa-gear"></i> ตั้งค่าร้านค้า</button>
+            
+            <div class="mt-8 pt-8 border-t border-gray-100">
+                <button onclick="Admin.resetSystem()" class="nav-btn text-red-500 hover:bg-red-50 hover:text-red-600">
+                    <i class="fa-solid fa-trash"></i> รีเซ็ตระบบ (วันใหม่)
+                </button>
+            </div>
+        </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full bg-slate-50">
-        <header class="h-16 bg-white border-b flex items-center justify-between px-8 shadow-sm">
-            <span class="font-bold text-lg" id="page-title">Dashboard</span>
-            <div class="text-right">
-                <div class="text-xs text-gray-400 uppercase">Now Serving</div>
-                <div class="font-bold text-xl text-indigo-600" id="head-current">A-000</div>
+    <main class="flex-1 flex flex-col h-full relative">
+        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+            <h1 class="text-xl font-bold text-slate-800" id="page-title">Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <div class="text-xs text-gray-400 uppercase font-bold">Now Serving</div>
+                    <div class="text-2xl font-bold text-blue-600" id="header-current">A-000</div>
+                </div>
             </div>
         </header>
 
-        <div id="content" class="flex-1 p-8 overflow-y-auto"></div>
+        <div id="content-area" class="flex-1 overflow-y-auto bg-gray-50 p-8"></div>
     </main>
+
+    <div id="modal-detail" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-md p-0 shadow-2xl overflow-hidden animate__animated animate__zoomIn">
+            <div class="bg-slate-50 p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-800">รายละเอียดคิว</h3>
+                <button onclick="document.getElementById('modal-detail').classList.add('hidden')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="text-sm text-gray-400 uppercase tracking-widest">Queue Number</div>
+                    <div class="text-5xl font-black text-blue-600" id="modal-q">A-001</div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold mt-2" id="modal-status">WAITING</div>
+                </div>
+                
+                <div class="detail-row"><span class="detail-label">ชื่อลูกค้า</span><span class="detail-val" id="modal-name">-</span></div>
+                <div class="detail-row"><span class="detail-label">เบอร์โทร</span><span class="detail-val" id="modal-phone">-</span></div>
+                <div class="detail-row"><span class="detail-label">จำนวน (ท่าน)</span><span class="detail-val" id="modal-pax">-</span></div>
+                <div class="detail-row"><span class="detail-label text-blue-600 font-bold">เวลาแจ้งมาถึง</span><span class="detail-val text-blue-600" id="modal-arrival">-</span></div>
+                <div class="detail-row border-none"><span class="detail-label">เวลาจอง</span><span class="detail-val text-gray-400" id="modal-time">-</span></div>
+
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button id="btn-modal-call" class="py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">เรียกคิว</button>
+                    <button id="btn-modal-done" class="py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600">เสร็จสิ้น</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -57,113 +118,106 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ROUTER
-        function Router(page) {
-            document.querySelectorAll('.nav-link').forEach(e => e.classList.remove('active'));
-            document.getElementById(`nav-${page}`).classList.add('active');
-            const el = document.getElementById('content');
-            const title = document.getElementById('page-title');
-            
-            if(page === 'live') { title.innerText = 'รายการคิวสด (Live)'; Pages.live(el); }
-            if(page === 'history') { title.innerText = 'ประวัติย้อนหลัง'; Pages.history(el); }
-            if(page === 'setting') { title.innerText = 'ตั้งค่าร้านค้า & ประกาศ'; Pages.setting(el); }
-        }
+        class AdminApp {
+            constructor() {
+                this.qRef = db.collection('q_system').doc('config').collection('queues');
+                this.initListener();
+            }
 
-        // LISTEN GLOBAL
-        db.collection('q_system').doc('config').onSnapshot(doc => {
-            if(doc.exists) document.getElementById('head-current').innerText = doc.data().current || 'A-000';
-            else db.collection('q_system').doc('config').set({current:'A-000', last:0}); // Auto Init
-        });
+            initListener() {
+                // Monitor Header
+                db.collection('q_system').doc('config').onSnapshot(doc => {
+                    if(doc.exists) document.getElementById('header-current').innerText = doc.data().current || 'A-000';
+                });
+            }
 
-        const Pages = {
-            live: (el) => {
+            renderLive(el) {
                 el.innerHTML = `
-                    <div class="grid grid-cols-4 gap-6 mb-6">
-                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">รอคิว</div><div class="text-2xl font-bold" id="s-wait">0</div></div>
-                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">เรียกแล้ว</div><div class="text-2xl font-bold text-blue-600" id="s-call">0</div></div>
-                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">เสร็จสิ้น</div><div class="text-2xl font-bold text-green-600" id="s-done">0</div></div>
-                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">ยกเลิก</div><div class="text-2xl font-bold text-red-600" id="s-can">0</div></div>
+                    <div class="grid grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">รอคิว</div><div class="text-3xl font-bold text-slate-800" id="s-wait">0</div></div>
+                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">เรียกแล้ว</div><div class="text-3xl font-bold text-blue-600" id="s-call">0</div></div>
+                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">เสร็จสิ้น</div><div class="text-3xl font-bold text-green-600" id="s-done">0</div></div>
+                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">ยกเลิก</div><div class="text-3xl font-bold text-red-500" id="s-canc">0</div></div>
                     </div>
                     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b text-xs uppercase text-slate-500">
-                                <tr><th class="p-4">Queue</th><th class="p-4">Name</th><th class="p-4">PAX</th><th class="p-4 text-right">Action</th></tr>
-                            </thead>
-                            <tbody id="q-table" class="divide-y text-sm"></tbody>
+                        <table class="data-table">
+                            <thead><tr><th>No.</th><th>Name</th><th>Time</th><th>Arrival</th><th>Actions</th></tr></thead>
+                            <tbody id="tb-live"></tbody>
                         </table>
+                        <div id="live-empty" class="p-10 text-center text-gray-400 hidden">ไม่มีคิวที่กำลังรอ</div>
                     </div>
                 `;
-                
-                const qRef = db.collection('q_system').doc('config').collection('queues');
-                qRef.orderBy('timestamp','asc').onSnapshot(snap => {
+
+                this.qRef.orderBy('timestamp','asc').onSnapshot(snap => {
                     const all = snap.docs.map(d=>({id:d.id, ...d.data()}));
+                    
                     // Stats
                     document.getElementById('s-wait').innerText = all.filter(x=>x.status==='waiting').length;
                     document.getElementById('s-call').innerText = all.filter(x=>x.status==='called').length;
                     document.getElementById('s-done').innerText = all.filter(x=>x.status==='served').length;
-                    document.getElementById('s-can').innerText = all.filter(x=>x.status==='cancelled').length;
+                    document.getElementById('s-canc').innerText = all.filter(x=>x.status==='cancelled').length;
 
-                    // Table (Waiting + Called)
+                    // Table
                     const active = all.filter(x => ['waiting','called'].includes(x.status));
-                    const tbody = document.getElementById('q-table');
+                    const tb = document.getElementById('tb-live');
                     
-                    if(active.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-400">ไม่มีคิวรอ</td></tr>';
-                    else {
-                        tbody.innerHTML = active.map(d => {
-                            const isCall = d.status === 'called';
-                            return `
-                                <tr class="${isCall?'bg-blue-50':''}">
-                                    <td class="p-4"><span class="font-bold text-lg ${isCall?'text-blue-600':''}">${d.number}</span></td>
-                                    <td class="p-4">
-                                        <div class="font-bold">${d.name}</div>
-                                        <div class="text-xs text-gray-400">${d.phone||'-'}</div>
-                                    </td>
-                                    <td class="p-4"><span class="bg-white border px-2 py-1 rounded text-xs">${d.pax} ท่าน</span></td>
-                                    <td class="p-4 text-right space-x-1">
-                                        <button onclick="Actions.call('${d.id}','${d.number}')" class="btn bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white"><i class="fa-solid fa-bullhorn"></i></button>
-                                        <button onclick="Actions.serve('${d.id}')" class="btn bg-green-100 text-green-600 hover:bg-green-600 hover:text-white"><i class="fa-solid fa-check"></i></button>
-                                        <button onclick="Actions.cancel('${d.id}')" class="btn bg-red-100 text-red-600 hover:bg-red-600 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('');
-                    }
-                });
-            },
+                    if(active.length===0) { tb.innerHTML=''; document.getElementById('live-empty').classList.remove('hidden'); return; }
+                    document.getElementById('live-empty').classList.add('hidden');
 
-            history: (el) => {
-                el.innerHTML = `<div class="bg-white rounded-xl border shadow-sm overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 border-b text-xs uppercase text-slate-500"><tr><th class="p-4">Queue</th><th class="p-4">Name</th><th class="p-4">Status</th><th class="p-4">Time</th></tr></thead><tbody id="h-table" class="divide-y text-sm"></tbody></table></div>`;
-                db.collection('q_system').doc('config').collection('queues').where('status','in',['served','cancelled']).orderBy('timestamp','desc').limit(50).onSnapshot(snap => {
-                    document.getElementById('h-table').innerHTML = snap.docs.map(d => {
-                        const dd = d.data();
-                        const color = dd.status==='served'?'text-green-600 bg-green-50':'text-red-600 bg-red-50';
-                        return `<tr><td class="p-4 font-bold">${dd.number}</td><td class="p-4">${dd.name}</td><td class="p-4"><span class="px-2 py-1 rounded text-xs uppercase font-bold ${color}">${dd.status}</span></td><td class="p-4 text-gray-400">${new Date(dd.timestamp.seconds*1000).toLocaleTimeString()}</td></tr>`;
+                    tb.innerHTML = active.map(d => {
+                        const isCall = d.status==='called';
+                        const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '-';
+                        return `
+                            <tr class="${isCall?'bg-blue-50 border-l-4 border-blue-600':''}">
+                                <td>
+                                    <span class="font-bold text-lg ${isCall?'text-blue-600':'text-slate-700'}">${d.number}</span>
+                                    ${isCall ? '<span class="block text-[10px] text-blue-500 font-bold uppercase">Calling</span>' : ''}
+                                </td>
+                                <td>
+                                    <div class="font-bold text-slate-700">${d.name}</div>
+                                    <div class="text-xs text-gray-400">${d.pax} ท่าน • ${d.phone}</div>
+                                </td>
+                                <td class="text-sm text-gray-500">${time}</td>
+                                <td><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">${d.arrivalTime || '-'}</span></td>
+                                <td class="space-x-1">
+                                    <button onclick="Admin.call('${d.id}','${d.number}')" class="action-btn btn-call"><i class="fa-solid fa-bullhorn"></i></button>
+                                    <button onclick="Admin.serve('${d.id}')" class="action-btn btn-done"><i class="fa-solid fa-check"></i></button>
+                                    <button onclick="Admin.viewDetail('${d.id}')" class="action-btn btn-info"><i class="fa-solid fa-eye"></i></button>
+                                    <button onclick="Admin.cancel('${d.id}')" class="action-btn btn-del"><i class="fa-solid fa-xmark"></i></button>
+                                </td>
+                            </tr>
+                        `;
                     }).join('');
                 });
-            },
+            }
 
-            setting: (el) => {
+            renderHistory(el) {
+                el.innerHTML = `<div class="bg-white rounded-xl border shadow-sm overflow-hidden"><table class="data-table"><thead><tr><th>No.</th><th>Name</th><th>Status</th><th>Time</th></tr></thead><tbody id="tb-hist"></tbody></table></div>`;
+                this.qRef.where('status','in',['served','cancelled']).orderBy('timestamp','desc').limit(50).onSnapshot(snap => {
+                    document.getElementById('tb-hist').innerHTML = snap.docs.map(doc => {
+                        const d = doc.data();
+                        const color = d.status==='served'?'text-green-600 bg-green-50':'text-red-600 bg-red-50';
+                        const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString() : '-';
+                        return `<tr><td><b>${d.number}</b></td><td>${d.name}</td><td><span class="px-2 py-1 rounded text-xs font-bold uppercase ${color}">${d.status}</span></td><td class="text-sm text-gray-400">${time}</td></tr>`;
+                    }).join('');
+                });
+            }
+
+            renderSetting(el) {
                 el.innerHTML = `
-                    <div class="max-w-xl mx-auto bg-white p-8 rounded-xl border shadow-sm">
-                        <h3 class="font-bold text-lg mb-6 border-b pb-2">ตั้งค่าระบบ</h3>
-                        
+                    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl border shadow-sm">
+                        <h3 class="font-bold text-lg mb-6 text-slate-800">ตั้งค่าร้านค้า</h3>
                         <div class="mb-4">
-                            <label class="block text-sm font-bold text-gray-500 mb-2">ชื่อร้านค้า (Shop Name)</label>
-                            <input id="set-name" class="input-box" placeholder="เช่น ร้านกาแฟ HubFu">
+                            <label class="block text-sm font-bold text-gray-500 mb-2">ชื่อร้านค้า</label>
+                            <input id="set-name" class="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="ชื่อร้าน...">
                         </div>
-
                         <div class="mb-6">
-                            <label class="block text-sm font-bold text-gray-500 mb-2">ประกาศข้อความวิ่ง (Announcement)</label>
-                            <textarea id="set-ann" class="input-box h-24" placeholder="ข้อความประกาศ..."></textarea>
+                            <label class="block text-sm font-bold text-gray-500 mb-2">ข้อความประกาศ (วิ่ง)</label>
+                            <textarea id="set-ann" class="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500 h-24" placeholder="โปรโมชั่น..."></textarea>
                         </div>
-
-                        <div class="flex gap-4 border-t pt-4">
-                            <button onclick="Actions.saveSettings(true)" class="btn bg-indigo-600 text-white flex-1">บันทึก & แสดงประกาศ</button>
-                            <button onclick="Actions.saveSettings(false)" class="btn bg-white border border-gray-300 text-gray-600">บันทึก & ปิดประกาศ</button>
-                        </div>
-
-                        <div class="mt-8 pt-8 border-t text-center">
-                            <button onclick="Actions.reset()" class="text-red-500 text-sm hover:underline">รีเซ็ตระบบเมื่อขึ้นวันใหม่ (Reset System)</button>
+                        <div class="flex gap-4 pt-4 border-t">
+                            <button onclick="Admin.saveSet(true)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold">บันทึก & เปิดประกาศ</button>
+                            <button onclick="Admin.saveSet(false)" class="flex-1 bg-white border text-gray-600 py-2 rounded-lg font-bold">ปิดประกาศ</button>
                         </div>
                     </div>
                 `;
@@ -174,29 +228,47 @@
                     }
                 });
             }
-        };
 
-        const Actions = {
-            call: (id, num) => {
-                db.collection('q_system').doc('config').collection('queues').doc(id).update({status:'called'});
-                db.collection('q_system').doc('config').update({current:num});
-            },
-            serve: (id) => db.collection('q_system').doc('config').collection('queues').doc(id).update({status:'served'}),
-            cancel: (id) => { if(confirm('Cancel?')) db.collection('q_system').doc('config').collection('queues').doc(id).update({status:'cancelled'}); },
+            // ACTIONS
+            call(id, num) {
+                this.qRef.doc(id).update({ status: 'called', lastCall: firebase.firestore.FieldValue.serverTimestamp() });
+                db.collection('q_system').doc('config').update({ current: num, forceUpdate: Date.now() });
+                this.speak(`เชิญหมายเลข ${num} ค่ะ`);
+            }
+            serve(id) { this.qRef.doc(id).update({status:'served'}); }
+            cancel(id) { if(confirm('Cancel?')) this.qRef.doc(id).update({status:'cancelled'}); }
             
-            saveSettings: (show) => {
-                const name = document.getElementById('set-name').value;
-                const ann = document.getElementById('set-ann').value;
-                db.collection('q_system').doc('config').update({
-                    shopName: name, announceText: ann, showAnnounce: show
-                }).then(() => Swal.fire('Success', 'บันทึกเรียบร้อย', 'success'));
-            },
+            viewDetail(id) {
+                this.qRef.doc(id).get().then(doc => {
+                    const d = doc.data();
+                    document.getElementById('modal-q').innerText = d.number;
+                    document.getElementById('modal-status').innerText = d.status.toUpperCase();
+                    document.getElementById('modal-name').innerText = d.name;
+                    document.getElementById('modal-phone').innerText = d.phone;
+                    document.getElementById('modal-pax').innerText = d.pax + ' ท่าน';
+                    document.getElementById('modal-arrival').innerText = d.arrivalTime || '-';
+                    document.getElementById('modal-time').innerText = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString() : '-';
+                    
+                    document.getElementById('btn-modal-call').onclick = () => { this.call(id, d.number); document.getElementById('modal-detail').classList.add('hidden'); };
+                    document.getElementById('btn-modal-done').onclick = () => { this.serve(id); document.getElementById('modal-detail').classList.add('hidden'); };
+                    
+                    document.getElementById('modal-detail').classList.remove('hidden');
+                });
+            }
 
-            reset: () => {
-                Swal.fire({title:'Reset System?', text:'ลบคิวทั้งหมด เริ่มนับ 1 ใหม่', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'}).then(async r => {
+            saveSet(show) {
+                db.collection('q_system').doc('config').update({
+                    shopName: document.getElementById('set-name').value,
+                    announceText: document.getElementById('set-ann').value,
+                    showAnnounce: show
+                }).then(()=> Swal.fire('Saved','','success'));
+            }
+
+            resetSystem() {
+                Swal.fire({title:'Reset System?', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'}).then(async r => {
                     if(r.isConfirmed) {
                         await db.collection('q_system').doc('config').update({current:'A-000', last:0});
-                        const snap = await db.collection('q_system').doc('config').collection('queues').get();
+                        const snap = await this.qRef.get();
                         const batch = db.batch();
                         snap.docs.forEach(d => batch.delete(d.ref));
                         await batch.commit();
@@ -204,8 +276,28 @@
                     }
                 });
             }
-        };
 
+            speak(txt) {
+                if('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance(txt);
+                    u.lang = 'th-TH'; u.rate = 0.9;
+                    speechSynthesis.speak(u);
+                }
+            }
+        }
+
+        function Router(p) {
+            document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById(`nav-${p}`).classList.add('active');
+            const el = document.getElementById('content-area');
+            const t = document.getElementById('page-title');
+            
+            if(p==='live') { t.innerText='Live Queue'; Admin.renderLive(el); }
+            if(p==='history') { t.innerText='History'; Admin.renderHistory(el); }
+            if(p==='setting') { t.innerText='Settings'; Admin.renderSetting(el); }
+        }
+
+        const Admin = new AdminApp();
         Router('live');
     </script>
 </body>
