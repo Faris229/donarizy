@@ -2,48 +2,140 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>MathMate - Teacher Console</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Space | Admin Console</title>
     
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-</head>
-<body class="flex h-screen bg-slate-900 text-slate-300 font-sans overflow-hidden">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col">
-        <div class="h-16 flex items-center px-6 border-b border-slate-800 font-bold text-lg text-blue-400">Teacher Panel</div>
-        <nav class="flex-1 p-2">
-            <div id="student-list" class="space-y-1">
-                </div>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; }
+        
+        /* Table Styles */
+        .q-table { width: 100%; text-align: left; border-collapse: separate; border-spacing: 0; }
+        .q-table th { background: #f8fafc; padding: 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        .q-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; background: white; transition: background 0.1s; }
+        .q-table tr:hover td { background: #f8fafc; }
+        .q-table tr:last-child td { border-bottom: none; }
+        .q-table th:first-child, .q-table td:first-child { padding-left: 1.5rem; }
+        .q-table th:last-child, .q-table td:last-child { padding-right: 1.5rem; }
+
+        /* Action Buttons */
+        .btn-icon { width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-call { background: #eff6ff; color: #2563eb; } .btn-call:hover { background: #2563eb; color: white; }
+        .btn-check { background: #ecfdf5; color: #059669; } .btn-check:hover { background: #059669; color: white; }
+        .btn-del { background: #fef2f2; color: #dc2626; } .btn-del:hover { background: #dc2626; color: white; }
+
+        /* Sidebar */
+        .nav-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; color: #64748b; font-weight: 500; margin-bottom: 4px; transition: all 0.2s; }
+        .nav-item:hover { background: #f8fafc; color: #0f172a; }
+        .nav-item.active { background: #0f172a; color: white; }
+        
+        .stat-card { background: white; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20">
+        <div class="h-16 flex items-center px-6 border-b border-gray-100">
+            <span class="font-bold text-lg text-slate-800">Q-Space <span class="text-xs bg-slate-100 px-2 py-1 rounded ml-2">ADMIN</span></span>
+        </div>
+        <nav class="flex-1 p-4 overflow-y-auto">
+            <button onclick="Admin.switchTab('live')" id="nav-live" class="nav-item active w-full text-left">
+                <i class="fa-solid fa-list-ol w-6"></i> รายการคิวสด
+            </button>
+            <button onclick="Admin.switchTab('history')" id="nav-history" class="nav-item w-full text-left">
+                <i class="fa-solid fa-clock-rotate-left w-6"></i> ประวัติวันนี้
+            </button>
+            <div class="mt-8 px-4 text-xs font-bold text-gray-400 uppercase">Controls</div>
+            <button onclick="Admin.resetSystem()" class="nav-item w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600">
+                <i class="fa-solid fa-trash w-6"></i> รีเซ็ตคิว (วันใหม่)
+            </button>
         </nav>
+        <div class="p-4 border-t border-gray-100 text-xs text-center text-gray-400">
+            Version 3.0 Enterprise
+        </div>
     </aside>
 
-    <main class="flex-1 flex flex-col bg-slate-900">
-        <header class="h-16 border-b border-slate-800 flex items-center px-6 justify-between bg-slate-900">
-            <span id="chat-title" class="font-bold text-white">Select Student</span>
-            <button onclick="firebase.auth().signOut()" class="text-red-400 hover:text-red-300 text-sm">Logout</button>
-        </header>
+    <main class="flex-1 flex flex-col relative h-full">
         
-        <div class="flex-1 flex gap-4 p-4 overflow-hidden">
-            <div class="flex-1 flex flex-col bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
-                <div id="msg-box" class="flex-1 p-4 overflow-y-auto space-y-2"></div>
-                <form onsubmit="Send(event)" class="p-3 bg-slate-900 border-t border-slate-800 flex gap-2">
-                    <input id="reply-in" class="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" placeholder="Reply..." disabled>
-                    <button id="reply-btn" class="bg-blue-600 text-white px-4 rounded disabled:opacity-50" disabled>Send</button>
-                </form>
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+            <h2 class="font-bold text-xl text-slate-800" id="page-title">Live Queue Management</h2>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <div class="text-xs text-gray-400 uppercase">Now Serving</div>
+                    <div class="text-xl font-bold text-blue-600" id="header-current">A-000</div>
+                </div>
             </div>
+        </header>
+
+        <div class="flex-1 p-8 overflow-y-auto bg-slate-50">
             
-            <div class="w-72 bg-slate-950 rounded-xl border border-slate-800 p-4 overflow-y-auto hidden md:block">
-                <h3 class="font-bold text-sm text-slate-400 mb-3 uppercase">Recent Calculations</h3>
-                <div id="calc-history" class="space-y-2 text-sm">Select a student...</div>
+            <div class="grid grid-cols-4 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="text-xs text-gray-400 font-bold uppercase">รอรับบริการ</div>
+                    <div class="text-3xl font-bold text-slate-800 mt-1" id="stat-waiting">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-xs text-gray-400 font-bold uppercase">เรียกแล้ว</div>
+                    <div class="text-3xl font-bold text-blue-600 mt-1" id="stat-called">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-xs text-gray-400 font-bold uppercase">เสร็จสิ้น</div>
+                    <div class="text-3xl font-bold text-green-600 mt-1" id="stat-served">0</div>
+                </div>
+                <div class="stat-card border-red-200 bg-red-50">
+                    <div class="text-xs text-red-400 font-bold uppercase">ยกเลิก</div>
+                    <div class="text-3xl font-bold text-red-600 mt-1" id="stat-cancel">0</div>
+                </div>
             </div>
+
+            <div id="view-live" class="animate__animated animate__fadeIn">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="q-table">
+                        <thead>
+                            <tr>
+                                <th>Queue No.</th>
+                                <th>Customer Name</th>
+                                <th>PAX</th>
+                                <th>Wait Time</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-live">
+                            </tbody>
+                    </table>
+                    <div id="empty-live" class="p-8 text-center text-gray-400 hidden">ไม่มีคิวที่กำลังรอ</div>
+                </div>
+            </div>
+
+            <div id="view-history" class="hidden animate__animated animate__fadeIn">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="q-table">
+                        <thead>
+                            <tr>
+                                <th>Queue No.</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-history">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </main>
 
     <script>
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -53,84 +145,161 @@
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
         firebase.initializeApp(firebaseConfig);
-        const rtdb = firebase.database();
         const db = firebase.firestore();
-        const ADMIN_EMAIL = 'farisxuma1@gmail.com';
 
-        let activeUid = null;
-        let chatListener = null;
-
-        // Login Check
-        firebase.auth().onAuthStateChanged(u => {
-            if(!u || u.email !== ADMIN_EMAIL) {
-                const e = prompt('Admin Email:');
-                const p = prompt('Password:');
-                firebase.auth().signInWithEmailAndPassword(e, p).catch(alert);
-            } else {
-                LoadStudents();
+        class AdminApp {
+            constructor() {
+                this.qRef = db.collection('q_system').doc('config').collection('queues');
+                this.initListeners();
             }
-        });
 
-        function LoadStudents() {
-            rtdb.ref('chats').on('value', snap => {
-                const div = document.getElementById('student-list');
-                div.innerHTML = '';
-                snap.forEach(c => {
-                    const uid = c.key;
-                    div.innerHTML += `
-                        <button onclick="LoadChat('${uid}')" class="w-full text-left px-4 py-3 rounded hover:bg-slate-800 flex items-center gap-3 ${activeUid===uid?'bg-blue-900/30 text-blue-300':''}">
-                            <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs"><i class="fa-solid fa-user"></i></div>
-                            <span class="truncate text-sm font-mono">ID: ${uid.substr(0,5)}</span>
-                        </button>
+            initListeners() {
+                // Monitor Stats
+                this.qRef.onSnapshot(snap => {
+                    let w=0, c=0, s=0, x=0;
+                    snap.forEach(doc => {
+                        const st = doc.data().status;
+                        if(st==='waiting') w++;
+                        if(st==='called') c++;
+                        if(st==='served') s++;
+                        if(st==='cancelled') x++;
+                    });
+                    document.getElementById('stat-waiting').innerText = w;
+                    document.getElementById('stat-called').innerText = c;
+                    document.getElementById('stat-served').innerText = s;
+                    document.getElementById('stat-cancel').innerText = x;
+                });
+
+                // Monitor Current Serving
+                db.collection('q_system').doc('config').onSnapshot(doc => {
+                    if(doc.exists) document.getElementById('header-current').innerText = doc.data().current || 'A-000';
+                });
+
+                // Load Live Table
+                this.qRef.where('status', 'in', ['waiting', 'called'])
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot(snap => this.renderLiveTable(snap));
+
+                // Load History Table
+                this.qRef.where('status', 'in', ['served', 'cancelled'])
+                    .orderBy('timestamp', 'desc').limit(50)
+                    .onSnapshot(snap => this.renderHistoryTable(snap));
+            }
+
+            renderLiveTable(snap) {
+                const tbody = document.getElementById('table-live');
+                const empty = document.getElementById('empty-live');
+                tbody.innerHTML = '';
+                
+                if(snap.empty) { empty.classList.remove('hidden'); return; }
+                else empty.classList.add('hidden');
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const isCalled = d.status === 'called';
+                    const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '-';
+                    
+                    const rowClass = isCalled ? 'bg-blue-50 border-l-4 border-blue-500' : '';
+                    
+                    tbody.innerHTML += `
+                        <tr class="${rowClass}">
+                            <td><span class="font-bold text-lg ${isCalled ? 'text-blue-600' : 'text-slate-700'}">${d.number}</span></td>
+                            <td>
+                                <div class="font-bold text-slate-700">${d.name}</div>
+                                <div class="text-xs text-gray-400">${d.phone || '-'}</div>
+                            </td>
+                            <td><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold">${d.pax} ท่าน</span></td>
+                            <td class="text-sm text-gray-500">${time}</td>
+                            <td class="text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="Admin.call('${doc.id}', '${d.number}')" class="btn-icon btn-call" title="เรียกคิว"><i class="fa-solid fa-bullhorn"></i></button>
+                                    <button onclick="Admin.serve('${doc.id}')" class="btn-icon btn-check" title="เสร็จสิ้น"><i class="fa-solid fa-check"></i></button>
+                                    <button onclick="Admin.cancel('${doc.id}')" class="btn-icon btn-del" title="ยกเลิก"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                            </td>
+                        </tr>
                     `;
                 });
-            });
-        }
+            }
 
-        function LoadChat(uid) {
-            if(chatListener) chatListener.off();
-            activeUid = uid;
-            
-            document.getElementById('chat-title').innerText = `Chatting with: ${uid}`;
-            document.getElementById('reply-in').disabled = false;
-            document.getElementById('reply-btn').disabled = false;
-            
-            const box = document.getElementById('msg-box');
-            box.innerHTML = '';
+            renderHistoryTable(snap) {
+                const tbody = document.getElementById('table-history');
+                tbody.innerHTML = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const color = d.status === 'served' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="font-bold">${d.number}</td>
+                            <td>${d.name}</td>
+                            <td><span class="px-2 py-1 rounded text-xs font-bold uppercase ${color}">${d.status}</span></td>
+                            <td class="text-sm text-gray-400">${new Date(d.timestamp.seconds*1000).toLocaleTimeString()}</td>
+                        </tr>
+                    `;
+                });
+            }
 
-            chatListener = rtdb.ref('chats/'+uid);
-            chatListener.limitToLast(50).on('child_added', s => {
-                const m = s.val();
-                const me = m.sender === 'admin';
-                box.innerHTML += `
-                    <div class="flex ${me?'justify-end':'justify-start'}">
-                        <div class="px-3 py-2 rounded-xl text-sm max-w-[80%] ${me?'bg-blue-600 text-white':'bg-slate-800 border border-slate-700'}">${m.text}</div>
-                    </div>
-                `;
-                box.scrollTop = 9999;
-            });
+            // ACTIONS
+            call(id, num) {
+                // 1. Update Status
+                this.qRef.doc(id).update({ status: 'called' });
+                // 2. Update Global Display
+                db.collection('q_system').doc('config').update({ current: num });
+                // 3. Speech
+                this.speak(`ขอเชิญหมายเลข ${num} ค่ะ`);
+            }
 
-            // Load Calc History
-            db.collection('math_history').where('uid','==',uid).orderBy('ts','desc').limit(10).onSnapshot(snap => {
-                const h = document.getElementById('calc-history');
-                if(snap.empty) { h.innerHTML='No data'; return;}
-                h.innerHTML = snap.docs.map(d => `
-                    <div class="p-2 bg-slate-900 border border-slate-800 rounded">
-                        <div class="text-slate-400 font-mono text-xs">${d.data().expr}</div>
-                        <div class="text-green-400 font-bold">= ${d.data().res}</div>
-                    </div>
-                `).join('');
-            });
-        }
+            serve(id) {
+                this.qRef.doc(id).update({ status: 'served' });
+            }
 
-        function Send(e) {
-            e.preventDefault();
-            const inp = document.getElementById('reply-in');
-            if(inp.value && activeUid) {
-                rtdb.ref('chats/'+activeUid).push({text:inp.value, sender:'admin', ts:Date.now()});
-                inp.value = '';
+            cancel(id) {
+                if(confirm('ยกเลิกคิวนี้?')) this.qRef.doc(id).update({ status: 'cancelled' });
+            }
+
+            resetSystem() {
+                Swal.fire({
+                    title: 'รีเซ็ตระบบ?',
+                    text: "คิวทั้งหมดจะถูกลบและเริ่มนับ 1 ใหม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'ยืนยันรีเซ็ต'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Reset Config
+                        db.collection('q_system').doc('config').set({ current: 'A-000', last: 0 });
+                        
+                        // Delete All Queues (Batch)
+                        this.qRef.get().then(snap => {
+                            const batch = db.batch();
+                            snap.docs.forEach(doc => batch.delete(doc.ref));
+                            return batch.commit();
+                        }).then(() => {
+                            Swal.fire('เรียบร้อย', 'ระบบพร้อมสำหรับวันใหม่', 'success');
+                        });
+                    }
+                });
+            }
+
+            speak(text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+
+            switchTab(tab) {
+                document.getElementById('view-live').classList.add('hidden');
+                document.getElementById('view-history').classList.add('hidden');
+                document.getElementById(`view-${tab}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+                document.getElementById(`nav-${tab}`).classList.add('active');
             }
         }
+
+        const Admin = new AdminApp();
     </script>
 </body>
 </html>
