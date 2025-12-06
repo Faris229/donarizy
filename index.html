@@ -2,7 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>FF Admin - Minimal Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FF Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,116 +13,127 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #334155; }
-        .input-field {
-            width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
-            padding: 0.75rem; transition: all 0.2s;
-        }
-        .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .btn {
-            width: 100%; padding: 0.75rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.2s;
-        }
-        .btn:active { transform: scale(0.98); }
+        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; padding-bottom: 80px; } /* Padding for bottom bar */
         
-        .card { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .input-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-size: 16px; } /* Font 16px prevents zoom on iOS */
+        .btn-action { padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; transition: transform 0.1s; }
+        .btn-action:active { transform: scale(0.97); }
+
+        /* Mobile Tabs */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
+        
+        .nav-btn.active { color: #2563eb; }
+        .nav-btn.active i { transform: translateY(-2px); }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
+<body class="md:flex md:h-screen md:pb-0 md:overflow-hidden">
 
-    <aside class="w-80 bg-white border-r border-gray-200 flex flex-col z-20 overflow-y-auto">
-        <div class="p-6 border-b border-gray-100">
-            <h1 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-gamepad text-blue-500 mr-2"></i>ADMIN CONTROL</h1>
-        </div>
-
-        <div class="p-6 space-y-6">
-            
-            <div class="space-y-3">
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">เพิ่มผู้เล่นใหม่</h3>
-                <input id="p-name" type="text" placeholder="ชื่อในเกม" class="input-field">
-                <input id="p-money" type="number" placeholder="ยอดโดเนท (บาท)" class="input-field">
-                <button onclick="addPlayer()" class="btn bg-slate-900 text-white hover:bg-slate-700 shadow-lg">
-                    <i class="fa-solid fa-plus mr-2"></i> ลงทะเบียนคิว
-                </button>
-            </div>
-
-            <hr class="border-gray-100">
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">ควบคุมการแข่ง</h3>
-                
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-xs font-bold text-yellow-600">KING</span>
-                        <span id="ad-king" class="font-bold text-slate-800">...</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-blue-600">CHALLENGER</span>
-                        <span id="ad-chal" class="font-bold text-slate-800">...</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="setWinner('king')" class="btn bg-yellow-500 text-white hover:bg-yellow-600">
-                        👑 แชมป์ชนะ
-                    </button>
-                    <button onclick="setWinner('chal')" class="btn bg-blue-600 text-white hover:bg-blue-700">
-                        ⚔️ ผู้ท้าชิงชนะ
-                    </button>
-                </div>
-                <button onclick="forceNext()" class="btn bg-white border border-gray-200 text-slate-500 hover:bg-gray-50 text-sm">
-                    <i class="fa-solid fa-forward mr-2"></i> บังคับเริ่มคู่ต่อไป
-                </button>
-            </div>
-
-            <hr class="border-gray-100">
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">ประกาศวิ่ง (Ticker)</h3>
-                <textarea id="ann-input" rows="2" placeholder="ข้อความประกาศ..." class="input-field"></textarea>
-                <div class="flex gap-2">
-                    <button onclick="toggleAnn(true)" class="btn bg-green-500 text-white text-xs">เปิด</button>
-                    <button onclick="toggleAnn(false)" class="btn bg-red-500 text-white text-xs">ปิด</button>
-                </div>
-            </div>
-
-        </div>
+    <aside class="hidden md:flex w-80 bg-white border-r border-gray-200 flex-col z-20">
+        <div class="p-6 border-b border-gray-100 font-bold text-xl text-slate-800">Admin Control</div>
+        <nav class="p-4 space-y-2">
+            <button onclick="switchTab('tab-control')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600">🎮 ควบคุมการแข่ง</button>
+            <button onclick="switchTab('tab-add')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600">➕ เพิ่มผู้เล่น</button>
+            <button onclick="switchTab('tab-list')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600">📋 รายการคิว</button>
+            <button onclick="switchTab('tab-setting')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600">⚙️ ตั้งค่า</button>
+        </nav>
     </aside>
 
-    <main class="flex-1 bg-slate-50 p-8 overflow-y-auto">
+    <main class="flex-1 p-4 md:p-8 md:overflow-y-auto w-full max-w-3xl mx-auto">
         
-        <div class="flex justify-between items-end mb-6">
-            <div>
-                <h2 class="text-2xl font-bold text-slate-800">รายการคิว (Waiting List)</h2>
-                <p class="text-slate-400 text-sm">ระบบเรียงตามยอดโดเนทอัตโนมัติ</p>
+        <div class="md:hidden flex items-center justify-between mb-6">
+            <h1 class="text-xl font-bold text-slate-800">FF Arena Admin</h1>
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
+
+        <div id="tab-control" class="tab-content active">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
+                <div class="text-xs font-bold text-slate-400 uppercase mb-2">สถานะปัจจุบัน</div>
+                <div class="flex justify-between items-center mb-2 p-3 bg-yellow-50 rounded-xl border border-yellow-100">
+                    <span class="text-xs font-bold text-yellow-700">KING</span>
+                    <span id="mon-king" class="font-bold text-slate-800">...</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-xl border border-blue-100">
+                    <span class="text-xs font-bold text-blue-700">CHAL</span>
+                    <span id="mon-chal" class="font-bold text-slate-800">...</span>
+                </div>
             </div>
-            <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 font-bold text-slate-600">
-                รวม: <span id="list-count" class="text-blue-600">0</span>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <button onclick="setWinner('king')" class="btn-action bg-yellow-500 text-white shadow-lg shadow-yellow-200">👑 King Win</button>
+                <button onclick="setWinner('chal')" class="btn-action bg-blue-600 text-white shadow-lg shadow-blue-200">⚔️ Chal Win</button>
+            </div>
+            <button onclick="forceNext()" class="btn-action bg-white border border-slate-200 text-slate-500 text-sm">บังคับเริ่มคู่ถัดไป (Force Next)</button>
+        </div>
+
+        <div id="tab-add" class="tab-content">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="font-bold text-lg mb-4">ลงทะเบียนคิว</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">ชื่อในเกม</label>
+                        <input id="inp-name" type="text" class="input-box" placeholder="Ex. Somsak_007">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">ยอดโดเนท</label>
+                        <input id="inp-donate" type="number" class="input-box" placeholder="0">
+                    </div>
+                    <button onclick="addPlayer()" class="btn-action bg-slate-900 text-white shadow-xl mt-4">ลงทะเบียนทันที</button>
+                </div>
             </div>
         </div>
 
-        <div class="card overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-100 text-slate-500 text-sm uppercase">
-                    <tr>
-                        <th class="p-4 w-16 text-center">#</th>
-                        <th class="p-4">ชื่อผู้เล่น</th>
-                        <th class="p-4">โดเนท</th>
-                        <th class="p-4 text-right">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody id="queue-table" class="divide-y divide-gray-100">
-                    </tbody>
-            </table>
+        <div id="tab-list" class="tab-content">
+            <h2 class="font-bold text-lg mb-4 flex justify-between">
+                รายการรอ (Queue) <span class="text-blue-600 text-sm bg-blue-50 px-2 rounded" id="list-count">0</span>
+            </h2>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                        <tr><th class="p-4">Name</th><th class="p-4 text-right">Donate</th><th class="p-4 text-center">Act</th></tr>
+                    </thead>
+                    <tbody id="queue-table" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="mt-8">
-            <h3 class="font-bold text-slate-400 mb-4">ประวัติการแข่งล่าสุด (History)</h3>
-            <div id="history-list" class="space-y-2"></div>
+        <div id="tab-setting" class="tab-content">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <h2 class="font-bold text-lg">ตั้งค่าระบบ</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="conf-king" placeholder="ชื่อกรอบ King" class="input-box text-sm">
+                    <input id="conf-chal" placeholder="ชื่อกรอบ Chal" class="input-box text-sm">
+                </div>
+                <textarea id="conf-ann" rows="2" placeholder="ข้อความประกาศ..." class="input-box text-sm"></textarea>
+                <div class="flex gap-2">
+                    <button onclick="saveConfig(true)" class="btn-action bg-green-500 text-white text-xs">Update & Show</button>
+                    <button onclick="saveConfig(false)" class="btn-action bg-red-100 text-red-500 text-xs">Hide</button>
+                </div>
+                <hr>
+                <button onclick="resetSystem()" class="text-xs text-red-400 underline w-full text-center">Reset System (ถ้าบั๊ก)</button>
+            </div>
         </div>
 
     </main>
 
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 h-16 flex justify-around items-center z-50 pb-safe">
+        <button onclick="switchTab('tab-control')" class="nav-btn active flex flex-col items-center text-slate-400 text-xs gap-1 w-full">
+            <i class="fa-solid fa-gamepad text-xl"></i> คุมแข่ง
+        </button>
+        <button onclick="switchTab('tab-add')" class="nav-btn flex flex-col items-center text-slate-400 text-xs gap-1 w-full">
+            <i class="fa-solid fa-circle-plus text-xl"></i> เพิ่มคน
+        </button>
+        <button onclick="switchTab('tab-list')" class="nav-btn flex flex-col items-center text-slate-400 text-xs gap-1 w-full">
+            <i class="fa-solid fa-list-ol text-xl"></i> คิวรอ
+        </button>
+        <button onclick="switchTab('tab-setting')" class="nav-btn flex flex-col items-center text-slate-400 text-xs gap-1 w-full">
+            <i class="fa-solid fa-gear text-xl"></i> ตั้งค่า
+        </button>
+    </nav>
+
     <script>
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -130,135 +142,126 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const sysRef = db.collection('arena_system').doc('main_state');
+        const qRef = sysRef.collection('queue');
 
-        // --- Logic ---
+        // Logic
+        sysRef.onSnapshot(doc => {
+            if(doc.exists) {
+                const d = doc.data();
+                document.getElementById('mon-king').innerText = d.kingName || '-';
+                document.getElementById('mon-chal').innerText = d.chalName || '-';
+                if(document.activeElement.id !== 'conf-king') document.getElementById('conf-king').value = d.kingTitle || 'KING';
+                if(document.activeElement.id !== 'conf-chal') document.getElementById('conf-chal').value = d.chalTitle || 'CHALLENGER';
+                if(document.activeElement.id !== 'conf-ann') document.getElementById('conf-ann').value = d.announcementText || '';
+            } else resetSystem(true);
+        });
 
-        // 1. Add Player
-        function addPlayer() {
-            const name = document.getElementById('p-name').value;
-            const money = Number(document.getElementById('p-money').value);
-
-            if(!name) return Swal.fire('แจ้งเตือน', 'กรุณาใส่ชื่อผู้เล่น', 'warning');
-
-            db.collection('arena_queue').add({
-                name: name,
-                donate: money,
-                status: 'waiting',
-                wins: 0,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById('p-name').value = '';
-                document.getElementById('p-money').value = '';
-                checkLogic(); // Auto promote if empty
-                const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500});
-                Toast.fire({icon: 'success', title: 'เพิ่มคิวแล้ว'});
-            });
-        }
-
-        // 2. Queue List
-        db.collection('arena_queue').where('status', '==', 'waiting')
-          .orderBy('donate', 'desc').orderBy('timestamp', 'asc')
-          .onSnapshot(snap => {
-              const tb = document.getElementById('queue-table');
-              document.getElementById('list-count').innerText = snap.size;
-              tb.innerHTML = '';
-              
-              if(snap.empty) {
-                  tb.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400">ไม่มีคิวรอ...</td></tr>';
-                  return;
-              }
-
-              snap.docs.forEach((doc, i) => {
-                  const d = doc.data();
-                  tb.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 text-center font-bold text-slate-400">${i+1}</td>
-                        <td class="p-4 font-bold text-slate-700">${d.name}</td>
-                        <td class="p-4 font-bold text-green-600">฿${d.donate}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="modMoney('${doc.id}', ${d.donate})" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-lg text-xs font-bold mr-2">+เติมเงิน</button>
-                            <button onclick="delPlayer('${doc.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded-lg text-xs font-bold">ลบ</button>
+        qRef.orderBy('donate', 'desc').orderBy('timestamp', 'asc').onSnapshot(snap => {
+            document.getElementById('list-count').innerText = snap.size;
+            const tb = document.getElementById('queue-table');
+            tb.innerHTML = '';
+            snap.forEach((doc, i) => {
+                const d = doc.data();
+                tb.innerHTML += `
+                    <tr class="border-b border-slate-50 last:border-0">
+                        <td class="p-4 font-bold text-slate-700">
+                            <div class="text-[10px] text-slate-400">#${i+1}</div>${d.name}
                         </td>
-                    </tr>
-                  `;
-              });
-          });
-
-        // 3. Match Logic
-        let kDoc, cDoc;
-        
-        db.collection('arena_queue').where('status','==','king').onSnapshot(s => {
-            kDoc = s.empty ? null : s.docs[0];
-            document.getElementById('ad-king').innerText = kDoc ? `${kDoc.data().name} (${kDoc.data().wins} Win)` : '-';
-        });
-        db.collection('arena_queue').where('status','==','challenger').onSnapshot(s => {
-            cDoc = s.empty ? null : s.docs[0];
-            document.getElementById('ad-chal').innerText = cDoc ? cDoc.data().name : '-';
-        });
-        
-        // History
-        db.collection('arena_queue').where('status','==','history').orderBy('timestamp','desc').limit(5).onSnapshot(s => {
-            document.getElementById('history-list').innerHTML = s.docs.map(d => 
-                `<div class="bg-white p-3 rounded-lg border border-slate-200 text-sm text-slate-500 flex justify-between"><span>${d.data().name}</span> <span class="text-xs bg-slate-100 px-2 rounded">จบเกม</span></div>`
-            ).join('');
-        });
-
-        // 4. Actions
-        function modMoney(id, oldVal) {
-            Swal.fire({ title: 'เพิ่มยอดโดเนท', input: 'number' }).then(res => {
-                if(res.value) db.collection('arena_queue').doc(id).update({ donate: oldVal + Number(res.value) });
+                        <td class="p-4 text-right font-bold text-green-500">฿${d.donate}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="delQ('${doc.id}')" class="text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
             });
-        }
-        function delPlayer(id) {
-            if(confirm('ลบผู้เล่นนี้?')) db.collection('arena_queue').doc(id).delete();
+            if(snap.empty) tb.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-400">ว่างเปล่า</td></tr>';
+        });
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // Update Nav Icons
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            // Simple logic to highlight clicked based on onclick attr match (simplified)
+            event.currentTarget.classList.add('active');
         }
 
-        async function checkLogic() {
-            if(!kDoc) {
-                const next = await getNext();
-                if(next) await db.collection('arena_queue').doc(next.id).update({status: 'king', wins: 0});
+        // Actions
+        function addPlayer() {
+            const n = document.getElementById('inp-name').value;
+            const m = Number(document.getElementById('inp-donate').value);
+            if(!n) return Swal.fire('Error', 'ใส่ชื่อด้วย', 'error');
+            qRef.add({name:n, donate:m, timestamp: firebase.firestore.FieldValue.serverTimestamp()})
+                .then(() => {
+                    document.getElementById('inp-name').value = '';
+                    document.getElementById('inp-donate').value = '';
+                    autoFill();
+                    Swal.fire({icon:'success', title:'เพิ่มแล้ว', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+                });
+        }
+
+        function delQ(id) { if(confirm('ลบ?')) qRef.doc(id).delete(); }
+
+        async function autoFill() {
+            const doc = await sysRef.get();
+            const d = doc.data();
+            if(!d.kingName || d.kingName==='ว่าง') {
+                const n = await nextQ();
+                if(n) { await sysRef.update({kingName:n.name, kingWins:0}); await qRef.doc(n.id).delete(); }
             }
             setTimeout(async () => {
-                if(!cDoc) {
-                    const next = await getNext();
-                    if(next) await db.collection('arena_queue').doc(next.id).update({status: 'challenger'});
+                const d2 = (await sysRef.get()).data();
+                if(!d2.chalName || d2.chalName==='ว่าง') {
+                    const n = await nextQ();
+                    if(n) { await sysRef.update({chalName:n.name, chalDonate:n.donate}); await qRef.doc(n.id).delete(); }
                 }
             }, 500);
         }
 
-        async function getNext() {
-            const s = await db.collection('arena_queue').where('status','==','waiting').orderBy('donate','desc').orderBy('timestamp','asc').limit(1).get();
-            return s.empty ? null : s.docs[0];
+        async function nextQ() {
+            const s = await qRef.orderBy('donate','desc').orderBy('timestamp','asc').limit(1).get();
+            return s.empty ? null : {id:s.docs[0].id, ...s.docs[0].data()};
         }
 
         async function setWinner(who) {
-            if(!kDoc || !cDoc) return Swal.fire('Error', 'ผู้เล่นไม่ครบ', 'error');
-            const batch = db.batch();
+            const d = (await sysRef.get()).data();
+            if(!d.kingName || !d.chalName || d.kingName==='ว่าง' || d.chalName==='ว่าง') return Swal.fire('Wait', 'คนไม่ครบ', 'warning');
             
-            if(who === 'king') {
-                batch.update(kDoc.ref, { wins: (kDoc.data().wins||0)+1 });
-                batch.update(cDoc.ref, { status: 'history' });
+            const n = await nextQ();
+            const u = {};
+            if(who==='king') {
+                u.kingWins = (d.kingWins||0)+1;
+                u.chalName = n ? n.name : 'ว่าง';
+                u.chalDonate = n ? n.donate : 0;
             } else {
-                batch.update(kDoc.ref, { status: 'history' });
-                batch.update(cDoc.ref, { status: 'king', wins: 1 });
+                u.kingName = d.chalName;
+                u.kingWins = 1;
+                u.chalName = n ? n.name : 'ว่าง';
+                u.chalDonate = n ? n.donate : 0;
             }
-            await batch.commit();
-            
-            const next = await getNext();
-            if(next) await db.collection('arena_queue').doc(next.id).update({status:'challenger'});
+            if(n) await qRef.doc(n.id).delete();
+            await sysRef.update(u);
         }
 
-        function forceNext() { checkLogic(); }
+        function forceNext() { autoFill(); }
 
-        // Announcement
-        function toggleAnn(state) {
-            const txt = document.getElementById('ann-input').value;
-            db.collection('announcements').doc('config').set({ text: txt, active: state });
-            Swal.fire('สำเร็จ', state ? 'เปิดประกาศแล้ว' : 'ปิดประกาศแล้ว', 'success');
+        function saveConfig(active) {
+            sysRef.update({
+                kingTitle: document.getElementById('conf-king').value,
+                chalTitle: document.getElementById('conf-chal').value,
+                announcementText: document.getElementById('conf-ann').value,
+                announcementActive: active
+            }).then(() => Swal.fire({icon:'success', title:'Updated', toast:true, position:'top', showConfirmButton:false, timer:1000}));
         }
 
+        function resetSystem(silent) {
+            const def = { kingName:'ว่าง', kingWins:0, kingTitle:'KING', chalName:'ว่าง', chalDonate:0, chalTitle:'CHALLENGER', announcementText:'Welcome', announcementActive:false };
+            sysRef.set(def, {merge:true}).then(()=> !silent && Swal.fire('Reset Done'));
+        }
     </script>
 </body>
 </html>
