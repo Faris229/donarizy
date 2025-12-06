@@ -2,86 +2,67 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wheel Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <style>
-        body { font-family: 'Kanit', sans-serif; background: #f1f5f9; }
-        .input-box { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .btn { padding: 10px 20px; border-radius: 8px; font-weight: bold; transition: all 0.2s; }
-        .btn:hover { transform: translateY(-2px); }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex h-screen bg-gray-100 font-sans">
 
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-10">
-        <div class="h-16 flex items-center px-6 font-bold text-xl text-slate-800 border-b">
-            Wheel Admin
-        </div>
-        <nav class="p-4 space-y-2">
-            <button onclick="showTab('prizes')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600 active-nav bg-slate-100"><i class="fa-solid fa-gift mr-2"></i> ของรางวัล</button>
-            <button onclick="showTab('codes')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600"><i class="fa-solid fa-ticket mr-2"></i> จัดการโค้ด</button>
-            <button onclick="showTab('history')" class="w-full text-left p-3 rounded hover:bg-slate-50 font-bold text-slate-600"><i class="fa-solid fa-clock-rotate-left mr-2"></i> ประวัติ</button>
+    <aside class="w-64 bg-white border-r flex flex-col">
+        <div class="p-6 font-bold text-xl text-purple-600 border-b">Admin Panel</div>
+        <nav class="p-4 space-y-1">
+            <button onclick="show('prizes')" class="w-full text-left p-3 rounded hover:bg-purple-50 text-gray-700 font-bold"><i class="fa-solid fa-gift w-6"></i> ของรางวัล</button>
+            <button onclick="show('codes')" class="w-full text-left p-3 rounded hover:bg-purple-50 text-gray-700 font-bold"><i class="fa-solid fa-ticket w-6"></i> โค้ด</button>
+            <button onclick="show('chat')" class="w-full text-left p-3 rounded hover:bg-purple-50 text-gray-700 font-bold"><i class="fa-solid fa-comments w-6"></i> แชท</button>
         </nav>
     </aside>
 
     <main class="flex-1 p-8 overflow-y-auto">
         
-        <div id="tab-prizes" class="tab-content">
-            <h2 class="text-2xl font-bold mb-6">จัดการของรางวัลในวงล้อ</h2>
+        <div id="prizes" class="section">
+            <h2 class="text-2xl font-bold mb-6">จัดการของรางวัล (Weighted Probability)</h2>
             
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                <h3 class="font-bold mb-4 text-slate-500 uppercase text-sm">เพิ่มรางวัลใหม่</h3>
-                <div class="flex gap-4">
-                    <input id="p-name" type="text" placeholder="ชื่อรางวัล (เช่น iPhone 15, เกลือ)" class="input-box flex-1">
-                    <input id="p-color" type="color" class="h-11 w-20 rounded cursor-pointer border p-1 bg-white">
-                    <button onclick="addPrize()" class="btn bg-blue-600 text-white shadow-lg shadow-blue-200">เพิ่ม</button>
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border">
+                <h3 class="font-bold mb-4 text-sm uppercase text-gray-400">เพิ่ม/แก้ไข รางวัล</h3>
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <input id="p-name" placeholder="ชื่อรางวัล (เช่น บัตรทรู)" class="border p-2 rounded col-span-2">
+                    <input id="p-color" type="color" class="h-10 w-full cursor-pointer">
+                    <input id="p-chance" type="number" placeholder="โอกาส (%)" class="border p-2 rounded">
                 </div>
+                <textarea id="p-items" placeholder="สินค้าข้างใน (Nested Items) - ใส่บรรทัดละ 1 อัน&#10;เช่น:&#10;TRUE-001&#10;TRUE-002" class="w-full border p-2 rounded h-24 mb-4 font-mono text-sm"></textarea>
+                <button onclick="addPrize()" class="bg-purple-600 text-white px-6 py-2 rounded font-bold hover:bg-purple-700">บันทึกรางวัล</button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="prize-list">
-                </div>
+            <div class="grid grid-cols-2 gap-4" id="prize-list"></div>
         </div>
 
-        <div id="tab-codes" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-6">จัดการโค้ดหมุนวงล้อ</h2>
-            
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                <h3 class="font-bold mb-4 text-slate-500 uppercase text-sm">สร้างโค้ดใหม่</h3>
-                <div class="flex gap-4">
-                    <input id="c-code" type="text" placeholder="พิมพ์โค้ด หรือกดสุ่ม..." class="input-box flex-1 font-mono uppercase">
-                    <button onclick="genRandomCode()" class="btn bg-slate-200 text-slate-600">สุ่ม</button>
-                    <button onclick="addCode()" class="btn bg-green-600 text-white shadow-lg shadow-green-200">สร้างโค้ด</button>
+        <div id="chat" class="section hidden h-full flex flex-col">
+            <h2 class="text-2xl font-bold mb-4">Live Chat</h2>
+            <div class="flex flex-1 gap-4 overflow-hidden h-[500px]">
+                <div id="user-list" class="w-1/3 bg-white border rounded overflow-y-auto"></div>
+                <div class="w-2/3 bg-white border rounded flex flex-col">
+                    <div id="msg-box" class="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-2">Select User</div>
+                    <form onsubmit="sendAdminChat(event)" class="p-3 border-t flex gap-2">
+                        <input id="admin-in" class="flex-1 border p-2 rounded" placeholder="Type...">
+                        <button class="bg-purple-600 text-white px-4 rounded">Send</button>
+                    </form>
                 </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-slate-500 text-sm uppercase">
-                        <tr><th class="p-4">Code</th><th class="p-4">Status</th><th class="p-4 text-right">Action</th></tr>
-                    </thead>
-                    <tbody id="code-list" class="divide-y text-sm"></tbody>
-                </table>
             </div>
         </div>
 
-        <div id="tab-history" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-6">ประวัติการหมุน</h2>
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-slate-500 text-sm uppercase">
-                        <tr><th class="p-4">รางวัล</th><th class="p-4">ใช้โค้ด</th><th class="p-4">เวลา</th></tr>
-                    </thead>
-                    <tbody id="hist-list" class="divide-y text-sm"></tbody>
-                </table>
+        <div id="codes" class="section hidden">
+            <h2 class="text-2xl font-bold mb-4">สร้างโค้ด</h2>
+            <div class="flex gap-2 mb-4">
+                <input id="new-code" class="border p-2 rounded flex-1" placeholder="CODE">
+                <button onclick="createCode()" class="bg-green-600 text-white px-4 rounded">Create</button>
             </div>
+            <div id="code-list" class="bg-white rounded border p-4"></div>
         </div>
 
     </main>
@@ -97,86 +78,90 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const rtdb = firebase.database();
 
-        // 1. PRIZES LOGIC
+        // 1. PRIZES
         function addPrize() {
             const name = document.getElementById('p-name').value;
             const color = document.getElementById('p-color').value;
-            if(!name) return;
-            
+            const chance = Number(document.getElementById('p-chance').value);
+            const itemsRaw = document.getElementById('p-items').value;
+            const items = itemsRaw.split('\n').filter(x => x.trim() !== '');
+
             db.collection('wheel_prizes').add({
-                name: name, color: color, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                name, color, chance, items, 
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 document.getElementById('p-name').value = '';
-                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Added', showConfirmButton:false, timer:1500});
+                document.getElementById('p-items').value = '';
+                Swal.fire('Success', 'เพิ่มรางวัลแล้ว', 'success');
             });
         }
 
         db.collection('wheel_prizes').orderBy('createdAt').onSnapshot(snap => {
             const div = document.getElementById('prize-list');
-            div.innerHTML = snap.docs.map(doc => `
-                <div class="bg-white p-4 rounded-xl border shadow-sm flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full border" style="background:${doc.data().color}"></div>
-                        <span class="font-bold text-slate-700">${doc.data().name}</span>
-                    </div>
-                    <button onclick="db.collection('wheel_prizes').doc('${doc.id}').delete()" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        });
-
-        // 2. CODES LOGIC
-        function genRandomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 8; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-            document.getElementById('c-code').value = result;
-        }
-
-        function addCode() {
-            const code = document.getElementById('c-code').value.toUpperCase().trim();
-            if(!code) return;
-            
-            db.collection('wheel_codes').add({
-                code: code, status: 'unused', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById('c-code').value = '';
-                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Code Created', showConfirmButton:false, timer:1500});
-            });
-        }
-
-        db.collection('wheel_codes').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            const tb = document.getElementById('code-list');
-            tb.innerHTML = snap.docs.map(doc => {
+            div.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
-                const statusClass = d.status === 'unused' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500 line-through';
+                const stock = d.items ? d.items.length : 0;
                 return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-4 font-mono font-bold">${d.code}</td>
-                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold uppercase ${statusClass}">${d.status}</span></td>
-                        <td class="p-4 text-right"><button onclick="db.collection('wheel_codes').doc('${doc.id}').delete()" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
+                    <div class="bg-white p-4 rounded border shadow-sm relative">
+                        <button onclick="db.collection('wheel_prizes').doc('${doc.id}').delete()" class="absolute top-2 right-2 text-red-400"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-4 h-4 rounded-full" style="background:${d.color}"></div>
+                            <span class="font-bold">${d.name}</span>
+                        </div>
+                        <div class="text-sm text-gray-500">โอกาส: ${d.chance}% | สต็อกของ: ${stock} ชิ้น</div>
+                    </div>
                 `;
             }).join('');
         });
 
-        // 3. HISTORY
-        db.collection('wheel_history').orderBy('timestamp', 'desc').limit(20).onSnapshot(snap => {
-            const tb = document.getElementById('hist-list');
-            tb.innerHTML = snap.docs.map(doc => `
-                <tr>
-                    <td class="p-4 font-bold text-blue-600">${doc.data().prize}</td>
-                    <td class="p-4 text-slate-500 font-mono">${doc.data().code}</td>
-                    <td class="p-4 text-slate-400 text-xs">${doc.data().timestamp ? new Date(doc.data().timestamp.seconds*1000).toLocaleString() : ''}</td>
-                </tr>
-            `).join('');
+        // 2. CHAT
+        let activeChat = null;
+        rtdb.ref('chats').on('value', snap => {
+            const div = document.getElementById('user-list');
+            div.innerHTML = '';
+            snap.forEach(c => {
+                div.innerHTML += `<div onclick="loadChat('${c.key}')" class="p-3 border-b hover:bg-gray-100 cursor-pointer ${activeChat===c.key?'bg-purple-100':''}">User: ${c.key.substr(0,5)}</div>`;
+            });
         });
 
-        // Tabs
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.getElementById('tab-'+id).classList.remove('hidden');
+        function loadChat(uid) {
+            activeChat = uid;
+            const div = document.getElementById('msg-box');
+            div.innerHTML = '';
+            rtdb.ref('chats/'+uid).limitToLast(20).on('child_added', s => {
+                const m = s.val();
+                const align = m.sender==='admin'?'text-right':'text-left';
+                const color = m.sender==='admin'?'bg-purple-600 text-white':'bg-white border';
+                div.innerHTML += `<div class="${align} mb-1"><span class="inline-block px-3 py-1 rounded ${color}">${m.text}</span></div>`;
+                div.scrollTop = div.scrollHeight;
+            });
         }
+
+        function sendAdminChat(e) {
+            e.preventDefault();
+            const val = document.getElementById('admin-in').value;
+            if(val && activeChat) {
+                rtdb.ref('chats/'+activeChat).push({text:val, sender:'admin', timestamp: Date.now()});
+                document.getElementById('admin-in').value = '';
+            }
+        }
+
+        // 3. CODES
+        function createCode() {
+            const c = document.getElementById('new-code').value;
+            if(c) db.collection('wheel_codes').add({code:c, status:'unused', createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+        }
+        db.collection('wheel_codes').orderBy('createdAt', 'desc').limit(20).onSnapshot(s => {
+            document.getElementById('code-list').innerHTML = s.docs.map(d => `<div class="p-2 border-b flex justify-between"><span>${d.data().code}</span><span class="text-xs uppercase">${d.data().status}</span></div>`).join('');
+        });
+
+        function show(id) {
+            document.querySelectorAll('.section').forEach(e => e.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+        show('prizes');
     </script>
 </body>
 </html>
