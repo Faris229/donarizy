@@ -15,34 +15,14 @@
 
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; color: #1f2937; }
-        
-        /* Sidebar */
         .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; z-index: 20; }
-        .nav-btn {
-            display: flex; align-items: center; padding: 14px 20px; color: #64748b;
-            font-weight: 500; transition: all 0.2s; border-radius: 12px; margin-bottom: 4px;
-        }
+        .nav-btn { display: flex; align-items: center; padding: 14px 20px; color: #64748b; font-weight: 500; transition: all 0.2s; border-radius: 12px; margin-bottom: 4px; }
         .nav-btn:hover { background: #f8fafc; color: #0f172a; }
         .nav-btn.active { background: #eff6ff; color: #2563eb; font-weight: 700; }
-        .nav-btn i { width: 24px; }
-
-        /* Table */
-        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .data-table th { text-align: left; padding: 16px; background: #f9fafb; font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; }
-        .data-table td { padding: 16px; background: white; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        .data-table tr:hover td { background: #f8fafc; }
-
-        /* Action Buttons */
         .action-btn { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; transition: all 0.2s; }
         .btn-call { background: #eff6ff; color: #2563eb; } .btn-call:hover { background: #2563eb; color: white; }
         .btn-done { background: #ecfdf5; color: #059669; } .btn-done:hover { background: #059669; color: white; }
-        .btn-info { background: #f3f4f6; color: #4b5563; } .btn-info:hover { background: #4b5563; color: white; }
         .btn-del  { background: #fef2f2; color: #dc2626; } .btn-del:hover { background: #dc2626; color: white; }
-
-        /* Detail Modal */
-        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e5e7eb; }
-        .detail-label { color: #6b7280; font-size: 0.9rem; }
-        .detail-val { font-weight: 600; color: #1f2937; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -53,13 +33,12 @@
         </div>
         <div class="p-4 flex-1 overflow-y-auto">
             <div class="text-xs font-bold text-gray-400 uppercase px-4 mb-2 mt-2">Main Menu</div>
-            <button onclick="Router('live')" id="nav-live" class="nav-btn active"><i class="fa-solid fa-list-ol"></i> รายการคิวสด</button>
-            <button onclick="Router('history')" id="nav-history" class="nav-btn"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติวันนี้</button>
-            <button onclick="Router('setting')" id="nav-setting" class="nav-btn"><i class="fa-solid fa-gear"></i> ตั้งค่าร้านค้า</button>
+            <button onclick="Router('live')" id="nav-live" class="nav-btn active"><i class="fa-solid fa-list-ol w-6"></i> รายการคิวสด</button>
+            <button onclick="Router('setting')" id="nav-setting" class="nav-btn"><i class="fa-solid fa-gear w-6"></i> ตั้งค่าระบบ</button>
             
             <div class="mt-8 pt-8 border-t border-gray-100">
                 <button onclick="Admin.resetSystem()" class="nav-btn text-red-500 hover:bg-red-50 hover:text-red-600">
-                    <i class="fa-solid fa-trash"></i> รีเซ็ตระบบ (วันใหม่)
+                    <i class="fa-solid fa-trash w-6"></i> รีเซ็ตระบบ
                 </button>
             </div>
         </div>
@@ -68,43 +47,14 @@
     <main class="flex-1 flex flex-col h-full relative">
         <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
             <h1 class="text-xl font-bold text-slate-800" id="page-title">Dashboard</h1>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <div class="text-xs text-gray-400 uppercase font-bold">Now Serving</div>
-                    <div class="text-2xl font-bold text-blue-600" id="header-current">A-000</div>
-                </div>
+            <div class="text-right">
+                <div class="text-xs text-gray-400 uppercase font-bold">Now Serving</div>
+                <div class="text-2xl font-bold text-blue-600" id="header-current">A-000</div>
             </div>
         </header>
 
         <div id="content-area" class="flex-1 overflow-y-auto bg-gray-50 p-8"></div>
     </main>
-
-    <div id="modal-detail" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-white rounded-2xl w-full max-w-md p-0 shadow-2xl overflow-hidden animate__animated animate__zoomIn">
-            <div class="bg-slate-50 p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-slate-800">รายละเอียดคิว</h3>
-                <button onclick="document.getElementById('modal-detail').classList.add('hidden')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-6">
-                <div class="text-center mb-6">
-                    <div class="text-sm text-gray-400 uppercase tracking-widest">Queue Number</div>
-                    <div class="text-5xl font-black text-blue-600" id="modal-q">A-001</div>
-                    <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold mt-2" id="modal-status">WAITING</div>
-                </div>
-                
-                <div class="detail-row"><span class="detail-label">ชื่อลูกค้า</span><span class="detail-val" id="modal-name">-</span></div>
-                <div class="detail-row"><span class="detail-label">เบอร์โทร</span><span class="detail-val" id="modal-phone">-</span></div>
-                <div class="detail-row"><span class="detail-label">จำนวน (ท่าน)</span><span class="detail-val" id="modal-pax">-</span></div>
-                <div class="detail-row"><span class="detail-label text-blue-600 font-bold">เวลาแจ้งมาถึง</span><span class="detail-val text-blue-600" id="modal-arrival">-</span></div>
-                <div class="detail-row border-none"><span class="detail-label">เวลาจอง</span><span class="detail-val text-gray-400" id="modal-time">-</span></div>
-
-                <div class="grid grid-cols-2 gap-3 mt-6">
-                    <button id="btn-modal-call" class="py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">เรียกคิว</button>
-                    <button id="btn-modal-done" class="py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600">เสร็จสิ้น</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         const firebaseConfig = {
@@ -121,28 +71,34 @@
         class AdminApp {
             constructor() {
                 this.qRef = db.collection('q_system').doc('config').collection('queues');
+                this.voiceTemplate = "ขอเชิญ คุณ {name} หมายเลข {queue} ค่ะ"; // Default
                 this.initListener();
             }
 
             initListener() {
-                // Monitor Header
+                // Monitor Global Config & Voice Template
                 db.collection('q_system').doc('config').onSnapshot(doc => {
-                    if(doc.exists) document.getElementById('header-current').innerText = doc.data().current || 'A-000';
+                    if(doc.exists) {
+                        const d = doc.data();
+                        document.getElementById('header-current').innerText = d.current || 'A-000';
+                        this.voiceTemplate = d.voicePattern || "ขอเชิญ คุณ {name} หมายเลข {queue} ค่ะ";
+                    }
                 });
             }
 
             renderLive(el) {
                 el.innerHTML = `
-                    <div class="grid grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">รอคิว</div><div class="text-3xl font-bold text-slate-800" id="s-wait">0</div></div>
-                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">เรียกแล้ว</div><div class="text-3xl font-bold text-blue-600" id="s-call">0</div></div>
-                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">เสร็จสิ้น</div><div class="text-3xl font-bold text-green-600" id="s-done">0</div></div>
-                        <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="text-xs font-bold text-gray-400 uppercase">ยกเลิก</div><div class="text-3xl font-bold text-red-500" id="s-canc">0</div></div>
-                    </div>
                     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <table class="data-table">
-                            <thead><tr><th>No.</th><th>Name</th><th>Time</th><th>Arrival</th><th>Actions</th></tr></thead>
-                            <tbody id="tb-live"></tbody>
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-bold">
+                                <tr>
+                                    <th class="p-4">Queue</th>
+                                    <th class="p-4">Customer</th>
+                                    <th class="p-4">Arrival</th>
+                                    <th class="p-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-live" class="text-sm divide-y divide-slate-100"></tbody>
                         </table>
                         <div id="live-empty" class="p-10 text-center text-gray-400 hidden">ไม่มีคิวที่กำลังรอ</div>
                     </div>
@@ -150,14 +106,6 @@
 
                 this.qRef.orderBy('timestamp','asc').onSnapshot(snap => {
                     const all = snap.docs.map(d=>({id:d.id, ...d.data()}));
-                    
-                    // Stats
-                    document.getElementById('s-wait').innerText = all.filter(x=>x.status==='waiting').length;
-                    document.getElementById('s-call').innerText = all.filter(x=>x.status==='called').length;
-                    document.getElementById('s-done').innerText = all.filter(x=>x.status==='served').length;
-                    document.getElementById('s-canc').innerText = all.filter(x=>x.status==='cancelled').length;
-
-                    // Table
                     const active = all.filter(x => ['waiting','called'].includes(x.status));
                     const tb = document.getElementById('tb-live');
                     
@@ -166,23 +114,17 @@
 
                     tb.innerHTML = active.map(d => {
                         const isCall = d.status==='called';
-                        const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '-';
                         return `
                             <tr class="${isCall?'bg-blue-50 border-l-4 border-blue-600':''}">
-                                <td>
-                                    <span class="font-bold text-lg ${isCall?'text-blue-600':'text-slate-700'}">${d.number}</span>
-                                    ${isCall ? '<span class="block text-[10px] text-blue-500 font-bold uppercase">Calling</span>' : ''}
-                                </td>
-                                <td>
+                                <td class="p-4"><span class="font-bold text-lg ${isCall?'text-blue-600':'text-slate-700'}">${d.number}</span></td>
+                                <td class="p-4">
                                     <div class="font-bold text-slate-700">${d.name}</div>
                                     <div class="text-xs text-gray-400">${d.pax} ท่าน • ${d.phone}</div>
                                 </td>
-                                <td class="text-sm text-gray-500">${time}</td>
-                                <td><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">${d.arrivalTime || '-'}</span></td>
-                                <td class="space-x-1">
-                                    <button onclick="Admin.call('${d.id}','${d.number}')" class="action-btn btn-call"><i class="fa-solid fa-bullhorn"></i></button>
+                                <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">${d.arrivalTime || '-'}</span></td>
+                                <td class="p-4 text-right space-x-1">
+                                    <button onclick="Admin.call('${d.id}','${d.number}','${d.name}')" class="action-btn btn-call"><i class="fa-solid fa-bullhorn"></i></button>
                                     <button onclick="Admin.serve('${d.id}')" class="action-btn btn-done"><i class="fa-solid fa-check"></i></button>
-                                    <button onclick="Admin.viewDetail('${d.id}')" class="action-btn btn-info"><i class="fa-solid fa-eye"></i></button>
                                     <button onclick="Admin.cancel('${d.id}')" class="action-btn btn-del"><i class="fa-solid fa-xmark"></i></button>
                                 </td>
                             </tr>
@@ -191,77 +133,73 @@
                 });
             }
 
-            renderHistory(el) {
-                el.innerHTML = `<div class="bg-white rounded-xl border shadow-sm overflow-hidden"><table class="data-table"><thead><tr><th>No.</th><th>Name</th><th>Status</th><th>Time</th></tr></thead><tbody id="tb-hist"></tbody></table></div>`;
-                this.qRef.where('status','in',['served','cancelled']).orderBy('timestamp','desc').limit(50).onSnapshot(snap => {
-                    document.getElementById('tb-hist').innerHTML = snap.docs.map(doc => {
-                        const d = doc.data();
-                        const color = d.status==='served'?'text-green-600 bg-green-50':'text-red-600 bg-red-50';
-                        const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString() : '-';
-                        return `<tr><td><b>${d.number}</b></td><td>${d.name}</td><td><span class="px-2 py-1 rounded text-xs font-bold uppercase ${color}">${d.status}</span></td><td class="text-sm text-gray-400">${time}</td></tr>`;
-                    }).join('');
-                });
-            }
-
             renderSetting(el) {
                 el.innerHTML = `
                     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl border shadow-sm">
-                        <h3 class="font-bold text-lg mb-6 text-slate-800">ตั้งค่าร้านค้า</h3>
+                        <h3 class="font-bold text-lg mb-6 text-slate-800">ตั้งค่าร้านค้า & เสียง</h3>
+                        
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-gray-500 mb-2">ชื่อร้านค้า</label>
                             <input id="set-name" class="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="ชื่อร้าน...">
                         </div>
-                        <div class="mb-6">
-                            <label class="block text-sm font-bold text-gray-500 mb-2">ข้อความประกาศ (วิ่ง)</label>
-                            <textarea id="set-ann" class="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500 h-24" placeholder="โปรโมชั่น..."></textarea>
+
+                        <div class="mb-4 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <label class="block text-sm font-bold text-yellow-700 mb-2"><i class="fa-solid fa-volume-high mr-2"></i>รูปแบบเสียงเรียก (Voice Pattern)</label>
+                            <input id="set-voice" class="w-full p-3 border border-yellow-300 rounded-lg focus:outline-none focus:border-yellow-500 bg-white" placeholder="เช่น ขอเชิญ คุณ {name} คิวที่ {queue} ค่ะ">
+                            <p class="text-xs text-yellow-600 mt-2">
+                                ใช้ <b>{name}</b> แทนชื่อลูกค้า และ <b>{queue}</b> แทนเลขคิว
+                            </p>
                         </div>
-                        <div class="flex gap-4 pt-4 border-t">
-                            <button onclick="Admin.saveSet(true)" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold">บันทึก & เปิดประกาศ</button>
-                            <button onclick="Admin.saveSet(false)" class="flex-1 bg-white border text-gray-600 py-2 rounded-lg font-bold">ปิดประกาศ</button>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold text-gray-500 mb-2">ประกาศข้อความวิ่ง</label>
+                            <textarea id="set-ann" class="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500 h-24"></textarea>
+                        </div>
+
+                        <div class="flex gap-4 border-t pt-4">
+                            <button onclick="Admin.saveSet(true)" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700">บันทึก & ใช้งาน</button>
                         </div>
                     </div>
                 `;
                 db.collection('q_system').doc('config').get().then(doc => {
                     if(doc.exists) {
-                        document.getElementById('set-name').value = doc.data().shopName || '';
-                        document.getElementById('set-ann').value = doc.data().announceText || '';
+                        const d = doc.data();
+                        document.getElementById('set-name').value = d.shopName || '';
+                        document.getElementById('set-ann').value = d.announceText || '';
+                        document.getElementById('set-voice').value = d.voicePattern || "ขอเชิญ คุณ {name} หมายเลข {queue} ค่ะ";
                     }
                 });
             }
 
             // ACTIONS
-            call(id, num) {
-                this.qRef.doc(id).update({ status: 'called', lastCall: firebase.firestore.FieldValue.serverTimestamp() });
+            call(id, num, name) {
+                // 1. Prepare Message
+                let msg = this.voiceTemplate;
+                msg = msg.replace('{name}', name).replace('{queue}', num);
+
+                // 2. Update DB with message (so client knows WHAT to speak)
+                this.qRef.doc(id).update({ 
+                    status: 'called', 
+                    lastCall: firebase.firestore.FieldValue.serverTimestamp(),
+                    voiceMessage: msg // <--- ส่งข้อความที่ประกอบร่างแล้วไปด้วย
+                });
+                
                 db.collection('q_system').doc('config').update({ current: num, forceUpdate: Date.now() });
-                this.speak(`เชิญหมายเลข ${num} ค่ะ`);
+                
+                // 3. Admin Speaks too (Optional)
+                this.speak(msg); 
             }
+
             serve(id) { this.qRef.doc(id).update({status:'served'}); }
             cancel(id) { if(confirm('Cancel?')) this.qRef.doc(id).update({status:'cancelled'}); }
             
-            viewDetail(id) {
-                this.qRef.doc(id).get().then(doc => {
-                    const d = doc.data();
-                    document.getElementById('modal-q').innerText = d.number;
-                    document.getElementById('modal-status').innerText = d.status.toUpperCase();
-                    document.getElementById('modal-name').innerText = d.name;
-                    document.getElementById('modal-phone').innerText = d.phone;
-                    document.getElementById('modal-pax').innerText = d.pax + ' ท่าน';
-                    document.getElementById('modal-arrival').innerText = d.arrivalTime || '-';
-                    document.getElementById('modal-time').innerText = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString() : '-';
-                    
-                    document.getElementById('btn-modal-call').onclick = () => { this.call(id, d.number); document.getElementById('modal-detail').classList.add('hidden'); };
-                    document.getElementById('btn-modal-done').onclick = () => { this.serve(id); document.getElementById('modal-detail').classList.add('hidden'); };
-                    
-                    document.getElementById('modal-detail').classList.remove('hidden');
-                });
-            }
-
             saveSet(show) {
                 db.collection('q_system').doc('config').update({
                     shopName: document.getElementById('set-name').value,
                     announceText: document.getElementById('set-ann').value,
+                    voicePattern: document.getElementById('set-voice').value, // Save Pattern
                     showAnnounce: show
-                }).then(()=> Swal.fire('Saved','','success'));
+                }).then(()=> Swal.fire('Success', 'บันทึกเรียบร้อย', 'success'));
             }
 
             resetSystem() {
@@ -293,7 +231,6 @@
             const t = document.getElementById('page-title');
             
             if(p==='live') { t.innerText='Live Queue'; Admin.renderLive(el); }
-            if(p==='history') { t.innerText='History'; Admin.renderHistory(el); }
             if(p==='setting') { t.innerText='Settings'; Admin.renderSetting(el); }
         }
 
