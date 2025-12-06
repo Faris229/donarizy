@@ -3,100 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Space Admin Pro</title>
-    
+    <title>Q-Admin Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #334155; }
-        
-        /* Sidebar Styling */
-        .sidebar { width: 280px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 20; box-shadow: 4px 0 24px rgba(0,0,0,0.02); }
-        .nav-btn { 
-            display: flex; align-items: center; padding: 16px 24px; 
-            color: #64748b; font-weight: 500; transition: all 0.2s; 
-            border-radius: 12px; margin-bottom: 8px; font-size: 0.95rem;
-        }
-        .nav-btn:hover { background: #f1f5f9; color: #0f172a; transform: translateX(5px); }
-        .nav-btn.active { background: #eff6ff; color: #2563eb; font-weight: 700; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
-        
-        /* Action Buttons */
-        .action-btn { 
-            width: 40px; height: 40px; border-radius: 10px; 
-            display: inline-flex; justify-content: center; align-items: center; 
-            transition: all 0.2s; cursor: pointer; border: none; font-size: 1.1rem;
-        }
-        .action-btn:active { transform: scale(0.9); }
-        
-        .btn-call { background: #eff6ff; color: #2563eb; } 
-        .btn-call:hover { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        
-        .btn-recall { background: #fff7ed; color: #ea580c; }
-        .btn-recall:hover { background: #ea580c; color: white; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3); }
-
-        .btn-done { background: #ecfdf5; color: #059669; } 
-        .btn-done:hover { background: #059669; color: white; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
-        
-        .btn-del  { background: #fef2f2; color: #dc2626; } 
-        .btn-del:hover { background: #dc2626; color: white; }
-
-        /* Table Styling */
-        tr { transition: 0.2s; }
-        tr:hover { background-color: #f8fafc; }
-        .row-called { background-color: #eff6ff !important; border-left: 4px solid #2563eb; }
+        body { font-family: 'Kanit', sans-serif; background: #f8fafc; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; height: 100vh; display: flex; flex-direction: column; }
+        .nav-btn { display: flex; align-items: center; padding: 14px 20px; color: #64748b; font-weight: 500; border-radius: 12px; margin-bottom: 5px; transition: 0.2s; cursor: pointer;}
+        .nav-btn:hover, .nav-btn.active { background: #eff6ff; color: #2563eb; }
+        .action-btn { width: 36px; height: 36px; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; transition: 0.2s; border:none; cursor: pointer; }
+        .action-btn:hover { transform: scale(1.1); filter: brightness(0.95); }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex overflow-hidden">
 
     <aside class="sidebar">
-        <div class="h-24 flex items-center px-8 border-b border-gray-100 mb-4">
-            <div>
-                <div class="text-2xl font-black text-slate-800 tracking-tight">Q-Space <span class="text-blue-600">Pro</span></div>
-                <div class="text-xs text-gray-400 font-medium">Admin Control Panel</div>
-            </div>
+        <div class="h-20 flex items-center px-6 border-b border-gray-100">
+            <h1 class="text-xl font-bold text-slate-800">Q-System <span class="text-blue-600">Admin</span></h1>
         </div>
-        <div class="p-4 flex-1 overflow-y-auto">
-            <div class="text-xs font-bold text-gray-400 uppercase px-4 mb-3 tracking-wider">Main Menu</div>
-            <button onclick="Router('live')" id="nav-live" class="nav-btn active">
-                <i class="fa-solid fa-layer-group w-8"></i> จัดการคิว (Live)
-            </button>
-            <button onclick="Router('setting')" id="nav-setting" class="nav-btn">
-                <i class="fa-solid fa-sliders w-8"></i> ตั้งค่าระบบ
-            </button>
+        <div class="p-4 flex-1">
+            <div class="text-xs font-bold text-gray-400 uppercase mb-2">Menu</div>
+            <div onclick="Router('live')" id="nav-live" class="nav-btn active"><i class="fa-solid fa-list-ol w-6"></i> จัดการคิว</div>
+            <div onclick="Router('setting')" id="nav-setting" class="nav-btn"><i class="fa-solid fa-gear w-6"></i> ตั้งค่าระบบ</div>
             
-            <div class="mt-auto pt-8 border-t border-gray-100">
-                <button onclick="Admin.resetSystem()" class="nav-btn text-red-500 hover:bg-red-50 hover:text-red-600 mt-4">
-                    <i class="fa-solid fa-rotate-right w-8"></i> รีเซ็ตระบบรายวัน
-                </button>
+            <div class="mt-8 pt-8 border-t">
+                <div onclick="Admin.resetSystem()" class="nav-btn text-red-500 hover:bg-red-50 hover:text-red-600">
+                    <i class="fa-solid fa-trash w-6"></i> รีเซ็ตระบบรายวัน
+                </div>
             </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full relative">
-        <header class="h-24 bg-white/80 backdrop-blur border-b border-gray-200 flex items-center justify-between px-10 shadow-sm z-10 sticky top-0">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800" id="page-title">Dashboard</h1>
-                <p class="text-xs text-gray-400">ภาพรวมสถานะคิวปัจจุบัน</p>
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="text-right">
-                    <div class="text-xs text-gray-400 uppercase font-bold tracking-wider">กำลังเรียก (Now Serving)</div>
-                    <div class="text-4xl font-black text-blue-600 tracking-tighter" id="header-current">---</div>
-                </div>
+    <main class="flex-1 h-screen flex flex-col">
+        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+            <h2 class="font-bold text-lg text-slate-700" id="page-title">จัดการคิว (Live Queue)</h2>
+            <div class="text-right">
+                <div class="text-xs text-gray-400 uppercase">Calling</div>
+                <div class="text-2xl font-black text-blue-600" id="header-current">---</div>
             </div>
         </header>
 
-        <div id="content-area" class="flex-1 overflow-y-auto bg-slate-50 p-10"></div>
+        <div id="content-area" class="flex-1 overflow-y-auto bg-slate-50 p-8"></div>
     </main>
 
     <script>
-        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -111,101 +66,88 @@
         class AdminApp {
             constructor() {
                 this.qRef = db.collection('q_system').doc('config').collection('queues');
-                this.voiceTemplate = "ขอเชิญหมายเลข {queue} ที่ช่องบริการค่ะ"; 
-                this.initListener();
+                this.voiceTemp = "เชิญหมายเลข {queue} ค่ะ";
+                this.init();
             }
 
-            initListener() {
-                // ฟังการตั้งค่า Global (เช่น เปลี่ยนชื่อร้าน หรือ รูปแบบเสียง)
-                db.collection('q_system').doc('config').onSnapshot(doc => {
-                    if(doc.exists) {
-                        const d = doc.data();
-                        document.getElementById('header-current').innerText = d.current || '---';
-                        this.voiceTemplate = d.voicePattern || "ขอเชิญหมายเลข {queue} ที่ช่องบริการค่ะ";
+            init() {
+                db.collection('q_system').doc('config').onSnapshot(d => {
+                    if(d.exists) {
+                        document.getElementById('header-current').innerText = d.data().current || '---';
+                        this.voiceTemp = d.data().voicePattern || "เชิญหมายเลข {queue} ค่ะ";
                     }
                 });
             }
 
-            // --- 1. หน้าจัดการคิว (Live Queue) ---
             renderLive(el) {
                 el.innerHTML = `
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-bold tracking-wider">
-                                    <tr>
-                                        <th class="p-5 pl-8">หมายเลขคิว</th>
-                                        <th class="p-5">ข้อมูลลูกค้า</th>
-                                        <th class="p-5">เวลารับบัตร</th>
-                                        <th class="p-5">สถานะ</th>
-                                        <th class="p-5 text-right pr-8">จัดการ (Actions)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tb-live" class="text-sm divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
-                        <div id="live-empty" class="p-16 text-center text-gray-400 hidden flex flex-col items-center">
-                            <i class="fa-solid fa-clipboard-check text-4xl mb-4 text-slate-300"></i>
-                            <span>ไม่มีคิวที่กำลังรอ</span>
+                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 border-b text-xs uppercase text-slate-500 font-bold">
+                                <tr>
+                                    <th class="p-4">คิว</th>
+                                    <th class="p-4">ลูกค้า</th>
+                                    <th class="p-4">สถานะ</th>
+                                    <th class="p-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-live" class="text-sm divide-y"></tbody>
+                        </table>
+                        <div id="empty-state" class="hidden p-10 text-center text-gray-400">
+                            <i class="fa-solid fa-mug-hot text-4xl mb-2"></i><br>ไม่มีคิวรอ
                         </div>
                     </div>
                 `;
 
-                // ดึงข้อมูล Realtime เฉพาะที่สถานะ waiting หรือ called
                 this.qRef.orderBy('timestamp','asc').onSnapshot(snap => {
-                    const all = snap.docs.map(d=>({id:d.id, ...d.data()}));
-                    const active = all.filter(x => ['waiting','called'].includes(x.status));
-                    const tb = document.getElementById('tb-live');
+                    const active = snap.docs.map(d=>({id:d.id, ...d.data()}))
+                                       .filter(x => ['waiting','called'].includes(x.status));
                     
-                    if(active.length === 0) { 
-                        tb.innerHTML=''; 
-                        document.getElementById('live-empty').classList.remove('hidden'); 
-                        return; 
+                    const tb = document.getElementById('tb-live');
+                    if(active.length === 0) {
+                        tb.innerHTML = '';
+                        document.getElementById('empty-state').classList.remove('hidden');
+                        return;
                     }
-                    document.getElementById('live-empty').classList.add('hidden');
+                    document.getElementById('empty-state').classList.add('hidden');
 
                     tb.innerHTML = active.map(d => {
-                        const isCall = d.status === 'called';
+                        const isCall = d.status==='called';
+                        const rowClass = isCall ? 'bg-blue-50' : 'hover:bg-slate-50';
+                        const dataStr = encodeURIComponent(JSON.stringify(d)); // เตรียมข้อมูลสำหรับ popup
+
                         return `
-                            <tr class="${isCall ? 'row-called' : ''} group hover:bg-slate-50">
-                                <td class="p-5 pl-8">
-                                    <span class="font-black text-2xl ${isCall ? 'text-blue-600' : 'text-slate-700'} tracking-tight">${d.number}</span>
+                            <tr class="${rowClass} transition">
+                                <td class="p-4"><span class="text-xl font-bold ${isCall?'text-blue-600':'text-slate-700'}">${d.number}</span></td>
+                                <td class="p-4">
+                                    <div class="font-bold text-slate-700">${d.name}</div>
+                                    <div class="text-xs text-gray-400"><i class="fa-solid fa-user-group"></i> ${d.pax}</div>
                                 </td>
-                                <td class="p-5">
-                                    <div class="font-bold text-slate-700 text-base">${d.name}</div>
-                                    <div class="text-xs text-slate-400 mt-1">
-                                        <i class="fa-solid fa-user-group mr-1"></i> ${d.pax} 
-                                        ${d.phone ? `<span class="ml-2"><i class="fa-solid fa-phone mr-1"></i>${d.phone}</span>` : ''}
-                                    </div>
+                                <td class="p-4">
+                                    ${isCall ? '<span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold animate-pulse">กำลังเรียก</span>' 
+                                             : '<span class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-xs font-bold">รอเรียก</span>'}
                                 </td>
-                                <td class="p-5">
-                                    <div class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold inline-block">
-                                        <i class="fa-regular fa-clock mr-1"></i> ${d.arrivalTime || '-'}
-                                    </div>
-                                </td>
-                                <td class="p-5">
-                                    ${isCall 
-                                        ? '<span class="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full animate-pulse">กำลังเรียก...</span>' 
-                                        : '<span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">รอเรียก</span>'}
-                                </td>
-                                <td class="p-5 text-right pr-8 space-x-2">
-                                    <button onclick="Admin.call('${d.id}','${d.number}','${d.name}', false)" 
-                                        class="action-btn btn-call group-hover:shadow-md" title="เรียกคิว">
-                                        <i class="fa-solid fa-bullhorn"></i>
-                                    </button>
+                                <td class="p-4 text-right flex justify-end gap-2 items-center">
                                     
-                                    <button onclick="Admin.call('${d.id}','${d.number}','${d.name}', true)" 
-                                        class="action-btn btn-recall group-hover:shadow-md" title="เรียกซ้ำ">
-                                        <i class="fa-solid fa-rotate-right"></i>
+                                    <button onclick="Admin.call('${d.id}','${d.number}','${d.name}',${isCall})" 
+                                        class="action-btn ${isCall?'bg-orange-100 text-orange-600':'bg-blue-100 text-blue-600'}" 
+                                        title="${isCall?'เรียกซ้ำ':'เรียกคิว'}">
+                                        <i class="fa-solid ${isCall?'fa-rotate-right':'fa-bullhorn'}"></i>
                                     </button>
 
-                                    <button onclick="Admin.serve('${d.id}')" 
-                                        class="action-btn btn-done group-hover:shadow-md" title="เสร็จสิ้น">
+                                    <button onclick="Admin.viewData('${dataStr}')" class="action-btn bg-purple-100 text-purple-600" title="ดูข้อมูล">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    <button onclick="Admin.moveToEnd('${d.id}','${d.number}')" class="action-btn bg-gray-100 text-gray-600" title="เลื่อนไปต่อท้าย">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                    </button>
+
+                                    <button onclick="Admin.serve('${d.id}')" class="action-btn bg-green-100 text-green-600" title="เสร็จสิ้น">
                                         <i class="fa-solid fa-check"></i>
                                     </button>
 
-                                    <button onclick="Admin.cancel('${d.id}')" 
-                                        class="action-btn btn-del opacity-50 hover:opacity-100" title="ยกเลิกคิว">
+                                    <button onclick="Admin.cancel('${d.id}')" class="action-btn bg-red-100 text-red-600" title="ยกเลิก">
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </td>
@@ -215,182 +157,153 @@
                 });
             }
 
-            // --- 2. หน้าตั้งค่า (Settings) ---
             renderSetting(el) {
                 el.innerHTML = `
-                    <div class="max-w-3xl mx-auto space-y-6">
-                        
-                        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-lg mb-6 text-slate-800 border-b pb-4">
-                                <i class="fa-solid fa-store text-blue-500 mr-2"></i> ข้อมูลร้านค้า
-                            </h3>
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-2">ชื่อร้าน / หัวข้อ</label>
-                                    <input id="set-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white transition" placeholder="เช่น คลินิกหมอใจดี">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-2">ตัวย่อหน้าคิว (Queue Prefix)</label>
-                                    <input id="set-prefix" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white transition font-bold text-blue-600" placeholder="เช่น A-, B-, VIP-">
-                                    <p class="text-xs text-gray-400 mt-1">จะมีผลกับคิวที่กดจองใหม่หลังจากนี้</p>
-                                </div>
+                    <div class="bg-white p-8 rounded-xl border max-w-2xl mx-auto shadow-sm">
+                        <h3 class="font-bold text-lg mb-6 border-b pb-2">ตั้งค่าระบบ</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm font-bold text-gray-500">ชื่อร้าน / หัวข้อ</label>
+                                <input id="set-name" class="w-full p-3 border rounded-lg" placeholder="ใส่ชื่อร้าน">
                             </div>
+                            <div>
+                                <label class="text-sm font-bold text-gray-500">ตัวย่อคิว (Prefix)</label>
+                                <input id="set-prefix" class="w-full p-3 border rounded-lg text-blue-600 font-bold" placeholder="เช่น A-, Q-, VIP-">
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold text-gray-500">รูปแบบเสียง (Voice Pattern)</label>
+                                <input id="set-voice" class="w-full p-3 border rounded-lg bg-yellow-50" placeholder="เชิญหมายเลข {queue} ค่ะ">
+                                <p class="text-xs text-gray-400 mt-1">ใช้ {queue} แทนเลขคิว และ {name} แทนชื่อลูกค้า</p>
+                            </div>
+                            <button onclick="Admin.saveSet()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow mt-2">บันทึกการตั้งค่า</button>
                         </div>
-
-                        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-lg mb-6 text-slate-800 border-b pb-4">
-                                <i class="fa-solid fa-volume-high text-yellow-500 mr-2"></i> ตั้งค่าเสียงเรียก (Voice)
-                            </h3>
-                            <div class="mb-4">
-                                <label class="block text-sm font-bold text-slate-600 mb-2">แพทเทิร์นเสียงพูด</label>
-                                <input id="set-voice" class="w-full p-3 bg-yellow-50 border border-yellow-200 rounded-xl focus:outline-none focus:border-yellow-500 text-slate-700" placeholder="ขอเชิญหมายเลข {queue} ค่ะ">
-                                <div class="flex gap-2 mt-2">
-                                    <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500"><b>{queue}</b> = เลขคิว</span>
-                                    <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500"><b>{name}</b> = ชื่อลูกค้า</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-lg mb-6 text-slate-800 border-b pb-4">
-                                <i class="fa-solid fa-bullhorn text-red-500 mr-2"></i> ข้อความวิ่ง (Marquee)
-                            </h3>
-                            <div class="mb-4">
-                                <textarea id="set-ann" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 h-24" placeholder="พิมพ์ข้อความประกาศ..."></textarea>
-                            </div>
-                            <div class="flex items-center gap-2 mb-6">
-                                <input type="checkbox" id="chk-show-ann" class="w-5 h-5 text-blue-600 rounded">
-                                <label for="chk-show-ann" class="text-sm font-medium text-slate-700">แสดงแถบประกาศบนหน้าจอลูกค้า</label>
-                            </div>
-                        </div>
-
-                        <button onclick="Admin.saveSet()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition transform active:scale-95">
-                            <i class="fa-solid fa-save mr-2"></i> บันทึกการตั้งค่าทั้งหมด
-                        </button>
                     </div>
                 `;
-                
-                // Load Config
-                db.collection('q_system').doc('config').get().then(doc => {
-                    if(doc.exists) {
-                        const d = doc.data();
-                        document.getElementById('set-name').value = d.shopName || '';
-                        document.getElementById('set-prefix').value = d.queuePrefix || 'A-';
-                        document.getElementById('set-ann').value = d.announceText || '';
-                        document.getElementById('set-voice').value = d.voicePattern || "ขอเชิญหมายเลข {queue} ค่ะ";
-                        document.getElementById('chk-show-ann').checked = d.showAnnounce || false;
+                db.collection('q_system').doc('config').get().then(d => {
+                    if(d.exists) {
+                        const data = d.data();
+                        document.getElementById('set-name').value = data.shopName || '';
+                        document.getElementById('set-prefix').value = data.queuePrefix || 'A-';
+                        document.getElementById('set-voice').value = data.voicePattern || '';
                     }
                 });
             }
 
-            // --- FUNCTIONS ---
-            
-            // ฟังก์ชันเรียกคิว (สำคัญ)
+            // --- ฟังก์ชันการทำงานหลัก ---
+
             call(id, num, name, isRecall) {
-                // 1. เตรียมข้อความเสียง
-                let msg = this.voiceTemplate;
-                // แทนที่ตัวแปร {queue} และ {name}
-                const spokenNum = num.split('').join(' '); // แยก A-001 เป็น เอ ขีด ศูนย์ ศูนย์ หนึ่ง (ให้อ่านชัด)
-                msg = msg.replace('{name}', name).replace('{queue}', spokenNum);
-
-                // 2. อัปเดต Database
-                const updateData = {
-                    lastCallTime: Date.now(), // timestamp ใหม่เพื่อให้ลูกค้ารู้ว่ามีการเรียกซ้ำ
-                    voiceMessage: msg // ส่งข้อความที่ประกอบเสร็จแล้วไปให้ลูกค้าพูดตาม
-                };
-
-                if (!isRecall) {
-                    // ถ้าเป็นการเรียกครั้งแรก ให้เปลี่ยนสถานะด้วย
-                    updateData.status = 'called';
-                    // อัปเดตเลขปัจจุบันที่หน้าจอใหญ่ (Config)
-                    db.collection('q_system').doc('config').update({ 
-                        current: num, 
-                        isCalling: true // บอกว่ากำลังเรียกอยู่ (เพื่อให้ขึ้น Badge)
-                    });
-                }
-
-                this.qRef.doc(id).update(updateData);
+                // เตรียมข้อความเสียง
+                const msg = this.voiceTemp.replace('{queue}', num.split('').join(' ')).replace('{name}', name);
                 
-                // 3. เครื่องแอดมินพูดด้วย (Optional)
-                this.speak(msg); 
-                
-                // 4. แจ้งเตือนแอดมิน
-                const toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true});
-                toast.fire({ icon: 'success', title: isRecall ? `เรียกซ้ำ ${num}` : `เรียกคิว ${num}` });
+                // อัปเดต DB เพื่อส่งสัญญาณไปหน้าจอลูกค้า
+                this.qRef.doc(id).update({
+                    status: 'called',
+                    lastCallTime: Date.now(), // timestamp ใหม่เพื่อให้ลูกค้ารู้ว่าเป็นการเรียกครั้งใหม่
+                    voiceMessage: msg
+                });
+
+                if(!isRecall) db.collection('q_system').doc('config').update({ current: num });
+                this.speak(msg); // เสียงออกที่เครื่องแอดมินด้วย
             }
 
             serve(id) { 
-                this.qRef.doc(id).update({status:'served'}); 
-                // ปิด Badge คำว่า Calling ที่หน้าจอรวม
-                db.collection('q_system').doc('config').update({ isCalling: false });
+                // เปลี่ยนสถานะ -> หน้าจอลูกค้าจะเปลี่ยนเป็น "ขอบคุณ"
+                this.qRef.doc(id).update({ status: 'served' }); 
             }
-            
-            cancel(id) { 
+
+            cancel(id) {
+                // เปลี่ยนสถานะ -> หน้าจอลูกค้าจะเปลี่ยนเป็น "ถูกยกเลิก"
                 Swal.fire({
-                    title: 'ยกเลิกคิวนี้?', text: "คิวจะถูกนำออกจากรายการรอ", icon: 'warning',
+                    title: 'ยกเลิกคิวนี้?', text: "ลูกค้าจะเห็นหน้าจอแจ้งยกเลิกทันที", icon: 'warning',
                     showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ใช่, ยกเลิก'
                 }).then((r) => {
-                    if(r.isConfirmed) this.qRef.doc(id).update({status:'cancelled'});
+                    if(r.isConfirmed) this.qRef.doc(id).update({ status: 'cancelled' });
                 });
             }
-            
+
+            // ฟังก์ชัน: เลื่อนคิวไปต่อท้าย (Move to End)
+            moveToEnd(id, num) {
+                Swal.fire({
+                    title: `เลื่อนคิว ${num}?`,
+                    text: "คิวนี้จะถูกย้ายไปต่อท้ายแถว (สถานะ Waiting)",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'ใช่, เลื่อนเลย'
+                }).then((r) => {
+                    if(r.isConfirmed) {
+                        // อัปเดต timestamp เป็นเวลาปัจจุบัน = ไปอยู่ท้ายสุดของการเรียงลำดับ
+                        // และเปลี่ยนสถานะกลับเป็น waiting
+                        this.qRef.doc(id).update({
+                            status: 'waiting',
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                });
+            }
+
+            // ฟังก์ชัน: ดูข้อมูลลูกค้า (Popup)
+            viewData(jsonStr) {
+                const d = JSON.parse(decodeURIComponent(jsonStr));
+                Swal.fire({
+                    title: `<span class="text-blue-600 text-3xl font-bold">${d.number}</span>`,
+                    html: `
+                        <div class="text-left bg-slate-50 p-6 rounded-lg space-y-3 text-base">
+                            <div class="flex justify-between border-b pb-2 border-slate-200">
+                                <span class="text-gray-500">ชื่อลูกค้า:</span> <b class="text-slate-800">${d.name}</b>
+                            </div>
+                            <div class="flex justify-between border-b pb-2 border-slate-200">
+                                <span class="text-gray-500">เบอร์โทร:</span> <b class="text-slate-800">${d.phone || '-'}</b>
+                            </div>
+                            <div class="flex justify-between border-b pb-2 border-slate-200">
+                                <span class="text-gray-500">จำนวน:</span> <b class="text-slate-800">${d.pax}</b>
+                            </div>
+                            <div class="flex justify-between border-b pb-2 border-slate-200">
+                                <span class="text-gray-500">เวลาจอง:</span> <b class="text-blue-600">${d.arrivalTime}</b>
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCloseButton: true
+                });
+            }
+
             saveSet() {
                 db.collection('q_system').doc('config').update({
                     shopName: document.getElementById('set-name').value,
-                    queuePrefix: document.getElementById('set-prefix').value, // บันทึก Prefix
-                    announceText: document.getElementById('set-ann').value,
-                    voicePattern: document.getElementById('set-voice').value,
-                    showAnnounce: document.getElementById('chk-show-ann').checked
-                }).then(()=> Swal.fire('บันทึกสำเร็จ', 'การตั้งค่าถูกนำไปใช้แล้ว', 'success'));
+                    queuePrefix: document.getElementById('set-prefix').value,
+                    voicePattern: document.getElementById('set-voice').value
+                }).then(()=> Swal.fire('บันทึกเรียบร้อย','','success'));
             }
 
             resetSystem() {
-                Swal.fire({
-                    title: 'รีเซ็ตระบบรายวัน?', 
-                    text: "คิวทั้งหมดจะถูกลบ และเลขคิวจะเริ่มนับ 1 ใหม่", 
-                    icon: 'warning',
-                    showCancelButton: true, 
-                    confirmButtonColor: '#ef4444',
-                    confirmButtonText: 'ยืนยัน รีเซ็ตเดี๋ยวนี้'
-                }).then(async r => {
+                Swal.fire({title:'รีเซ็ตระบบรายวัน?', text:'คิวทั้งหมดจะถูกลบ', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'}).then(async r=>{
                     if(r.isConfirmed) {
-                        // 1. Reset Config Counter
-                        await db.collection('q_system').doc('config').update({
-                            current: '---', 
-                            last: 0,
-                            isCalling: false
-                        });
-                        
-                        // 2. Delete all queues (Batch Delete)
-                        const snap = await this.qRef.get();
-                        const batch = db.batch();
-                        snap.docs.forEach(d => batch.delete(d.ref));
-                        await batch.commit();
-                        
-                        Swal.fire('รีเซ็ตเรียบร้อย','ระบบพร้อมสำหรับวันใหม่','success');
+                        await db.collection('q_system').doc('config').update({current:'---', last:0});
+                        const s = await this.qRef.get();
+                        const b = db.batch();
+                        s.docs.forEach(d=>b.delete(d.ref));
+                        await b.commit();
+                        Swal.fire('รีเซ็ตแล้ว','','success');
                     }
                 });
             }
 
             speak(txt) {
                 if('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); // หยุดเสียงเก่าก่อน
+                    window.speechSynthesis.cancel();
                     const u = new SpeechSynthesisUtterance(txt);
-                    u.lang = 'th-TH'; 
-                    u.rate = 0.9;
-                    speechSynthesis.speak(u);
+                    u.lang = 'th-TH'; u.rate = 0.9;
+                    window.speechSynthesis.speak(u);
                 }
             }
         }
 
         function Router(p) {
-            document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`nav-${p}`).classList.add('active');
             const el = document.getElementById('content-area');
-            const t = document.getElementById('page-title');
-            
-            if(p==='live') { t.innerText='จัดการคิว (Live Queue)'; Admin.renderLive(el); }
-            if(p==='setting') { t.innerText='ตั้งค่าระบบ (Settings)'; Admin.renderSetting(el); }
+            if(p==='live') { document.getElementById('page-title').innerText='จัดการคิว (Live)'; new AdminApp().renderLive(el); }
+            if(p==='setting') { document.getElementById('page-title').innerText='ตั้งค่า'; new AdminApp().renderSetting(el); }
         }
 
         const Admin = new AdminApp();
