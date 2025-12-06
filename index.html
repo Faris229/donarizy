@@ -3,138 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Space | Admin Console</title>
-    
+    <title>Q-Space Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; }
-        
-        /* Table Styles */
-        .q-table { width: 100%; text-align: left; border-collapse: separate; border-spacing: 0; }
-        .q-table th { background: #f8fafc; padding: 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
-        .q-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; background: white; transition: background 0.1s; }
-        .q-table tr:hover td { background: #f8fafc; }
-        .q-table tr:last-child td { border-bottom: none; }
-        .q-table th:first-child, .q-table td:first-child { padding-left: 1.5rem; }
-        .q-table th:last-child, .q-table td:last-child { padding-right: 1.5rem; }
-
-        /* Action Buttons */
-        .btn-icon { width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .btn-call { background: #eff6ff; color: #2563eb; } .btn-call:hover { background: #2563eb; color: white; }
-        .btn-check { background: #ecfdf5; color: #059669; } .btn-check:hover { background: #059669; color: white; }
-        .btn-del { background: #fef2f2; color: #dc2626; } .btn-del:hover { background: #dc2626; color: white; }
-
-        /* Sidebar */
-        .nav-item { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; color: #64748b; font-weight: 500; margin-bottom: 4px; transition: all 0.2s; }
-        .nav-item:hover { background: #f8fafc; color: #0f172a; }
-        .nav-item.active { background: #0f172a; color: white; }
-        
-        .stat-card { background: white; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .nav-link.active { background: #e0e7ff; color: #3730a3; font-weight: bold; border-right: 4px solid #4f46e5; }
+        .input-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .btn { padding: 8px 16px; border-radius: 8px; font-weight: bold; transition: all 0.2s; }
+        .btn:active { transform: scale(0.97); }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden text-slate-700">
 
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20">
-        <div class="h-16 flex items-center px-6 border-b border-gray-100">
-            <span class="font-bold text-lg text-slate-800">Q-Space <span class="text-xs bg-slate-100 px-2 py-1 rounded ml-2">ADMIN</span></span>
+    <aside class="w-64 bg-white border-r flex flex-col z-20">
+        <div class="h-16 flex items-center px-6 font-bold text-xl text-indigo-700 border-b">
+            ADMIN PANEL
         </div>
-        <nav class="flex-1 p-4 overflow-y-auto">
-            <button onclick="Admin.switchTab('live')" id="nav-live" class="nav-item active w-full text-left">
-                <i class="fa-solid fa-list-ol w-6"></i> รายการคิวสด
-            </button>
-            <button onclick="Admin.switchTab('history')" id="nav-history" class="nav-item w-full text-left">
-                <i class="fa-solid fa-clock-rotate-left w-6"></i> ประวัติวันนี้
-            </button>
-            <div class="mt-8 px-4 text-xs font-bold text-gray-400 uppercase">Controls</div>
-            <button onclick="Admin.resetSystem()" class="nav-item w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600">
-                <i class="fa-solid fa-trash w-6"></i> รีเซ็ตคิว (วันใหม่)
-            </button>
+        <nav class="flex-1 p-4 space-y-1">
+            <button onclick="Router('live')" id="nav-live" class="nav-link w-full text-left p-3 rounded hover:bg-slate-50 flex gap-3"><i class="fa-solid fa-list-ol w-5"></i> จัดการคิวสด</button>
+            <button onclick="Router('history')" id="nav-history" class="nav-link w-full text-left p-3 rounded hover:bg-slate-50 flex gap-3"><i class="fa-solid fa-clock-rotate-left w-5"></i> ประวัติ</button>
+            <button onclick="Router('setting')" id="nav-setting" class="nav-link w-full text-left p-3 rounded hover:bg-slate-50 flex gap-3"><i class="fa-solid fa-gear w-5"></i> ตั้งค่าร้านค้า</button>
         </nav>
-        <div class="p-4 border-t border-gray-100 text-xs text-center text-gray-400">
-            Version 3.0 Enterprise
-        </div>
     </aside>
 
-    <main class="flex-1 flex flex-col relative h-full">
-        
-        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
-            <h2 class="font-bold text-xl text-slate-800" id="page-title">Live Queue Management</h2>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <div class="text-xs text-gray-400 uppercase">Now Serving</div>
-                    <div class="text-xl font-bold text-blue-600" id="header-current">A-000</div>
-                </div>
+    <main class="flex-1 flex flex-col h-full bg-slate-50">
+        <header class="h-16 bg-white border-b flex items-center justify-between px-8 shadow-sm">
+            <span class="font-bold text-lg" id="page-title">Dashboard</span>
+            <div class="text-right">
+                <div class="text-xs text-gray-400 uppercase">Now Serving</div>
+                <div class="font-bold text-xl text-indigo-600" id="head-current">A-000</div>
             </div>
         </header>
 
-        <div class="flex-1 p-8 overflow-y-auto bg-slate-50">
-            
-            <div class="grid grid-cols-4 gap-6 mb-8">
-                <div class="stat-card">
-                    <div class="text-xs text-gray-400 font-bold uppercase">รอรับบริการ</div>
-                    <div class="text-3xl font-bold text-slate-800 mt-1" id="stat-waiting">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="text-xs text-gray-400 font-bold uppercase">เรียกแล้ว</div>
-                    <div class="text-3xl font-bold text-blue-600 mt-1" id="stat-called">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="text-xs text-gray-400 font-bold uppercase">เสร็จสิ้น</div>
-                    <div class="text-3xl font-bold text-green-600 mt-1" id="stat-served">0</div>
-                </div>
-                <div class="stat-card border-red-200 bg-red-50">
-                    <div class="text-xs text-red-400 font-bold uppercase">ยกเลิก</div>
-                    <div class="text-3xl font-bold text-red-600 mt-1" id="stat-cancel">0</div>
-                </div>
-            </div>
-
-            <div id="view-live" class="animate__animated animate__fadeIn">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="q-table">
-                        <thead>
-                            <tr>
-                                <th>Queue No.</th>
-                                <th>Customer Name</th>
-                                <th>PAX</th>
-                                <th>Wait Time</th>
-                                <th class="text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-live">
-                            </tbody>
-                    </table>
-                    <div id="empty-live" class="p-8 text-center text-gray-400 hidden">ไม่มีคิวที่กำลังรอ</div>
-                </div>
-            </div>
-
-            <div id="view-history" class="hidden animate__animated animate__fadeIn">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="q-table">
-                        <thead>
-                            <tr>
-                                <th>Queue No.</th>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-history">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
+        <div id="content" class="flex-1 p-8 overflow-y-auto"></div>
     </main>
-<script>
-        // --- 1. CONFIGURATION (ใส่ค่าของท่าน) ---
+
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -143,196 +54,159 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        // Initialize Firebase
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        class AdminApp {
-            constructor() {
-                // อ้างอิง Collection หลัก
-                this.qRef = db.collection('q_system').doc('config').collection('queues');
-                this.initListeners();
-            }
+        // ROUTER
+        function Router(page) {
+            document.querySelectorAll('.nav-link').forEach(e => e.classList.remove('active'));
+            document.getElementById(`nav-${page}`).classList.add('active');
+            const el = document.getElementById('content');
+            const title = document.getElementById('page-title');
+            
+            if(page === 'live') { title.innerText = 'รายการคิวสด (Live)'; Pages.live(el); }
+            if(page === 'history') { title.innerText = 'ประวัติย้อนหลัง'; Pages.history(el); }
+            if(page === 'setting') { title.innerText = 'ตั้งค่าร้านค้า & ประกาศ'; Pages.setting(el); }
+        }
 
-            initListeners() {
-                // 1. ฟังข้อมูลคิวทั้งหมด (แก้ไข: ดึงมาทั้งหมดแล้วค่อยกรอง เพื่อแก้ปัญหา Index Error)
-                this.qRef.orderBy('timestamp', 'asc').onSnapshot(snap => {
-                    
-                    const allDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    
-                    // แยกประเภทข้อมูล
-                    const waiting = allDocs.filter(d => d.status === 'waiting');
-                    const called = allDocs.filter(d => d.status === 'called');
-                    const served = allDocs.filter(d => d.status === 'served');
-                    const cancelled = allDocs.filter(d => d.status === 'cancelled');
+        // LISTEN GLOBAL
+        db.collection('q_system').doc('config').onSnapshot(doc => {
+            if(doc.exists) document.getElementById('head-current').innerText = doc.data().current || 'A-000';
+            else db.collection('q_system').doc('config').set({current:'A-000', last:0}); // Auto Init
+        });
 
-                    // อัปเดตตัวเลข Dashboard
-                    document.getElementById('stat-waiting').innerText = waiting.length;
-                    document.getElementById('stat-called').innerText = called.length;
-                    document.getElementById('stat-served').innerText = served.length;
-                    document.getElementById('stat-cancel').innerText = cancelled.length;
-
-                    // ส่งข้อมูลไปวาดตาราง (รวม Waiting และ Called ไว้หน้า Live)
-                    this.renderLiveTable([...called, ...waiting]); // เอา Called ขึ้นก่อน
-                    
-                    // ส่งข้อมูลไปหน้าประวัติ (Served + Cancelled)
-                    // กลับด้าน array ให้ประวัติล่าสุดอยู่บน
-                    this.renderHistoryTable([...served, ...cancelled].reverse());
-                }, error => {
-                    console.error("Error loading queues:", error);
-                    Swal.fire("Connection Error", "ไม่สามารถดึงข้อมูลได้: " + error.message, "error");
-                });
-
-                // 2. ฟังคิวปัจจุบัน (Header)
-                db.collection('q_system').doc('config').onSnapshot(doc => {
-                    if(doc.exists) document.getElementById('header-current').innerText = doc.data().current || 'A-000';
-                });
-            }
-
-            renderLiveTable(data) {
-                const tbody = document.getElementById('table-live');
-                const empty = document.getElementById('empty-live');
-                tbody.innerHTML = '';
+        const Pages = {
+            live: (el) => {
+                el.innerHTML = `
+                    <div class="grid grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">รอคิว</div><div class="text-2xl font-bold" id="s-wait">0</div></div>
+                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">เรียกแล้ว</div><div class="text-2xl font-bold text-blue-600" id="s-call">0</div></div>
+                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">เสร็จสิ้น</div><div class="text-2xl font-bold text-green-600" id="s-done">0</div></div>
+                        <div class="bg-white p-4 rounded-xl border shadow-sm"><div class="text-xs text-gray-400 font-bold uppercase">ยกเลิก</div><div class="text-2xl font-bold text-red-600" id="s-can">0</div></div>
+                    </div>
+                    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b text-xs uppercase text-slate-500">
+                                <tr><th class="p-4">Queue</th><th class="p-4">Name</th><th class="p-4">PAX</th><th class="p-4 text-right">Action</th></tr>
+                            </thead>
+                            <tbody id="q-table" class="divide-y text-sm"></tbody>
+                        </table>
+                    </div>
+                `;
                 
-                if(data.length === 0) { 
-                    empty.classList.remove('hidden'); 
-                    return; 
-                } else {
-                    empty.classList.add('hidden');
-                }
+                const qRef = db.collection('q_system').doc('config').collection('queues');
+                qRef.orderBy('timestamp','asc').onSnapshot(snap => {
+                    const all = snap.docs.map(d=>({id:d.id, ...d.data()}));
+                    // Stats
+                    document.getElementById('s-wait').innerText = all.filter(x=>x.status==='waiting').length;
+                    document.getElementById('s-call').innerText = all.filter(x=>x.status==='called').length;
+                    document.getElementById('s-done').innerText = all.filter(x=>x.status==='served').length;
+                    document.getElementById('s-can').innerText = all.filter(x=>x.status==='cancelled').length;
 
-                data.forEach(d => {
-                    const isCalled = d.status === 'called';
-                    // แปลง Timestamp เป็นเวลา
-                    const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '-';
+                    // Table (Waiting + Called)
+                    const active = all.filter(x => ['waiting','called'].includes(x.status));
+                    const tbody = document.getElementById('q-table');
                     
-                    const rowClass = isCalled ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-gray-50';
-                    const statusBadge = isCalled 
-                        ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold animate-pulse">กำลังเรียก</span>` 
-                        : `<span class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-xs">รอคิว</span>`;
-
-                    tbody.innerHTML += `
-                        <tr class="${rowClass} transition-colors duration-200">
-                            <td class="p-4">
-                                <span class="font-bold text-xl ${isCalled ? 'text-blue-600' : 'text-slate-700'}">${d.number}</span>
-                                <div class="mt-1">${statusBadge}</div>
-                            </td>
-                            <td class="p-4">
-                                <div class="font-bold text-slate-700">${d.name}</div>
-                                <div class="text-xs text-gray-400"><i class="fa-solid fa-phone mr-1"></i>${d.phone || '-'}</div>
-                            </td>
-                            <td class="p-4"><span class="bg-white border border-gray-200 text-gray-600 px-3 py-1 rounded-lg text-sm font-bold shadow-sm">${d.pax} ท่าน</span></td>
-                            <td class="p-4 text-sm text-gray-500 font-mono">${time}</td>
-                            <td class="p-4 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <button onclick="Admin.call('${d.id}', '${d.number}')" class="btn-icon btn-call shadow-sm" title="เรียกคิว"><i class="fa-solid fa-bullhorn"></i></button>
-                                    <button onclick="Admin.serve('${d.id}')" class="btn-icon btn-check shadow-sm" title="เสร็จสิ้น"><i class="fa-solid fa-check"></i></button>
-                                    <button onclick="Admin.cancel('${d.id}')" class="btn-icon btn-del shadow-sm" title="ยกเลิก"><i class="fa-solid fa-xmark"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                    if(active.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-400">ไม่มีคิวรอ</td></tr>';
+                    else {
+                        tbody.innerHTML = active.map(d => {
+                            const isCall = d.status === 'called';
+                            return `
+                                <tr class="${isCall?'bg-blue-50':''}">
+                                    <td class="p-4"><span class="font-bold text-lg ${isCall?'text-blue-600':''}">${d.number}</span></td>
+                                    <td class="p-4">
+                                        <div class="font-bold">${d.name}</div>
+                                        <div class="text-xs text-gray-400">${d.phone||'-'}</div>
+                                    </td>
+                                    <td class="p-4"><span class="bg-white border px-2 py-1 rounded text-xs">${d.pax} ท่าน</span></td>
+                                    <td class="p-4 text-right space-x-1">
+                                        <button onclick="Actions.call('${d.id}','${d.number}')" class="btn bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white"><i class="fa-solid fa-bullhorn"></i></button>
+                                        <button onclick="Actions.serve('${d.id}')" class="btn bg-green-100 text-green-600 hover:bg-green-600 hover:text-white"><i class="fa-solid fa-check"></i></button>
+                                        <button onclick="Actions.cancel('${d.id}')" class="btn bg-red-100 text-red-600 hover:bg-red-600 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
                 });
-            }
+            },
 
-            renderHistoryTable(data) {
-                const tbody = document.getElementById('table-history');
-                tbody.innerHTML = '';
-                
-                if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400">ยังไม่มีประวัติวันนี้</td></tr>';
-                    return;
-                }
-
-                data.forEach(d => {
-                    const isServed = d.status === 'served';
-                    const color = isServed ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
-                    const label = isServed ? 'เสร็จสิ้น' : 'ยกเลิก';
-                    const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH') : '-';
-
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-4 font-bold text-slate-600">${d.number}</td>
-                            <td class="p-4 text-slate-600">${d.name}</td>
-                            <td class="p-4"><span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${color}">${label}</span></td>
-                            <td class="p-4 text-sm text-gray-400 font-mono">${time}</td>
-                        </tr>
-                    `;
+            history: (el) => {
+                el.innerHTML = `<div class="bg-white rounded-xl border shadow-sm overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 border-b text-xs uppercase text-slate-500"><tr><th class="p-4">Queue</th><th class="p-4">Name</th><th class="p-4">Status</th><th class="p-4">Time</th></tr></thead><tbody id="h-table" class="divide-y text-sm"></tbody></table></div>`;
+                db.collection('q_system').doc('config').collection('queues').where('status','in',['served','cancelled']).orderBy('timestamp','desc').limit(50).onSnapshot(snap => {
+                    document.getElementById('h-table').innerHTML = snap.docs.map(d => {
+                        const dd = d.data();
+                        const color = dd.status==='served'?'text-green-600 bg-green-50':'text-red-600 bg-red-50';
+                        return `<tr><td class="p-4 font-bold">${dd.number}</td><td class="p-4">${dd.name}</td><td class="p-4"><span class="px-2 py-1 rounded text-xs uppercase font-bold ${color}">${dd.status}</span></td><td class="p-4 text-gray-400">${new Date(dd.timestamp.seconds*1000).toLocaleTimeString()}</td></tr>`;
+                    }).join('');
                 });
-            }
+            },
 
-            // --- ACTIONS ---
-            call(id, num) {
-                // อัปเดตสถานะคิวเป็น 'called'
-                this.qRef.doc(id).update({ status: 'called' });
-                // อัปเดตเลขปัจจุบันที่ Config หลัก (เพื่อให้หน้าลูกค้าเห็น)
-                db.collection('q_system').doc('config').update({ current: num });
-                // พูดชื่อ
-                this.speak(`ขอเชิญหมายเลข ${num} ค่ะ`);
-            }
-
-            serve(id) {
-                this.qRef.doc(id).update({ status: 'served' });
-            }
-
-            cancel(id) {
-                Swal.fire({
-                    title: 'ยกเลิกคิวนี้?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'ยืนยัน'
-                }).then((r) => {
-                    if(r.isConfirmed) this.qRef.doc(id).update({ status: 'cancelled' });
-                });
-            }
-
-            resetSystem() {
-                Swal.fire({
-                    title: 'รีเซ็ตระบบ (วันใหม่)?',
-                    text: "คิวทั้งหมดจะถูกลบและเริ่มนับ 1 ใหม่",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'ยืนยันรีเซ็ต'
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        // 1. Reset Config
-                        await db.collection('q_system').doc('config').set({ current: 'A-000', last: 0 });
+            setting: (el) => {
+                el.innerHTML = `
+                    <div class="max-w-xl mx-auto bg-white p-8 rounded-xl border shadow-sm">
+                        <h3 class="font-bold text-lg mb-6 border-b pb-2">ตั้งค่าระบบ</h3>
                         
-                        // 2. Delete All Queues (Client-side Batch Delete)
-                        const snap = await this.qRef.get();
-                        const batch = db.batch();
-                        snap.docs.forEach(doc => batch.delete(doc.ref));
-                        await batch.commit();
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-500 mb-2">ชื่อร้านค้า (Shop Name)</label>
+                            <input id="set-name" class="input-box" placeholder="เช่น ร้านกาแฟ HubFu">
+                        </div>
 
-                        Swal.fire('เรียบร้อย', 'ระบบพร้อมสำหรับวันใหม่', 'success');
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold text-gray-500 mb-2">ประกาศข้อความวิ่ง (Announcement)</label>
+                            <textarea id="set-ann" class="input-box h-24" placeholder="ข้อความประกาศ..."></textarea>
+                        </div>
+
+                        <div class="flex gap-4 border-t pt-4">
+                            <button onclick="Actions.saveSettings(true)" class="btn bg-indigo-600 text-white flex-1">บันทึก & แสดงประกาศ</button>
+                            <button onclick="Actions.saveSettings(false)" class="btn bg-white border border-gray-300 text-gray-600">บันทึก & ปิดประกาศ</button>
+                        </div>
+
+                        <div class="mt-8 pt-8 border-t text-center">
+                            <button onclick="Actions.reset()" class="text-red-500 text-sm hover:underline">รีเซ็ตระบบเมื่อขึ้นวันใหม่ (Reset System)</button>
+                        </div>
+                    </div>
+                `;
+                db.collection('q_system').doc('config').get().then(doc => {
+                    if(doc.exists) {
+                        document.getElementById('set-name').value = doc.data().shopName || '';
+                        document.getElementById('set-ann').value = doc.data().announceText || '';
                     }
                 });
             }
+        };
 
-            speak(text) {
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'th-TH';
-                    utterance.rate = 0.9;
-                    speechSynthesis.speak(utterance);
-                }
+        const Actions = {
+            call: (id, num) => {
+                db.collection('q_system').doc('config').collection('queues').doc(id).update({status:'called'});
+                db.collection('q_system').doc('config').update({current:num});
+            },
+            serve: (id) => db.collection('q_system').doc('config').collection('queues').doc(id).update({status:'served'}),
+            cancel: (id) => { if(confirm('Cancel?')) db.collection('q_system').doc('config').collection('queues').doc(id).update({status:'cancelled'}); },
+            
+            saveSettings: (show) => {
+                const name = document.getElementById('set-name').value;
+                const ann = document.getElementById('set-ann').value;
+                db.collection('q_system').doc('config').update({
+                    shopName: name, announceText: ann, showAnnounce: show
+                }).then(() => Swal.fire('Success', 'บันทึกเรียบร้อย', 'success'));
+            },
+
+            reset: () => {
+                Swal.fire({title:'Reset System?', text:'ลบคิวทั้งหมด เริ่มนับ 1 ใหม่', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'}).then(async r => {
+                    if(r.isConfirmed) {
+                        await db.collection('q_system').doc('config').update({current:'A-000', last:0});
+                        const snap = await db.collection('q_system').doc('config').collection('queues').get();
+                        const batch = db.batch();
+                        snap.docs.forEach(d => batch.delete(d.ref));
+                        await batch.commit();
+                        Swal.fire('Reset Done','','success');
+                    }
+                });
             }
+        };
 
-            switchTab(tab) {
-                document.getElementById('view-live').classList.add('hidden');
-                document.getElementById('view-history').classList.add('hidden');
-                document.getElementById(`view-${tab}`).classList.remove('hidden');
-                
-                document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-                document.getElementById(`nav-${tab}`).classList.add('active');
-            }
-        }
-
-        // Start Admin App
-        const Admin = new AdminApp();
+        Router('live');
     </script>
 </body>
 </html>
-
