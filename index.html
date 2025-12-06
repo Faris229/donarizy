@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HubFu Admin Enterprise Console</title>
+    <title>HubFu Admin - Enterprise Console</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -21,98 +21,125 @@
         
         body { 
             font-family: 'Kanit', sans-serif; 
-            background-color: #111827; /* Dark Mode Core */
-            color: #e5e7eb;
-            overflow: hidden; /* Prevent body scroll, use inner containers */
+            background-color: #f8fafc; /* พื้นหลังสีขาวเทา */
+            color: #1e293b; /* ตัวหนังสือสีเข้ม */
+            overflow: hidden; 
+        }
+
+        /* Smooth Scrollbar */
+        .smooth-scroll { overflow-y: auto; scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* UI Components */
+        .sidebar-link {
+            transition: all 0.2s ease;
+            border-right: 3px solid transparent;
+            color: #64748b;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-right-color: #0f172a;
+            font-weight: 600;
         }
         
-        .font-inter { font-family: 'Inter', sans-serif; }
-
-        /* --- Smooth Scrollbar (Key Requirement) --- */
-        .smooth-scroll {
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* iOS Momentum */
+        .card-white {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
         }
-        
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; transition: background 0.3s; }
-        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
 
-        /* UI Elements */
-        .glass-sidebar { background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); border-right: 1px solid #374151; }
-        .glass-card { background: #1f2937; border: 1px solid #374151; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
-        .nav-item { transition: all 0.2s ease; border-left: 3px solid transparent; }
-        .nav-item:hover, .nav-item.active { background: #374151; color: #60a5fa; border-left-color: #60a5fa; }
-        
-        .table-row { transition: background 0.1s; }
-        .table-row:hover { background: #374151; }
-        
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-enter { animation: fadeIn 0.3s ease-out forwards; }
+        .btn-primary {
+            background-color: #0f172a; /* สีดำด้าน */
+            color: white;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover {
+            background-color: #1e293b;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success { background-color: #10b981; color: white; }
+        .btn-success:hover { background-color: #059669; }
+
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="flex h-screen">
 
-    <aside class="w-64 glass-sidebar flex flex-col z-20 flex-shrink-0">
-        <div class="h-16 flex items-center px-6 border-b border-gray-700">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 font-bold text-white shadow-lg shadow-blue-500/30">A</div>
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20 shadow-sm">
+        <div class="h-20 flex items-center px-8 border-b border-gray-100">
+            <div class="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center text-xl font-bold mr-3 shadow-lg">HF</div>
             <div>
-                <h1 class="font-bold text-lg tracking-wide text-white">HubFu <span class="text-blue-500 text-xs">ADMIN</span></h1>
+                <h1 class="font-bold text-lg tracking-tight text-slate-800">HubFu <span class="text-blue-600 text-xs uppercase">Admin</span></h1>
             </div>
         </div>
 
-        <nav class="flex-1 py-6 space-y-1 overflow-y-auto smooth-scroll px-2">
-            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Overview</p>
-            <button onclick="router('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md active">
-                <i class="fa-solid fa-chart-pie w-6"></i> Dashboard
+        <nav class="flex-1 py-6 space-y-1 overflow-y-auto px-4">
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Main</p>
+            <button onclick="router('dashboard')" id="nav-dashboard" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1 active">
+                <i class="fa-solid fa-chart-pie w-5 mr-3"></i> ภาพรวมระบบ
             </button>
 
-            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Management</p>
-            <button onclick="router('products')" id="nav-products" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md">
-                <i class="fa-solid fa-box-open w-6"></i> สินค้า (Products)
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Store</p>
+            <button onclick="router('products')" id="nav-products" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1">
+                <i class="fa-solid fa-box-open w-5 mr-3"></i> จัดการสินค้า
             </button>
-            <button onclick="router('rentals')" id="nav-rentals" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md flex justify-between">
-                <span><i class="fa-solid fa-list-check w-6"></i> รายการเช่า</span>
-                <span id="badge-rentals" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
-            <button onclick="router('users')" id="nav-users" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md">
-                <i class="fa-solid fa-users w-6"></i> ผู้ใช้งาน (Users)
+            <button onclick="router('rentals')" id="nav-rentals" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1 justify-between">
+                <div class="flex items-center"><i class="fa-solid fa-list-check w-5 mr-3"></i> รายการเช่า</div>
+                <span id="badge-rentals" class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
             </button>
 
-            <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Finance & Support</p>
-            <button onclick="router('finance')" id="nav-finance" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md flex justify-between">
-                <span><i class="fa-solid fa-money-bill-transfer w-6"></i> การเงิน (Topup)</span>
-                <span id="badge-topup" class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Users & Finance</p>
+            <button onclick="router('users')" id="nav-users" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1">
+                <i class="fa-solid fa-users w-5 mr-3"></i> ผู้ใช้งาน
             </button>
-            <button onclick="router('chat')" id="nav-chat" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md">
-                <i class="fa-solid fa-comments w-6"></i> แชทซัพพอร์ต
+            <button onclick="router('finance')" id="nav-finance" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1 justify-between">
+                <div class="flex items-center"><i class="fa-solid fa-wallet w-5 mr-3"></i> อนุมัติเติมเงิน</div>
+                <span id="badge-topup" class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="router('chat')" id="nav-chat" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1">
+                <i class="fa-solid fa-comments w-5 mr-3"></i> แชทซัพพอร์ต
             </button>
         </nav>
 
-        <div class="p-4 border-t border-gray-700 bg-gray-800/50">
+        <div class="p-4 border-t border-gray-100 bg-slate-50">
             <div class="flex items-center">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-green-400 to-blue-500"></div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-white">Admin</p>
-                    <p class="text-xs text-gray-500">System Operator</p>
+                <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-user-shield"></i></div>
+                <div class="ml-3 overflow-hidden">
+                    <p class="text-sm font-bold text-slate-700 truncate">Administrator</p>
+                    <p class="text-[10px] text-slate-500 truncate" id="admin-email-display">Connecting...</p>
                 </div>
-                <button onclick="auth.signOut()" class="ml-auto text-gray-400 hover:text-red-500"><i class="fa-solid fa-power-off"></i></button>
+                <button onclick="auth.signOut()" class="ml-auto text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen relative bg-gray-900">
+    <main class="flex-1 flex flex-col h-screen relative bg-[#f8fafc]">
         
-        <header class="h-16 bg-gray-900/90 backdrop-blur border-b border-gray-800 flex justify-between items-center px-8 sticky top-0 z-10">
-            <h2 id="page-title" class="text-xl font-bold text-white">Dashboard Overview</h2>
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-200 flex justify-between items-center px-8 sticky top-0 z-10">
+            <div>
+                <h2 id="page-title" class="text-2xl font-bold text-slate-800">Dashboard</h2>
+                <p id="page-desc" class="text-xs text-slate-400">ภาพรวมและสถิติระบบ</p>
+            </div>
             <div class="flex items-center gap-4">
-                <div class="bg-gray-800 px-3 py-1 rounded-full border border-gray-700 flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-xs text-gray-300">System Online</span>
+                <div class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-100">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    System Online
                 </div>
             </div>
         </header>
@@ -122,67 +149,84 @@
 
     </main>
 
-    <div id="modal-login" class="fixed inset-0 z-50 bg-black flex items-center justify-center">
-        <div class="bg-gray-800 p-8 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl text-center">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-6 flex items-center justify-center text-3xl font-bold text-white">HF</div>
-            <h2 class="text-2xl font-bold text-white mb-2">Restricted Access</h2>
-            <p class="text-gray-400 mb-8">This portal is for authorized administrators only.</p>
-            <button onclick="handleAdminLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition">
-                Authenticate Securely
+    <div id="modal-login" class="fixed inset-0 z-50 bg-white flex items-center justify-center hidden">
+        <div class="bg-white p-10 rounded-3xl w-full max-w-md shadow-2xl border border-gray-100 text-center">
+            <div class="w-16 h-16 bg-black text-white rounded-2xl mx-auto mb-6 flex items-center justify-center text-3xl font-bold shadow-lg">HF</div>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Admin Portal</h2>
+            <p class="text-slate-400 mb-8">กรุณายืนยันตัวตนเพื่อเข้าสู่ระบบจัดการ</p>
+            <button onclick="handleAdminLogin()" class="w-full btn-primary py-4 rounded-xl font-bold text-lg">
+                เข้าสู่ระบบ (Secure Login)
             </button>
         </div>
     </div>
 
-    <div id="modal-user-edit" class="fixed inset-0 z-40 bg-black/80 hidden flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-gray-800 w-full max-w-lg rounded-xl border border-gray-700 shadow-2xl overflow-hidden animate-enter">
-            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">จัดการผู้ใช้ (User Editor)</h3>
-                <button onclick="closeModal('modal-user-edit')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <div id="modal-product" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 text-lg">เพิ่มสินค้าใหม่</h3>
+                <button onclick="closeModal('modal-product')" class="text-slate-400 hover:text-black"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-6">
-                <div class="mb-4 text-center">
-                    <p class="text-sm text-gray-500">Target User</p>
-                    <p id="edit-user-email" class="text-xl font-bold text-white">user@example.com</p>
-                    <input type="hidden" id="edit-user-id">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อสินค้า / เกม</label>
+                    <input id="prod-name" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 focus:outline-none focus:border-black transition">
                 </div>
-                
-                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 mb-6">
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Current Balance</label>
-                    <div class="flex items-center justify-between">
-                         <span id="edit-user-balance" class="text-2xl font-bold text-green-400">฿0.00</span>
-                         <div class="flex gap-2">
-                             <button onclick="adjustBalance('add')" class="bg-green-600/20 text-green-500 px-3 py-1 rounded text-xs border border-green-600/30 hover:bg-green-600 hover:text-white transition"><i class="fa-solid fa-plus"></i> เพิ่มเงิน</button>
-                             <button onclick="adjustBalance('remove')" class="bg-red-600/20 text-red-500 px-3 py-1 rounded text-xs border border-red-600/30 hover:bg-red-600 hover:text-white transition"><i class="fa-solid fa-minus"></i> ลบเงิน</button>
-                         </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ราคา (บาท/ชม.)</label>
+                        <input id="prod-price" type="number" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 focus:outline-none focus:border-black transition">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">สถานะ</label>
+                        <select id="prod-status" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3">
+                            <option value="available">พร้อมเช่า (Available)</option>
+                            <option value="busy">ไม่ว่าง (Busy)</option>
+                            <option value="maintenance">ปิดปรับปรุง</option>
+                        </select>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg" onclick="resetUserPassword()">Reset Password</button>
-                    <button class="bg-red-600 hover:bg-red-500 text-white py-3 rounded-lg" onclick="banUser()">Ban User</button>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ลิงก์รูปภาพ (URL)</label>
+                    <input id="prod-img" type="text" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 focus:outline-none focus:border-black transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รายละเอียด</label>
+                    <textarea id="prod-desc" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 h-24 focus:outline-none focus:border-black transition"></textarea>
+                </div>
+                <div class="pt-2 flex gap-3">
+                    <button onclick="saveProduct()" class="flex-1 btn-primary py-3 rounded-xl font-bold">บันทึกสินค้า</button>
+                    <button onclick="closeModal('modal-product')" class="flex-1 bg-white border border-gray-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-gray-50">ยกเลิก</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-product" class="fixed inset-0 z-40 bg-black/80 hidden flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-gray-800 w-full max-w-md rounded-xl border border-gray-700 shadow-2xl animate-enter">
-            <div class="p-6">
-                <h3 class="text-xl font-bold mb-4">เพิ่มสินค้าใหม่</h3>
-                <input id="prod-name" type="text" placeholder="ชื่อสินค้า / เกม" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 mb-3 text-white focus:border-blue-500 focus:outline-none">
-                <input id="prod-price" type="number" placeholder="ราคาต่อชั่วโมง (บาท)" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 mb-3 text-white focus:border-blue-500 focus:outline-none">
-                <input id="prod-img" type="text" placeholder="URL รูปภาพ" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 mb-3 text-white focus:border-blue-500 focus:outline-none">
-                <textarea id="prod-desc" placeholder="รายละเอียด..." class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 mb-4 text-white h-24 focus:border-blue-500 focus:outline-none"></textarea>
-                <div class="flex gap-3">
-                    <button onclick="saveProduct()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-500">บันทึก</button>
-                    <button onclick="closeModal('modal-product')" class="flex-1 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">ยกเลิก</button>
+    <div id="modal-user" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl animate-fade-in">
+            <div class="p-6 text-center">
+                <div class="w-20 h-20 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                    <i class="fa-solid fa-user text-3xl text-slate-400"></i>
                 </div>
+                <h3 id="edit-user-email-display" class="text-xl font-bold text-slate-800">user@example.com</h3>
+                <p class="text-sm text-slate-400 mb-6">UID: <span id="edit-user-id-display">...</span></p>
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Current Balance</p>
+                    <p id="edit-user-balance-display" class="text-3xl font-bold text-green-600 my-2">฿0.00</p>
+                    <div class="flex gap-2 justify-center mt-3">
+                        <button onclick="adjustBalance('add')" class="bg-green-100 text-green-700 px-4 py-1 rounded-lg text-xs font-bold hover:bg-green-200"><i class="fa-solid fa-plus"></i> เพิ่มเงิน</button>
+                        <button onclick="adjustBalance('remove')" class="bg-red-100 text-red-700 px-4 py-1 rounded-lg text-xs font-bold hover:bg-red-200"><i class="fa-solid fa-minus"></i> ลดเงิน</button>
+                    </div>
+                </div>
+
+                <input type="hidden" id="edit-user-id">
+                <button onclick="closeModal('modal-user')" class="w-full bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
+        // 1. CONFIGURATION (ใช้ Config เดียวกับหน้าลูกค้า)
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -198,37 +242,30 @@
         const rtdb = firebase.database();
         
         const ADMIN_EMAIL = 'farisxuma1@gmail.com';
-        let currentTab = 'dashboard';
-        let activeChatUserId = null;
+        let activeChatId = null;
 
-        // --- AUTH & INIT ---
+        // 2. AUTHENTICATION
         auth.onAuthStateChanged(user => {
             if(user && user.email === ADMIN_EMAIL) {
                 document.getElementById('modal-login').classList.add('hidden');
-                initAdminSystem();
+                document.getElementById('admin-email-display').innerText = user.email;
+                initApp();
             } else {
                 document.getElementById('modal-login').classList.remove('hidden');
                 if(user) {
-                    Swal.fire('Unauthorized', 'อีเมลนี้ไม่ใช่แอดมิน', 'error').then(() => auth.signOut());
+                    Swal.fire('Access Denied', 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้', 'error').then(() => auth.signOut());
                 }
             }
         });
 
         function handleAdminLogin() {
             Swal.fire({
-                title: 'Admin Verification',
-                html: `
-                    <input id="swal-email" class="swal2-input" placeholder="Email">
-                    <input id="swal-pass" type="password" class="swal2-input" placeholder="Password">
-                `,
-                confirmButtonText: 'Login',
-                background: '#1f2937',
-                color: '#fff',
+                title: 'Admin Login',
+                html: '<input id="swal-email" class="swal2-input" placeholder="Email"><input id="swal-pass" type="password" class="swal2-input" placeholder="Password">',
+                showCancelButton: true,
+                confirmButtonColor: '#0f172a',
                 preConfirm: () => {
-                    return [
-                        document.getElementById('swal-email').value,
-                        document.getElementById('swal-pass').value
-                    ]
+                    return [document.getElementById('swal-email').value, document.getElementById('swal-pass').value]
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -238,161 +275,164 @@
             });
         }
 
-        function initAdminSystem() {
+        // 3. ROUTING & INIT
+        function initApp() {
             router('dashboard');
-            listenToBadges(); // Realtime badges count
+            listenBadges();
         }
 
-        // --- ROUTING & RENDERING ---
-        function router(tab) {
-            currentTab = tab;
-            // UI Update
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-gray-700', 'text-blue-400', 'border-blue-400'));
-            const navBtn = document.getElementById(`nav-${tab}`);
+        function router(page) {
+            // Update Sidebar UI
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active', 'bg-slate-100', 'text-slate-800', 'font-bold'));
+            const navBtn = document.getElementById(`nav-${page}`);
             if(navBtn) navBtn.classList.add('active');
 
-            const contentDiv = document.getElementById('app-content');
-            const titleDiv = document.getElementById('page-title');
+            const content = document.getElementById('app-content');
+            const title = document.getElementById('page-title');
+            const desc = document.getElementById('page-desc');
 
-            contentDiv.innerHTML = '<div class="text-center text-gray-500 mt-20"><i class="fa-solid fa-circle-notch fa-spin text-3xl"></i><br>Loading Enterprise Data...</div>';
+            // Loading State
+            content.innerHTML = '<div class="text-center pt-20 text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i><br>Loading data...</div>';
 
             setTimeout(() => {
-                switch(tab) {
+                switch(page) {
                     case 'dashboard':
-                        titleDiv.innerText = 'System Dashboard';
-                        renderDashboard(contentDiv);
+                        title.innerText = 'Dashboard Overview';
+                        desc.innerText = 'ภาพรวมสถิติและสถานะระบบ';
+                        renderDashboard(content);
                         break;
                     case 'products':
-                        titleDiv.innerText = 'Product Management';
-                        renderProducts(contentDiv);
+                        title.innerText = 'Product Management';
+                        desc.innerText = 'จัดการสินค้า ลงของใหม่ แก้ไขราคา';
+                        renderProducts(content);
                         break;
                     case 'rentals':
-                        titleDiv.innerText = 'Rental Orders';
-                        renderRentals(contentDiv);
+                        title.innerText = 'Rental Orders';
+                        desc.innerText = 'รายการเช่าที่รออนุมัติและกำลังใช้งาน';
+                        renderRentals(content);
                         break;
                     case 'users':
-                        titleDiv.innerText = 'User Database';
-                        renderUsers(contentDiv);
+                        title.innerText = 'User Database';
+                        desc.innerText = 'รายชื่อผู้ใช้และจัดการยอดเงิน';
+                        renderUsers(content);
                         break;
                     case 'finance':
-                        titleDiv.innerText = 'Financial Overview (Topups)';
-                        renderFinance(contentDiv);
+                        title.innerText = 'Topup Requests';
+                        desc.innerText = 'รายการแจ้งโอนเงินที่รอตรวจสอบ';
+                        renderFinance(content);
                         break;
                     case 'chat':
-                        titleDiv.innerText = 'Support Center';
-                        renderChat(contentDiv);
+                        title.innerText = 'Support Center';
+                        desc.innerText = 'แชทสดกับลูกค้า';
+                        renderChat(content);
                         break;
                 }
-            }, 300);
+            }, 200);
         }
 
-        // --- 1. DASHBOARD VIEW ---
+        // --- MODULE 1: DASHBOARD (Fix Graph) ---
         function renderDashboard(container) {
-            // Mock Data calculation would happen here in real app
             container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-enter">
-                    <div class="glass-card p-6 rounded-xl border-l-4 border-green-500">
-                        <p class="text-gray-400 text-sm font-bold uppercase">Total Revenue</p>
-                        <h3 class="text-3xl font-bold text-white mt-2">฿42,500</h3>
-                        <p class="text-xs text-green-400 mt-1"><i class="fa-solid fa-arrow-up"></i> +12% from last week</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
+                    <div class="card-white p-6 border-l-4 border-black">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Total Users</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="dash-users">...</h3>
                     </div>
-                    <div class="glass-card p-6 rounded-xl border-l-4 border-blue-500">
-                        <p class="text-gray-400 text-sm font-bold uppercase">Total Users</p>
-                        <h3 class="text-3xl font-bold text-white mt-2" id="stat-users-count">Loading...</h3>
+                    <div class="card-white p-6 border-l-4 border-blue-600">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Active Rentals</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="dash-rentals">...</h3>
                     </div>
-                    <div class="glass-card p-6 rounded-xl border-l-4 border-yellow-500">
-                        <p class="text-gray-400 text-sm font-bold uppercase">Pending Orders</p>
-                        <h3 class="text-3xl font-bold text-white mt-2" id="stat-pending-orders">0</h3>
+                    <div class="card-white p-6 border-l-4 border-red-500">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Pending Topups</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="dash-topups">...</h3>
                     </div>
-                    <div class="glass-card p-6 rounded-xl border-l-4 border-purple-500">
-                        <p class="text-gray-400 text-sm font-bold uppercase">Active Rentals</p>
-                        <h3 class="text-3xl font-bold text-white mt-2" id="stat-active-rentals">0</h3>
+                    <div class="card-white p-6 border-l-4 border-green-500">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Est. Revenue</p>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-1">฿12,450</h3>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-enter" style="animation-delay: 0.1s;">
-                    <div class="glass-card p-6 rounded-xl lg:col-span-2">
-                        <h4 class="font-bold text-gray-300 mb-4">Revenue Analytics</h4>
-                        <div class="h-64">
-                             <canvas id="revenueChart"></canvas>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+                    <div class="card-white p-6 lg:col-span-2">
+                        <h4 class="font-bold text-slate-700 mb-4">Traffic & Revenue</h4>
+                        <div class="h-64 relative w-full">
+                            <canvas id="mainChart"></canvas>
                         </div>
                     </div>
-                    <div class="glass-card p-6 rounded-xl">
-                        <h4 class="font-bold text-gray-300 mb-4">Recent Activity</h4>
-                        <div class="space-y-3 text-sm text-gray-400 h-64 overflow-y-auto smooth-scroll" id="activity-log">
-                            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-green-500 rounded-full"></div> System initialized</div>
+                    <div class="card-white p-6">
+                        <h4 class="font-bold text-slate-700 mb-4">Recent Activity</h4>
+                        <div class="space-y-4 text-sm" id="activity-log">
+                            <div class="flex items-center gap-3 text-slate-500"><div class="w-2 h-2 bg-green-500 rounded-full"></div> System Ready</div>
                             </div>
                     </div>
                 </div>
             `;
-            
-            // Load Real Stats
-            db.collection('users').get().then(snap => document.getElementById('stat-users-count').innerText = snap.size);
-            db.collection('rentals').where('status','==','pending').onSnapshot(snap => document.getElementById('stat-pending-orders').innerText = snap.size);
-            db.collection('rentals').where('status','==','active').onSnapshot(snap => document.getElementById('stat-active-rentals').innerText = snap.size);
 
-            // Init Chart.js
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Income (THB)',
-                        data: [1200, 1900, 3000, 5000, 2300, 6000, 7500],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { grid: { color: '#374151' } }, x: { grid: { display: false } } }
+            // Load Counters
+            db.collection('users').onSnapshot(s => document.getElementById('dash-users').innerText = s.size);
+            db.collection('rentals').where('status','==','active').onSnapshot(s => document.getElementById('dash-rentals').innerText = s.size);
+            db.collection('topups').where('status','==','pending').onSnapshot(s => document.getElementById('dash-topups').innerText = s.size);
+
+            // Fix Graph Loading: Delay slightly to ensure DOM is ready
+            setTimeout(() => {
+                const ctx = document.getElementById('mainChart');
+                if(ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Income',
+                                data: [1500, 2300, 1800, 3200, 4500, 6000, 5200],
+                                borderColor: '#0f172a',
+                                backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
+                        }
+                    });
                 }
-            });
+            }, 100);
         }
 
-        // --- 2. PRODUCTS VIEW ---
+        // --- MODULE 2: PRODUCTS ---
         function renderProducts(container) {
             container.innerHTML = `
-                <div class="flex justify-between items-center mb-6 animate-enter">
-                    <div class="relative w-64">
-                         <i class="fa-solid fa-search absolute left-3 top-3 text-gray-500"></i>
-                         <input type="text" placeholder="Search products..." class="bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 w-full text-white focus:outline-none">
-                    </div>
-                    <button onclick="document.getElementById('modal-product').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-blue-500/30 transition">
-                        <i class="fa-solid fa-plus"></i> Add Product
+                <div class="flex justify-between items-center mb-6 animate-fade-in">
+                    <input type="text" placeholder="ค้นหาสินค้า..." class="bg-white border border-gray-200 rounded-lg px-4 py-2 w-64 focus:outline-none focus:border-black">
+                    <button onclick="document.getElementById('modal-product').classList.remove('hidden')" class="btn-primary px-6 py-2 rounded-lg font-bold flex items-center">
+                        <i class="fa-solid fa-plus mr-2"></i> เพิ่มสินค้า
                     </button>
                 </div>
-                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-enter">
-                    </div>
+                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in"></div>
             `;
-
+            
             db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snap => {
                 const grid = document.getElementById('product-grid');
-                if(snap.empty) { grid.innerHTML = '<div class="col-span-full text-center text-gray-500">No products found.</div>'; return; }
+                if(!grid) return;
+                if(snap.empty) { grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">ยังไม่มีสินค้าในระบบ</div>'; return; }
                 
                 grid.innerHTML = snap.docs.map(doc => {
                     const p = doc.data();
+                    const statusColor = p.status === 'available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
                     return `
-                        <div class="glass-card rounded-xl overflow-hidden group hover:border-blue-500/50 transition relative">
-                            <img src="${p.image}" class="w-full h-40 object-cover opacity-70 group-hover:opacity-100 transition">
-                            <div class="p-4">
-                                <h4 class="font-bold text-white truncate">${p.name}</h4>
-                                <div class="flex justify-between items-center mt-2">
-                                    <span class="text-green-400 font-bold">฿${p.price}<span class="text-xs text-gray-500">/hr</span></span>
-                                    <div class="flex gap-2">
-                                        <button onclick="deleteProduct('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
-                                        <button class="text-blue-500 hover:text-blue-400"><i class="fa-solid fa-pen"></i></button>
-                                    </div>
-                                </div>
+                        <div class="card-white overflow-hidden group hover:shadow-lg transition">
+                            <div class="h-40 overflow-hidden relative">
+                                <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 rounded ${statusColor}">${p.status || 'Available'}</span>
                             </div>
-                            <div class="absolute top-2 right-2">
-                                <span class="bg-gray-900/80 text-xs px-2 py-1 rounded text-white">${p.status || 'Available'}</span>
+                            <div class="p-4">
+                                <h4 class="font-bold text-slate-800 truncate">${p.name}</h4>
+                                <div class="flex justify-between items-end mt-2">
+                                    <span class="text-lg font-bold text-blue-600">฿${p.price}</span>
+                                    <button onclick="deleteProduct('${doc.id}')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -405,144 +445,143 @@
             const price = Number(document.getElementById('prod-price').value);
             const image = document.getElementById('prod-img').value;
             const desc = document.getElementById('prod-desc').value;
+            const status = document.getElementById('prod-status').value;
 
-            if(!name || !price) return Swal.fire('Error', 'กรุณากรอกข้อมูล', 'warning');
+            if(!name || !price) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและราคา', 'warning');
 
             db.collection('products').add({
-                name, price, image, desc,
-                status: 'available',
+                name, price, image, desc, status,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 closeModal('modal-product');
-                Swal.fire('Success', 'เพิ่มสินค้าแล้ว', 'success');
-                // Clear fields logic here
+                Swal.fire('สำเร็จ', 'เพิ่มสินค้าเรียบร้อย', 'success');
+                document.getElementById('prod-name').value = ''; // Clear form
             });
         }
 
         function deleteProduct(id) {
-            Swal.fire({ title: 'Are you sure?', text: "ลบแล้วกู้คืนไม่ได้", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' })
-            .then(res => { if(res.isConfirmed) db.collection('products').doc(id).delete(); });
+            Swal.fire({
+                title: 'ยืนยันลบสินค้า?',
+                text: "การกระทำนี้ไม่สามารถย้อนกลับได้",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'ลบทันที'
+            }).then((res) => {
+                if(res.isConfirmed) db.collection('products').doc(id).delete();
+            });
         }
 
-        // --- 3. USERS VIEW ---
-        function renderUsers(container) {
+        // --- MODULE 3: RENTALS ---
+        function renderRentals(container) {
             container.innerHTML = `
-                <div class="glass-card rounded-xl overflow-hidden animate-enter">
-                    <div class="p-4 border-b border-gray-700 bg-gray-800 flex justify-between">
-                        <h3 class="font-bold text-white">Registered Users</h3>
-                        <input type="text" placeholder="Search email..." class="bg-gray-900 border border-gray-600 rounded px-3 py-1 text-sm text-white focus:outline-none">
-                    </div>
-                    <table class="w-full text-left text-gray-400 text-sm">
-                        <thead class="bg-gray-900 uppercase font-bold text-xs">
-                            <tr>
-                                <th class="p-4">User Info</th>
-                                <th class="p-4">Balance</th>
-                                <th class="p-4">Role</th>
-                                <th class="p-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body" class="divide-y divide-gray-700">
-                            </tbody>
-                    </table>
+                <div class="card-white overflow-hidden animate-fade-in">
+                    <div class="p-4 border-b border-gray-100 bg-slate-50 font-bold text-slate-700">รายการเช่า (Orders)</div>
+                    <div id="rental-list" class="divide-y divide-gray-100"></div>
                 </div>
             `;
+            
+            db.collection('rentals').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                const list = document.getElementById('rental-list');
+                if(!list) return;
+                if(snap.empty) { list.innerHTML = '<div class="p-8 text-center text-slate-400">ไม่มีรายการเช่า</div>'; return; }
 
-            db.collection('users').onSnapshot(snap => {
-                const tbody = document.getElementById('user-table-body');
-                tbody.innerHTML = snap.docs.map(doc => {
-                    const u = doc.data();
+                list.innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    const isPending = d.status === 'pending';
                     return `
-                        <tr class="table-row">
-                            <td class="p-4 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-white overflow-hidden">
-                                     <img src="https://ui-avatars.com/api/?name=${u.email}&background=random" class="w-full h-full">
+                        <div class="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-4 mb-2 md:mb-0 w-full md:w-auto">
+                                <div class="w-10 h-10 rounded-full ${isPending ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'} flex items-center justify-center">
+                                    <i class="fa-solid ${isPending ? 'fa-clock' : 'fa-check'}"></i>
                                 </div>
                                 <div>
-                                    <div class="text-white font-bold">${u.email}</div>
-                                    <div class="text-xs text-gray-600">UID: ${doc.id.substring(0,8)}...</div>
+                                    <div class="font-bold text-slate-800">${d.productName} (${d.hours} ชม.)</div>
+                                    <div class="text-xs text-slate-500">User: ${d.userId} • <span class="font-bold text-blue-600">฿${d.cost}</span></div>
                                 </div>
-                            </td>
-                            <td class="p-4 font-bold text-green-400">฿${(u.balance || 0).toLocaleString()}</td>
-                            <td class="p-4"><span class="bg-gray-800 px-2 py-1 rounded text-xs border border-gray-700">${u.role || 'User'}</span></td>
-                            <td class="p-4 text-right">
-                                <button onclick="openUserEdit('${doc.id}', '${u.email}', ${u.balance || 0})" class="bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-1 rounded text-xs transition border border-blue-600/30">
-                                    Manage
+                            </div>
+                            ${isPending ? `
+                                <button onclick="sendCredentials('${doc.id}', '${d.userId}')" class="btn-primary px-4 py-2 rounded-lg text-sm font-bold shadow-md">
+                                    ส่ง ID/Pass
                                 </button>
-                            </td>
-                        </tr>
+                            ` : `
+                                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">ส่งแล้ว</span>
+                            `}
+                        </div>
                     `;
                 }).join('');
             });
         }
 
-        // User Management Logic
-        function openUserEdit(id, email, balance) {
-            document.getElementById('modal-user-edit').classList.remove('hidden');
-            document.getElementById('edit-user-email').innerText = email;
-            document.getElementById('edit-user-balance').innerText = `฿${balance.toLocaleString()}`;
-            document.getElementById('edit-user-id').value = id;
-            window.currentUserBalance = balance; // Store for calc
-        }
-
-        function adjustBalance(type) {
-            const userId = document.getElementById('edit-user-id').value;
+        function sendCredentials(rentalId, userId) {
             Swal.fire({
-                title: type === 'add' ? 'Add Balance (เติมเงิน)' : 'Deduct Balance (หักเงิน)',
-                input: 'number',
-                inputLabel: 'Amount',
-                background: '#1f2937', color: '#fff',
-                showCancelButton: true
-            }).then(res => {
+                title: 'ส่งมอบสินค้า',
+                html: `
+                    <input id="swal-id" class="swal2-input" placeholder="ID / Username">
+                    <input id="swal-pass" class="swal2-input" placeholder="Password / Code">
+                `,
+                confirmButtonText: 'ส่งข้อมูลให้ลูกค้า',
+                confirmButtonColor: '#0f172a',
+                preConfirm: () => {
+                    const u = document.getElementById('swal-id').value;
+                    const p = document.getElementById('swal-pass').value;
+                    if(!u || !p) Swal.showValidationMessage('กรุณากรอกให้ครบ');
+                    return { u, p };
+                }
+            }).then((res) => {
                 if(res.isConfirmed) {
-                    const amount = Number(res.value);
-                    const updateData = {
-                        balance: firebase.firestore.FieldValue.increment(type === 'add' ? amount : -amount)
-                    };
-                    db.collection('users').doc(userId).update(updateData).then(() => {
-                        Swal.fire('Success', 'Balance updated', 'success');
-                        closeModal('modal-user-edit');
+                    // 1. ส่งเข้า Chat
+                    rtdb.ref('chats/' + userId).push({
+                        text: `[SYSTEM] จัดส่งสินค้าเรียบร้อย! \nID: ${res.value.u} \nPASS: ${res.value.p}`,
+                        sender: 'admin',
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
+                    // 2. อัปเดตสถานะ
+                    db.collection('rentals').doc(rentalId).update({ status: 'active' });
+                    Swal.fire('เรียบร้อย', 'ข้อมูลถูกส่งไปทางแชทแล้ว', 'success');
                 }
             });
         }
 
-        // --- 4. FINANCE VIEW (Topups) ---
+        // --- MODULE 4: FINANCE (Topups) ---
         function renderFinance(container) {
             container.innerHTML = `
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-enter">
-                    <div class="lg:col-span-2 glass-card rounded-xl overflow-hidden">
-                        <div class="p-4 bg-gray-800 font-bold text-white border-b border-gray-700">Pending Transactions</div>
-                        <div id="finance-list" class="divide-y divide-gray-700 max-h-[600px] overflow-y-auto smooth-scroll">
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                    <div class="card-white overflow-hidden">
+                        <div class="p-4 bg-slate-800 text-white font-bold flex justify-between">
+                            <span>รายการรอดำเนินการ (Pending)</span>
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div id="topup-list" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto"></div>
                     </div>
-                    <div class="glass-card rounded-xl p-6 text-center text-gray-400 flex flex-col items-center justify-center">
-                        <i class="fa-solid fa-receipt text-6xl mb-4 opacity-30"></i>
-                        <p>Select a transaction to view slip detail</p>
+                     <div class="card-white p-6 flex flex-col items-center justify-center text-center text-slate-400">
+                        <i class="fa-solid fa-receipt text-6xl mb-4 opacity-20"></i>
+                        <h3 class="font-bold text-slate-600">Topup Center</h3>
+                        <p class="text-sm">กดที่รูปตาเพื่อดูสลิป<br>กดอนุมัติเพื่อเพิ่มเงินให้ลูกค้าอัตโนมัติ</p>
                     </div>
                 </div>
             `;
-
+            
             db.collection('topups').where('status', '==', 'pending').onSnapshot(snap => {
-                const list = document.getElementById('finance-list');
-                if(snap.empty) { list.innerHTML = '<div class="p-6 text-center text-gray-500">No pending transactions</div>'; return; }
-
+                const list = document.getElementById('topup-list');
+                if(!list) return;
+                if(snap.empty) { list.innerHTML = '<div class="p-6 text-center text-slate-400">ไม่มีรายการค้าง</div>'; return; }
+                
                 list.innerHTML = snap.docs.map(doc => {
                     const d = doc.data();
-                    // Mock Slip Image for demo if not present
-                    const slipImg = d.slipUrl || 'https://via.placeholder.com/300x500?text=Slip+Image'; 
                     return `
-                        <div class="p-4 hover:bg-gray-800 transition flex justify-between items-center group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-900 rounded-full flex items-center justify-center text-blue-400"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        <div class="p-4 hover:bg-slate-50 transition">
+                            <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <div class="font-bold text-white">฿${d.amount}</div>
-                                    <div class="text-xs text-gray-500">${d.email} • ${d.ref || 'No Ref'}</div>
+                                    <span class="text-lg font-bold text-green-600">฿${d.amount}</span>
+                                    <div class="text-xs text-slate-500 truncate w-32">${d.email}</div>
                                 </div>
+                                <button onclick="Swal.fire({imageUrl: '${d.ref || "https://via.placeholder.com/300?text=No+Slip"}', showConfirmButton:false})" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-eye"></i></button>
                             </div>
-                            <div class="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition">
-                                <button onclick="processTopup('${doc.id}', '${d.userId}', ${d.amount}, 'approve')" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">Approve</button>
-                                <button onclick="processTopup('${doc.id}', null, 0, 'reject')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Reject</button>
-                                <button onclick="Swal.fire({imageUrl: '${slipImg}', imageAlt: 'Slip', background: '#1f2937'})" class="bg-gray-700 text-white px-3 py-1 rounded text-xs"><i class="fa-solid fa-eye"></i></button>
+                            <div class="text-xs text-slate-400 mb-2">Ref: ${d.ref || '-'}</div>
+                            <div class="flex gap-2">
+                                <button onclick="processTopup('${doc.id}', '${d.userId}', ${d.amount}, 'approve')" class="flex-1 btn-success py-1.5 rounded text-xs font-bold">อนุมัติ</button>
+                                <button onclick="processTopup('${doc.id}', null, 0, 'reject')" class="flex-1 btn-danger py-1.5 rounded text-xs font-bold">ปฏิเสธ</button>
                             </div>
                         </div>
                     `;
@@ -556,94 +595,116 @@
             
             if(action === 'approve') {
                 const userRef = db.collection('users').doc(userId);
-                batch.update(topupRef, { status: 'approved', processedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                batch.update(topupRef, { status: 'approved' });
                 batch.update(userRef, { balance: firebase.firestore.FieldValue.increment(amount) });
-                batch.commit().then(() => Swal.fire('Approved', `Added ฿${amount} to user.`, 'success'));
+                batch.commit().then(() => Swal.fire('Success', `เพิ่มเงิน ฿${amount} ให้ลูกค้าแล้ว`, 'success'));
             } else {
                 batch.update(topupRef, { status: 'rejected' });
-                batch.commit().then(() => Swal.fire('Rejected', 'Transaction rejected.', 'info'));
+                batch.commit().then(() => Swal.fire('Rejected', 'ปฏิเสธรายการแล้ว', 'info'));
             }
         }
 
-        // --- 5. RENTALS & CHAT (Simplified Enterprise Logic) ---
-        function renderRentals(container) {
+        // --- MODULE 5: USERS ---
+        function renderUsers(container) {
             container.innerHTML = `
-                <h3 class="text-white font-bold mb-4 animate-enter">Incoming Orders</h3>
-                <div id="rental-list" class="space-y-3 animate-enter"></div>
+                <div class="card-white overflow-hidden animate-fade-in">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-400">
+                            <tr>
+                                <th class="p-4">User</th>
+                                <th class="p-4">Balance</th>
+                                <th class="p-4 text-right">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
             `;
-            // Similar logic to users/finance but for 'rentals' collection
-            db.collection('rentals').where('status', '==', 'pending').onSnapshot(snap => {
-                const div = document.getElementById('rental-list');
-                if(snap.empty) { div.innerHTML = '<p class="text-gray-500">No pending rentals.</p>'; return; }
-                div.innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
+            
+            db.collection('users').limit(20).onSnapshot(snap => {
+                const tbody = document.getElementById('user-table-body');
+                if(!tbody) return;
+                tbody.innerHTML = snap.docs.map(doc => {
+                    const u = doc.data();
                     return `
-                        <div class="glass-card p-4 rounded-xl flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold text-white">${d.productName}</h4>
-                                <p class="text-sm text-gray-400">User: ${d.userId} • ${d.hours} Hours</p>
-                            </div>
-                            <button onclick="sendIdPassPrompt('${doc.id}', '${d.userId}')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-sm">
-                                Send Credentials
-                            </button>
-                        </div>
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-4">
+                                <div class="font-bold text-slate-800">${u.email}</div>
+                                <div class="text-xs text-slate-400">UID: ${doc.id.substring(0,8)}...</div>
+                            </td>
+                            <td class="p-4 font-bold text-green-600">฿${(u.balance || 0).toLocaleString()}</td>
+                            <td class="p-4 text-right">
+                                <button onclick="openUserEdit('${doc.id}', '${u.email}', ${u.balance || 0})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">
+                                    แก้ไข
+                                </button>
+                            </td>
+                        </tr>
                     `;
                 }).join('');
             });
         }
 
-        function sendIdPassPrompt(rentalId, userId) {
+        function openUserEdit(id, email, balance) {
+            document.getElementById('edit-user-email-display').innerText = email;
+            document.getElementById('edit-user-id-display').innerText = id;
+            document.getElementById('edit-user-balance-display').innerText = `฿${balance.toLocaleString()}`;
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('modal-user').classList.remove('hidden');
+        }
+
+        function adjustBalance(type) {
+            const uid = document.getElementById('edit-user-id').value;
             Swal.fire({
-                title: 'Deliver Item',
-                html: '<input id="swal-id" class="swal2-input" placeholder="Username/ID"><input id="swal-pass" class="swal2-input" placeholder="Password/Code">',
-                background: '#1f2937', color: '#fff',
-                preConfirm: () => { return { u: document.getElementById('swal-id').value, p: document.getElementById('swal-pass').value } }
-            }).then(res => {
+                title: type === 'add' ? 'เติมเงินพิเศษ' : 'หักเงิน',
+                input: 'number',
+                inputLabel: 'จำนวนเงิน (บาท)',
+                confirmButtonText: 'ยืนยัน',
+                confirmButtonColor: type === 'add' ? '#10b981' : '#ef4444'
+            }).then((res) => {
                 if(res.isConfirmed) {
-                    const { u, p } = res.value;
-                    // 1. Send via Chat
-                    rtdb.ref('chats/' + userId).push({
-                        text: `[SYSTEM]: Your order is ready! ID: ${u} | PASS: ${p}`,
-                        sender: 'admin',
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    const amount = Number(res.value);
+                    const val = type === 'add' ? amount : -amount;
+                    db.collection('users').doc(uid).update({
+                        balance: firebase.firestore.FieldValue.increment(val)
+                    }).then(() => {
+                        Swal.fire('Success', 'ปรับยอดเงินเรียบร้อย', 'success');
+                        closeModal('modal-user');
                     });
-                    // 2. Update Rental Status
-                    db.collection('rentals').doc(rentalId).update({ status: 'active' });
-                    Swal.fire('Sent!', 'Credentials sent to user chat.', 'success');
                 }
             });
         }
 
+        // --- MODULE 6: CHAT ---
         function renderChat(container) {
             container.innerHTML = `
-                <div class="flex h-[calc(100vh-140px)] gap-4 animate-enter">
-                    <div class="w-1/3 glass-card rounded-xl overflow-hidden flex flex-col">
-                        <div class="p-3 bg-gray-800 border-b border-gray-700 font-bold text-white">Inbox</div>
-                        <div id="chat-user-list" class="flex-1 overflow-y-auto smooth-scroll p-2 space-y-1"></div>
+                <div class="flex h-[calc(100vh-160px)] gap-4 animate-fade-in">
+                    <div class="w-1/3 card-white flex flex-col overflow-hidden">
+                        <div class="p-3 bg-slate-50 border-b border-gray-100 font-bold text-slate-600 text-sm">Inbox</div>
+                        <div id="chat-user-list" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
                     </div>
-                    <div class="w-2/3 glass-card rounded-xl overflow-hidden flex flex-col">
-                        <div id="chat-box-display" class="flex-1 overflow-y-auto smooth-scroll p-4 space-y-2 bg-gray-900/50">
-                            <div class="text-center text-gray-600 mt-20">Select a conversation</div>
+                    <div class="w-2/3 card-white flex flex-col overflow-hidden">
+                        <div id="chat-box-display" class="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-50">
+                            <div class="text-center text-slate-400 mt-20">เลือกผู้ใช้งานเพื่อเริ่มแชท</div>
                         </div>
-                        <div class="p-3 bg-gray-800 border-t border-gray-700 flex gap-2">
-                            <input id="admin-chat-input" type="text" class="flex-1 bg-gray-900 border border-gray-600 rounded px-3 text-white focus:outline-none" placeholder="Type message...">
-                            <button onclick="sendAdminMessage()" class="bg-blue-600 text-white px-4 rounded hover:bg-blue-500"><i class="fa-solid fa-paper-plane"></i></button>
+                        <div class="p-3 bg-white border-t border-gray-100 flex gap-2">
+                            <input id="admin-chat-input" type="text" class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 focus:outline-none focus:border-black" placeholder="พิมพ์ข้อความตอบกลับ...">
+                            <button onclick="sendAdminMessage()" class="btn-primary w-10 h-10 rounded-lg flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button>
                         </div>
                     </div>
                 </div>
             `;
             
-            // Load Chat Users
             rtdb.ref('chats').on('value', snap => {
                 const list = document.getElementById('chat-user-list');
                 if(!list) return;
                 list.innerHTML = '';
                 snap.forEach(child => {
                     const uid = child.key;
+                    const isActive = uid === activeChatId;
                     list.innerHTML += `
-                        <div onclick="openChat('${uid}')" class="p-3 rounded hover:bg-gray-700 cursor-pointer text-gray-300 text-sm border-b border-gray-800 flex items-center gap-2 ${activeChatUserId === uid ? 'bg-gray-700 text-white' : ''}">
-                            <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-user"></i></div>
-                            <div class="truncate">User: ${uid.substring(0,8)}...</div>
+                        <div onclick="openChat('${uid}')" class="p-3 rounded-lg cursor-pointer flex items-center gap-3 transition ${isActive ? 'bg-slate-800 text-white' : 'hover:bg-slate-100 text-slate-600'}">
+                            <div class="w-8 h-8 rounded-full ${isActive ? 'bg-slate-600' : 'bg-slate-200'} flex items-center justify-center text-xs"><i class="fa-solid fa-user"></i></div>
+                            <div class="truncate text-sm font-medium">User: ${uid.substring(0,6)}...</div>
                         </div>
                     `;
                 });
@@ -651,21 +712,21 @@
         }
 
         window.openChat = (uid) => {
-            activeChatUserId = uid;
+            activeChatId = uid;
             const display = document.getElementById('chat-box-display');
-            display.innerHTML = '<div class="text-center text-gray-500">Loading history...</div>';
+            display.innerHTML = '<div class="text-center text-slate-400">Loading history...</div>';
             
-            // Highlight active user in list (simple re-render trigger usually, here we just set var)
+            // Re-render user list to update highlight
             
             rtdb.ref('chats/' + uid).limitToLast(50).on('value', snap => {
-                if(activeChatUserId !== uid) return;
+                if(activeChatId !== uid) return;
                 display.innerHTML = '';
                 snap.forEach(msgSnap => {
                     const m = msgSnap.val();
                     const isAdmin = m.sender === 'admin';
                     display.innerHTML += `
                         <div class="flex ${isAdmin ? 'justify-end' : 'justify-start'}">
-                            <div class="${isAdmin ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200'} px-3 py-2 rounded-lg max-w-[70%] text-sm">
+                            <div class="${isAdmin ? 'bg-slate-800 text-white' : 'bg-white border border-gray-200 text-slate-800'} px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow-sm">
                                 ${m.text}
                             </div>
                         </div>
@@ -677,28 +738,25 @@
 
         window.sendAdminMessage = () => {
             const input = document.getElementById('admin-chat-input');
-            if(!input.value || !activeChatUserId) return;
-            rtdb.ref('chats/' + activeChatUserId).push({
-                text: input.value,
-                sender: 'admin',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+            if(!input.value || !activeChatId) return;
+            rtdb.ref('chats/' + activeChatId).push({
+                text: input.value, sender: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP
             });
             input.value = '';
         }
 
-        // --- UTILS ---
+        // UTILS
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function listenToBadges() {
-            db.collection('topups').where('status','==','pending').onSnapshot(s => {
-                const b = document.getElementById('badge-topup');
-                if(b) { b.innerText = s.size; b.classList.toggle('hidden', s.size === 0); }
-            });
+        function listenBadges() {
             db.collection('rentals').where('status','==','pending').onSnapshot(s => {
                 const b = document.getElementById('badge-rentals');
-                if(b) { b.innerText = s.size; b.classList.toggle('hidden', s.size === 0); }
+                if(b) { b.innerText = s.size; b.classList.toggle('hidden', s.size===0); }
+            });
+            db.collection('topups').where('status','==','pending').onSnapshot(s => {
+                const b = document.getElementById('badge-topup');
+                if(b) { b.innerText = s.size; b.classList.toggle('hidden', s.size===0); }
             });
         }
-
     </script>
 </body>
 </html>
