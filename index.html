@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Admin Ultimate (Fixed)</title>
+    <title>Q-Admin Ultimate Refined</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,40 +18,29 @@
         
         /* Sidebar */
         .sidebar { width: 280px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; height: 100vh; z-index: 50; }
-        
-        /* Nav Items */
-        .nav-item { 
-            padding: 14px 20px; margin: 4px 16px; border-radius: 10px; cursor: pointer; 
-            color: #64748b; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 0.95rem;
-        }
+        .nav-item { padding: 14px 20px; margin: 4px 16px; border-radius: 10px; cursor: pointer; color: #64748b; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
         .nav-item:hover { background: #f1f5f9; color: #0f172a; }
         .nav-item.active { background: #eff6ff; color: #2563eb; font-weight: 700; border: 1px solid #dbeafe; }
         
-        /* Action Buttons (Big & Clear) */
-        .btn-action { 
-            padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; 
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
-            transition: 0.2s; border: 1px solid transparent; cursor: pointer; white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+        /* Action Buttons */
+        .btn-action { padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border: 1px solid transparent; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-action:active { transform: scale(0.96); }
-        .btn-action i { font-size: 1.1em; }
+        .btn-call { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; } .btn-call:hover { background: #dbeafe; }
+        .btn-recall { background: #fff7ed; color: #ea580c; border-color: #fed7aa; } .btn-recall:hover { background: #ffedd5; }
+        .btn-view { background: #f3e8ff; color: #9333ea; border-color: #e9d5ff; } .btn-view:hover { background: #e9d5ff; }
+        .btn-done { background: #ecfdf5; color: #059669; border-color: #86efac; } .btn-done:hover { background: #d1fae5; }
+        .btn-cancel { background: #fef2f2; color: #dc2626; border-color: #fecaca; } .btn-cancel:hover { background: #fee2e2; }
 
-        /* Color Variants */
-        .btn-call { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-        .btn-call:hover { background: #dbeafe; }
-        
-        .btn-recall { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
-        .btn-recall:hover { background: #ffedd5; }
-        
-        .btn-view { background: #f3e8ff; color: #9333ea; border-color: #e9d5ff; }
-        .btn-view:hover { background: #e9d5ff; }
-        
-        .btn-done { background: #ecfdf5; color: #059669; border-color: #86efac; }
-        .btn-done:hover { background: #d1fae5; }
-        
-        .btn-cancel { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
-        .btn-cancel:hover { background: #fee2e2; }
+        /* Status Tag (ในหน้าตั้งค่า) */
+        .status-tag { display: inline-flex; align-items: center; background: #e0e7ff; color: #4338ca; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; margin-right: 8px; margin-bottom: 8px; border: 1px solid #c7d2fe; }
+        .status-tag button { margin-left: 8px; color: #6366f1; cursor: pointer; border: none; background: none; font-size: 1rem; }
+        .status-tag button:hover { color: #dc2626; }
+
+        /* Custom Select Styling */
+        .custom-select {
+            appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1em;
+        }
 
         /* Toggle Switch */
         .toggle-checkbox:checked { right: 0; border-color: #10b981; }
@@ -63,36 +52,24 @@
     <aside class="sidebar shadow-xl">
         <div class="h-24 flex items-center px-8 border-b border-slate-100">
             <div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group text-blue-600"></i> Q-Admin
-                </h1>
-                <p class="text-xs text-slate-400 font-bold ml-8">Ultimate Control</p>
+                <h1 class="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2"><i class="fa-solid fa-layer-group text-blue-600"></i> Q-Admin</h1>
+                <p class="text-xs text-slate-400 font-bold ml-8">System Refined</p>
             </div>
         </div>
         <nav class="flex-1 py-6 overflow-y-auto">
             <div class="text-[10px] font-bold text-slate-400 uppercase px-8 mb-2 tracking-wider">Main Menu</div>
-            <div onclick="Router('live')" id="nav-live" class="nav-item active">
-                <i class="fa-solid fa-list-check w-5 text-center"></i> จัดการคิว (Live)
-            </div>
-            <div onclick="Router('history')" id="nav-history" class="nav-item">
-                <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> ประวัติย้อนหลัง
-            </div>
-            
+            <div onclick="Router('live')" id="nav-live" class="nav-item active"><i class="fa-solid fa-list-check w-5 text-center"></i> จัดการคิว (Live)</div>
+            <div onclick="Router('history')" id="nav-history" class="nav-item"><i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> ประวัติย้อนหลัง</div>
             <div class="text-[10px] font-bold text-slate-400 uppercase px-8 mb-2 mt-8 tracking-wider">System</div>
-            <div onclick="Router('setting')" id="nav-setting" class="nav-item">
-                <i class="fa-solid fa-sliders w-5 text-center"></i> ตั้งค่า / ประกาศ
-            </div>
+            <div onclick="Router('setting')" id="nav-setting" class="nav-item"><i class="fa-solid fa-sliders w-5 text-center"></i> ตั้งค่าระบบ</div>
         </nav>
         <div class="p-6 border-t bg-slate-50">
-            <button onclick="window.Admin.resetSystem()" class="w-full py-3 rounded-xl bg-white border border-red-200 text-red-600 font-bold hover:bg-red-50 transition shadow-sm text-sm">
-                <i class="fa-solid fa-trash mr-2"></i> รีเซ็ตระบบรายวัน
-            </button>
+            <button onclick="window.Admin.resetSystem()" class="w-full py-3 rounded-xl bg-white border border-red-200 text-red-600 font-bold hover:bg-red-50 transition shadow-sm text-sm"><i class="fa-solid fa-trash mr-2"></i> รีเซ็ตรายวัน</button>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-hidden">
         <header class="h-24 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10 shadow-sm shrink-0">
-            
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-3 bg-slate-50 px-5 py-2.5 rounded-full border border-slate-200 shadow-inner">
                     <span class="text-sm font-bold text-slate-600" id="shop-status-text">สถานะร้าน</span>
@@ -101,30 +78,17 @@
                         <label for="shop-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"></label>
                     </div>
                 </div>
-
-                <div class="hidden lg:flex gap-6 px-6 border-l border-slate-200">
-                    <div class="text-center">
-                        <div class="text-[10px] text-slate-400 font-bold uppercase">รอคิว</div>
-                        <div class="text-xl font-black text-blue-600" id="stat-wait">0</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-[10px] text-slate-400 font-bold uppercase">เสร็จสิ้น</div>
-                        <div class="text-xl font-black text-green-600" id="stat-done">0</div>
-                    </div>
-                </div>
             </div>
-
             <div class="text-right">
                 <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">กำลังเรียก (Now Serving)</div>
                 <div class="text-4xl font-black text-blue-600 leading-none tracking-tight drop-shadow-sm" id="header-current">---</div>
             </div>
         </header>
-
         <div id="content-area" class="flex-1 overflow-y-auto p-8 scroll-smooth"></div>
     </main>
 
     <script>
-        // --- 1. Firebase Config (ใส่ค่าเดิมของคุณ) ---
+        // --- Firebase Init ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -133,164 +97,120 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        
-        // Initialize Firebase safely
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- 2. Admin Logic Class ---
+        // --- Admin Class ---
         class AdminApp {
             constructor() {
                 this.qRef = db.collection('q_system').doc('config').collection('queues');
                 this.configRef = db.collection('q_system').doc('config');
                 this.voiceTemp = "เชิญหมายเลข {queue} ค่ะ";
-                this.customStatusList = [];
-                
-                // เริ่มทำงานทันที
+                this.customStatusList = []; 
+                this.tempStatusList = []; // สำหรับหน้า Setting
                 this.init();
             }
 
             init() {
-                // Listen to Config Changes
                 this.configRef.onSnapshot(d => {
                     if(d.exists) {
                         const data = d.data();
-                        
-                        // Update Header Info
-                        const currentQ = document.getElementById('header-current');
-                        if(currentQ) currentQ.innerText = data.current || '---';
+                        const header = document.getElementById('header-current');
+                        if(header) header.innerText = data.current || '---';
                         
                         this.voiceTemp = data.voicePattern || "เชิญหมายเลข {queue} ค่ะ";
                         this.customStatusList = data.statusList || [];
                         
-                        // Update Shop Toggle UI
+                        // Shop Toggle UI
                         const toggle = document.getElementById('shop-toggle');
                         const label = document.querySelector('.toggle-label');
-                        const statusText = document.getElementById('shop-status-text');
-                        
+                        const txt = document.getElementById('shop-status-text');
                         if(toggle && label) {
                             const isOpen = data.isShopOpen !== false;
                             toggle.checked = isOpen;
                             label.style.backgroundColor = isOpen ? '#10b981' : '#d1d5db';
-                            statusText.innerText = isOpen ? 'ร้านเปิด' : 'ร้านปิด';
-                            statusText.className = isOpen ? 'text-sm font-bold text-green-600' : 'text-sm font-bold text-red-500';
+                            txt.innerText = isOpen ? 'ร้านเปิด' : 'ร้านปิด';
+                            txt.className = isOpen ? 'text-sm font-bold text-green-600' : 'text-sm font-bold text-red-500';
                         }
-                        
-                        // Refresh Table if in Live View (เพื่ออัปเดต Dropdown list)
-                        if(document.getElementById('nav-live') && document.getElementById('nav-live').classList.contains('active')) {
-                            // การ re-render อาจจะทำให้ตารางกระพริบ แต่จำเป็นถ้ารายชื่อสถานะเปลี่ยน
-                            // ในที่นี้เราปล่อยให้ Snapshot ของ qRef จัดการตารางแทน
+
+                        // Re-render setting page (if active) to update tags
+                        if(document.getElementById('nav-setting') && document.getElementById('nav-setting').classList.contains('active')) {
+                            // Don't re-render full page to avoid input loss, just update if needed.
+                            // In this simple version, we let user manually refresh or save.
                         }
                     }
                 });
-
-                // Listen for Stats
-                this.qRef.onSnapshot(snap => {
-                    const all = snap.docs.map(d => d.data());
-                    const wait = document.getElementById('stat-wait');
-                    const done = document.getElementById('stat-done');
-                    if(wait) wait.innerText = all.filter(x => x.status === 'waiting' || x.status === 'called').length;
-                    if(done) done.innerText = all.filter(x => x.status === 'served').length;
-                });
             }
 
-            // --- RENDER: Live Queue ---
+            // --- 1. Live Queue ---
             renderLive(el) {
                 el.innerHTML = `
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                         <table class="w-full text-left border-collapse">
                             <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-bold tracking-wider">
                                 <tr>
-                                    <th class="p-5 pl-8">หมายเลขคิว</th>
-                                    <th class="p-5">ข้อมูลลูกค้า</th>
+                                    <th class="p-5 pl-8">คิว</th>
+                                    <th class="p-5">ลูกค้า</th>
                                     <th class="p-5">สถานะ</th>
-                                    <th class="p-5 text-right pr-8">จัดการ (Actions)</th>
+                                    <th class="p-5 text-right pr-8">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="tb-live" class="text-sm divide-y divide-slate-100"></tbody>
                         </table>
                         <div id="empty-live" class="hidden flex flex-col items-center justify-center p-20 text-center text-slate-400">
-                            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                                <i class="fa-solid fa-mug-hot text-3xl text-slate-300"></i>
-                            </div>
-                            <h3 class="font-bold text-lg text-slate-500">ไม่มีคิวรอในขณะนี้</h3>
-                            <p>รายการจองใหม่จะปรากฏที่นี่</p>
+                            <i class="fa-solid fa-mug-hot text-4xl mb-4 text-slate-200"></i>
+                            <h3 class="font-bold">ไม่มีคิวรอ</h3>
                         </div>
                     </div>
                 `;
 
-                // Realtime Queue List
                 this.qRef.orderBy('timestamp','asc').onSnapshot(snap => {
                     const active = snap.docs.map(d=>({id:d.id, ...d.data()})).filter(x => ['waiting','called'].includes(x.status));
                     const tb = document.getElementById('tb-live');
-                    const empty = document.getElementById('empty-live');
+                    const emp = document.getElementById('empty-live');
                     
-                    if(!tb) return; // ป้องกัน error ถ้าเปลี่ยนหน้าไปแล้ว
-
-                    if(active.length === 0) {
-                        tb.innerHTML=''; 
-                        empty.classList.remove('hidden'); 
-                        return;
-                    }
-                    empty.classList.add('hidden');
+                    if(!tb) return;
+                    if(active.length===0) { tb.innerHTML=''; emp.classList.remove('hidden'); return; }
+                    emp.classList.add('hidden');
 
                     tb.innerHTML = active.map(d => {
                         const isCall = d.status === 'called';
-                        // Safe encode for HTML attributes
                         const dataStr = encodeURIComponent(JSON.stringify(d));
                         
-                        // Dropdown Options
-                        let statusOpt = `<option value="">-- สถานะเพิ่มเติม --</option>` + 
+                        // สร้าง Options แบบสวยๆ
+                        let statusOpt = `<option value="">-- สถานะ --</option>` + 
                             this.customStatusList.map(s => `<option value="${s}" ${d.customStatus === s ? 'selected' : ''}>${s}</option>`).join('');
 
                         return `
-                            <tr class="${isCall ? 'bg-blue-50/50' : 'hover:bg-slate-50'} transition group border-l-4 ${isCall ? 'border-l-blue-500' : 'border-l-transparent'}">
-                                <td class="p-5 pl-6">
-                                    <span class="text-3xl font-black ${isCall?'text-blue-600':'text-slate-700'} tracking-tight">${d.number}</span>
-                                </td>
+                            <tr class="${isCall ? 'bg-blue-50/50' : 'hover:bg-slate-50'} transition border-l-4 ${isCall ? 'border-l-blue-500' : 'border-l-transparent'}">
+                                <td class="p-5 pl-6"><span class="text-3xl font-black ${isCall?'text-blue-600':'text-slate-700'} tracking-tight">${d.number}</span></td>
                                 <td class="p-5">
                                     <div class="font-bold text-slate-800 text-lg">${d.name}</div>
-                                    <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 font-medium">
-                                        <span class="bg-slate-100 px-2 py-1 rounded"><i class="fa-solid fa-user-group"></i> ${d.pax} ท่าน</span>
-                                        <span class="bg-slate-100 px-2 py-1 rounded"><i class="fa-regular fa-clock"></i> ${d.arrivalTime}</span>
-                                    </div>
+                                    <div class="text-xs text-slate-500 mt-1 font-medium"><i class="fa-solid fa-user-group"></i> ${d.pax} ท่าน • ${d.arrivalTime}</div>
                                 </td>
-                                
                                 <td class="p-5">
-                                    <div class="flex flex-col gap-2 max-w-[160px]">
+                                    <div class="flex flex-col gap-2 max-w-[180px]">
                                         ${isCall 
-                                            ? '<span class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold text-center animate-pulse"><i class="fa-solid fa-bullhorn"></i> กำลังเรียก...</span>' 
-                                            : '<span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold text-center">รอเรียก</span>'}
+                                            ? '<span class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold text-center animate-pulse"><i class="fa-solid fa-bullhorn"></i> กำลังเรียก...</span>' 
+                                            : '<span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold text-center">รอเรียก</span>'}
                                         
                                         ${this.customStatusList.length > 0 ? `
-                                        <select onchange="window.Admin.updateCustomStatus('${d.id}', this.value)" 
-                                            class="p-2 border border-slate-200 rounded-lg text-xs bg-white text-slate-700 outline-none font-medium focus:border-blue-500 cursor-pointer hover:bg-slate-50">
-                                            ${statusOpt}
-                                        </select>` : ''}
+                                        <div class="relative">
+                                            <select onchange="window.Admin.updateCustomStatus('${d.id}', this.value)" 
+                                                class="custom-select w-full p-2 pl-3 pr-8 border border-slate-300 rounded-lg text-xs bg-white text-slate-700 font-bold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none cursor-pointer transition shadow-sm hover:border-blue-400">
+                                                ${statusOpt}
+                                            </select>
+                                        </div>` : ''}
                                     </div>
                                 </td>
-
                                 <td class="p-5 text-right pr-8">
-                                    <div class="flex justify-end items-center gap-2">
-                                        <button onclick="window.Admin.call('${d.id}','${d.number}','${d.name}',${isCall})" 
-                                            class="btn-action ${isCall ? 'btn-recall' : 'btn-call'}" title="แจ้งเตือนเสียง">
-                                            <i class="fa-solid ${isCall?'fa-rotate-right':'fa-bullhorn'}"></i> 
-                                            ${isCall ? 'เรียกซ้ำ' : 'เรียกคิว'}
+                                    <div class="flex justify-end gap-2">
+                                        <button onclick="window.Admin.call('${d.id}','${d.number}','${d.name}',${isCall})" class="btn-action ${isCall?'btn-recall':'btn-call'}">
+                                            <i class="fa-solid ${isCall?'fa-rotate-right':'fa-bullhorn'}"></i> ${isCall?'เรียกซ้ำ':'เรียก'}
                                         </button>
-                                        
-                                        <button onclick="window.Admin.viewData('${dataStr}')" class="btn-action btn-view" title="ดูรายละเอียด">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        
-                                        <button onclick="window.Admin.serve('${d.id}')" class="btn-action btn-done" title="จบงาน">
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-
-                                        <button onclick="window.Admin.cancel('${d.id}')" class="btn-action btn-cancel" title="ยกเลิกคิว">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
+                                        <button onclick="window.Admin.viewData('${dataStr}')" class="btn-action btn-view"><i class="fa-solid fa-eye"></i></button>
+                                        <button onclick="window.Admin.serve('${d.id}')" class="btn-action btn-done"><i class="fa-solid fa-check"></i></button>
+                                        <button onclick="window.Admin.cancel('${d.id}')" class="btn-action btn-cancel"><i class="fa-solid fa-xmark"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -299,266 +219,194 @@
                 });
             }
 
-            // --- RENDER: History ---
+            // --- 2. History (Fixed: Client-side Filter) ---
             renderHistory(el) {
                 el.innerHTML = `
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-100 bg-slate-50 flex justify-between items-center">
-                            <h3 class="font-bold text-slate-700">ประวัติคิวล่าสุด (50 รายการ)</h3>
-                            <button onclick="Router('live')" class="text-xs font-bold text-blue-600 hover:underline">กลับไปหน้าหลัก</button>
+                            <h3 class="font-bold text-slate-700">ประวัติคิวล่าสุด (100 รายการ)</h3>
                         </div>
-                        <div id="hist-list" class="divide-y divide-gray-100">
-                            <div class="p-8 text-center text-gray-400">กำลังโหลดข้อมูล...</div>
+                        <div id="hist-list" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+                            <div class="p-8 text-center text-gray-400"><i class="fa-solid fa-circle-notch fa-spin"></i> กำลังโหลด...</div>
                         </div>
                     </div>
                 `;
-                this.qRef.where('status','in',['served','cancelled']).orderBy('timestamp','desc').limit(50).get().then(snap => {
+                
+                // ดึง 100 รายการล่าสุด แล้วกรองเอาเฉพาะ served/cancelled เพื่อแก้ปัญหา Index
+                this.qRef.orderBy('timestamp', 'desc').limit(100).get().then(snap => {
                     const list = document.getElementById('hist-list');
-                    if(snap.empty) {
-                        list.innerHTML = '<div class="p-8 text-center text-gray-400">ยังไม่มีประวัติการให้บริการ</div>';
-                        return;
-                    }
-                    list.innerHTML = snap.docs.map(d => {
-                        const dat = d.data();
-                        const isServed = dat.status === 'served';
+                    if(snap.empty) { list.innerHTML = '<div class="p-8 text-center text-gray-400">ไม่มีประวัติ</div>'; return; }
+
+                    const items = snap.docs.map(d => d.data()).filter(d => ['served','cancelled'].includes(d.status));
+                    
+                    if(items.length === 0) { list.innerHTML = '<div class="p-8 text-center text-gray-400">ยังไม่มีคิวที่จบงาน</div>'; return; }
+
+                    list.innerHTML = items.map(d => {
+                        const isDone = d.status === 'served';
+                        const badge = isDone ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+                        const icon = isDone ? 'fa-check' : 'fa-ban';
                         return `
                             <div class="flex justify-between items-center p-4 hover:bg-slate-50 transition">
                                 <div class="flex items-center gap-4">
-                                    <span class="font-black text-xl text-slate-700 w-20">${dat.number}</span>
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600 border border-slate-200">${d.number.replace(/[A-Z]-?/,'')}</div>
                                     <div>
-                                        <div class="font-bold text-slate-700 text-sm">${dat.name}</div>
-                                        <div class="text-xs text-slate-400">${dat.arrivalTime}</div>
+                                        <div class="font-bold text-slate-800 text-sm"><span class="text-blue-600">${d.prefix||''}</span>${d.number.replace(d.prefix||'','')} - ${d.name}</div>
+                                        <div class="text-xs text-slate-400">${d.arrivalTime}</div>
                                     </div>
                                 </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${isServed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                                    ${isServed ? '<i class="fa-solid fa-check mr-1"></i> เสร็จสิ้น' : '<i class="fa-solid fa-ban mr-1"></i> ยกเลิก'}
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase ${badge} flex items-center gap-1">
+                                    <i class="fa-solid ${icon}"></i> ${d.status}
                                 </span>
                             </div>`;
                     }).join('');
                 });
             }
 
-            // --- RENDER: Settings ---
+            // --- 3. Settings (New: Tag Input System) ---
             renderSetting(el) {
+                // โหลดค่าปัจจุบันเข้าตัวแปรชั่วคราว
+                this.tempStatusList = [...this.customStatusList];
+
                 el.innerHTML = `
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-xl mb-6 text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-store text-blue-600"></i> ข้อมูลร้านค้า
-                            </h3>
+                            <h3 class="font-bold text-xl mb-6 text-slate-800"><i class="fa-solid fa-store text-blue-600 mr-2"></i> ข้อมูลร้านค้า</h3>
                             <div class="space-y-5">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-500 mb-2">ชื่อร้าน / หัวข้อ</label>
-                                    <input id="set-name" class="w-full p-3 border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="เช่น คลินิกทันตกรรม...">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-500 mb-2">ตัวย่อคิว (Prefix)</label>
-                                    <input id="set-prefix" class="w-full p-3 border border-slate-300 rounded-xl font-bold text-blue-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="เช่น A-, Q-, VIP-">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-500 mb-2">ประกาศตัววิ่ง (Marquee)</label>
-                                    <textarea id="set-ann" rows="3" class="w-full p-3 border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition" placeholder="พิมพ์ข้อความที่ต้องการแจ้งลูกค้า..."></textarea>
-                                </div>
+                                <input id="set-name" class="w-full p-3 border rounded-xl bg-slate-50" placeholder="ชื่อร้าน">
+                                <input id="set-prefix" class="w-full p-3 border rounded-xl bg-slate-50 font-bold text-blue-600" placeholder="Prefix (e.g. A-)">
+                                <textarea id="set-ann" rows="3" class="w-full p-3 border rounded-xl bg-slate-50" placeholder="ประกาศวิ่ง..."></textarea>
                             </div>
                         </div>
 
                         <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-xl mb-6 text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-gear text-slate-600"></i> ตั้งค่าระบบ
-                            </h3>
-                            <div class="space-y-5">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-500 mb-2">รายการสถานะ (Custom Status)</label>
-                                    <p class="text-xs text-slate-400 mb-2">คั่นด้วยลูกน้ำ (,) เช่น: รอคิว, กำลังปรุง, รอเสิร์ฟ</p>
-                                    <textarea id="set-status-list" rows="2" class="w-full p-3 border border-indigo-200 bg-indigo-50 text-indigo-700 font-bold rounded-xl focus:border-indigo-500 outline-none transition"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-500 mb-2">รูปแบบเสียงเรียก (Voice Pattern)</label>
-                                    <input id="set-voice" class="w-full p-3 border border-yellow-200 bg-yellow-50 text-slate-700 rounded-xl focus:border-yellow-500 outline-none transition" placeholder="เชิญหมายเลข {queue} ค่ะ">
-                                </div>
-                                <div class="pt-4">
-                                    <button onclick="window.Admin.saveSet()" class="w-full py-4 bg-blue-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-xl transition transform active:scale-95">
-                                        <i class="fa-solid fa-save mr-2"></i> บันทึกการตั้งค่าทั้งหมด
-                                    </button>
+                            <h3 class="font-bold text-xl mb-6 text-slate-800"><i class="fa-solid fa-list-ul text-indigo-600 mr-2"></i> ตั้งค่าสถานะ</h3>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-slate-500 mb-2">เพิ่มสถานะใหม่ (พิมพ์แล้วกด +)</label>
+                                <div class="flex gap-2">
+                                    <input id="input-new-status" type="text" class="flex-1 p-3 border border-indigo-200 rounded-xl bg-indigo-50 focus:border-indigo-500 outline-none transition" placeholder="เช่น กำลังปรุง, รอเสิร์ฟ">
+                                    <button onclick="window.Admin.addStatusFromInput()" class="px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition"><i class="fa-solid fa-plus"></i></button>
                                 </div>
                             </div>
+
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 min-h-[100px]">
+                                <div id="status-tags-container" class="flex flex-wrap">
+                                    </div>
+                                <div id="no-tags-msg" class="text-xs text-slate-400 text-center mt-2 hidden">ไม่มีสถานะพิเศษ</div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <label class="block text-sm font-bold text-slate-500 mb-2">เสียงเรียก</label>
+                                <input id="set-voice" class="w-full p-3 border border-yellow-200 rounded-xl bg-yellow-50" placeholder="เชิญหมายเลข {queue} ค่ะ">
+                            </div>
+
+                            <button onclick="window.Admin.saveSet()" class="w-full py-4 bg-blue-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-blue-700 mt-6 transition transform active:scale-95">บันทึกการตั้งค่า</button>
                         </div>
                     </div>
                 `;
-                
-                // Load Current Data
+
+                // Load Initial Data
                 this.configRef.get().then(d => {
                     if(d.exists) {
                         const dat = d.data();
                         document.getElementById('set-name').value = dat.shopName||'';
                         document.getElementById('set-prefix').value = dat.queuePrefix||'A-';
                         document.getElementById('set-ann').value = dat.announceText||'';
-                        document.getElementById('set-status-list').value = (dat.statusList||[]).join(', ');
                         document.getElementById('set-voice').value = dat.voicePattern||'';
+                        
+                        this.tempStatusList = dat.statusList || [];
+                        this.renderStatusTags(); // แสดง Tags
                     }
                 });
             }
 
-            // --- POPUP ACTIONS (Fixes Scope Issues) ---
+            // --- Helper: Status Tags Logic ---
+            renderStatusTags() {
+                const container = document.getElementById('status-tags-container');
+                if(!container) return;
+                
+                container.innerHTML = '';
+                if(this.tempStatusList.length === 0) {
+                    document.getElementById('no-tags-msg').classList.remove('hidden');
+                } else {
+                    document.getElementById('no-tags-msg').classList.add('hidden');
+                    this.tempStatusList.forEach((st, index) => {
+                        container.innerHTML += `
+                            <div class="status-tag animate__animated animate__fadeIn">
+                                ${st}
+                                <button onclick="window.Admin.removeStatus(${index})"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            addStatusFromInput() {
+                const input = document.getElementById('input-new-status');
+                const val = input.value.trim();
+                if(val && !this.tempStatusList.includes(val)) {
+                    this.tempStatusList.push(val);
+                    this.renderStatusTags();
+                    input.value = '';
+                    input.focus();
+                }
+            }
+
+            removeStatus(index) {
+                this.tempStatusList.splice(index, 1);
+                this.renderStatusTags();
+            }
+
+            // --- Actions ---
+            toggleShop(isOpen) { this.configRef.update({isShopOpen:isOpen}); }
+            
+            call(id, num, name, isRecall) {
+                const msg = this.voiceTemp.replace('{queue}', num.split('').join(' ')).replace('{name}', name);
+                this.qRef.doc(id).update({status:'called', lastCallTime:Date.now(), voiceMessage:msg});
+                if(!isRecall) this.configRef.update({current:num});
+                this.speak(msg);
+            }
+            
+            serve(id) { this.qRef.doc(id).update({status:'served'}); }
+            cancel(id) { Swal.fire({title:'ยกเลิกคิว?', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'}).then(r=>{if(r.isConfirmed) this.qRef.doc(id).update({status:'cancelled'})}); }
+            updateCustomStatus(id, val) { this.qRef.doc(id).update({customStatus:val}); }
+            
             viewData(jsonStr) {
                 const d = JSON.parse(decodeURIComponent(jsonStr));
                 Swal.fire({
                     title: `<div class="text-blue-600 text-5xl font-black mt-2">${d.number}</div>`,
                     html: `
-                        <div class="bg-slate-50 p-6 rounded-2xl text-left space-y-4 mb-6 border border-slate-100 shadow-inner">
-                            <div class="flex justify-between border-b border-slate-200 pb-2">
-                                <span class="text-slate-400 font-bold text-sm">ชื่อลูกค้า</span> 
-                                <span class="text-slate-800 font-bold text-lg">${d.name}</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-200 pb-2">
-                                <span class="text-slate-400 font-bold text-sm">เบอร์โทร</span> 
-                                <span class="text-slate-800 font-bold">${d.phone || '-'}</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-200 pb-2">
-                                <span class="text-slate-400 font-bold text-sm">จำนวนคน</span> 
-                                <span class="text-slate-800 font-bold"><i class="fa-solid fa-user-group mr-1"></i> ${d.pax}</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-200 pb-2">
-                                <span class="text-slate-400 font-bold text-sm">เวลาจอง</span> 
-                                <span class="text-blue-600 font-bold">${d.arrivalTime}</span>
-                            </div>
+                        <div class="bg-slate-50 p-5 rounded-xl text-left space-y-3 mb-6 border border-slate-100">
+                            <div class="flex justify-between border-b pb-2"><span class="font-bold text-slate-400">ชื่อ</span> <span class="font-bold text-slate-800">${d.name}</span></div>
+                            <div class="flex justify-between border-b pb-2"><span class="font-bold text-slate-400">เบอร์</span> <span>${d.phone||'-'}</span></div>
+                            <div class="flex justify-between border-b pb-2"><span class="font-bold text-slate-400">จำนวน</span> <span>${d.pax} ท่าน</span></div>
+                            <div class="flex justify-between border-b pb-2"><span class="font-bold text-slate-400">เวลา</span> <span class="text-blue-600 font-bold">${d.arrivalTime}</span></div>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="window.Admin.call('${d.id}','${d.number}','${d.name}',false); Swal.close();" 
-                                class="py-3 bg-blue-100 text-blue-700 font-bold rounded-xl hover:bg-blue-200 transition">
-                                <i class="fa-solid fa-bullhorn"></i> เรียกคิว
-                            </button>
-                            <button onclick="window.Admin.serve('${d.id}'); Swal.close();" 
-                                class="py-3 bg-green-100 text-green-700 font-bold rounded-xl hover:bg-green-200 transition">
-                                <i class="fa-solid fa-check"></i> จบงาน
-                            </button>
-                            <button onclick="window.Admin.moveToEnd('${d.id}','${d.number}'); Swal.close();" 
-                                class="py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition">
-                                <i class="fa-solid fa-arrow-down"></i> ย้ายไปท้ายสุด
-                            </button>
-                            <button onclick="window.Admin.printTicket('${d.number}','${d.name}','${d.pax}');" 
-                                class="py-3 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">
-                                <i class="fa-solid fa-print"></i> พิมพ์บัตร
-                            </button>
-                        </div>
-                    `,
-                    showConfirmButton: false, 
-                    showCloseButton: true,
-                    width: '400px',
-                    padding: '2em',
-                    customClass: { popup: 'rounded-3xl' }
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="window.Admin.call('${d.id}','${d.number}','${d.name}',false); Swal.close();" class="py-3 bg-blue-100 text-blue-700 font-bold rounded-lg">เรียกคิว</button>
+                            <button onclick="window.Admin.serve('${d.id}'); Swal.close();" class="py-3 bg-green-100 text-green-700 font-bold rounded-lg">จบงาน</button>
+                        </div>`,
+                    showConfirmButton: false, showCloseButton: true
                 });
-            }
-
-            printTicket(num, name, pax) {
-                const win = window.open('', '', 'width=350,height=450');
-                win.document.write(`
-                    <html>
-                        <body style="font-family:sans-serif; text-align:center; padding:20px;">
-                            <h3 style="margin:0;">บัตรคิว</h3>
-                            <h1 style="font-size:3.5rem; margin:10px 0; font-weight:800;">${num}</h1>
-                            <div style="font-size:1.2rem; margin-bottom:5px;"><b>${name}</b></div>
-                            <div style="font-size:1rem;">จำนวน: ${pax}</div>
-                            <div style="border-top:1px dashed #000; margin:20px 0;"></div>
-                            <div style="font-size:0.8rem; color:#555;">${new Date().toLocaleString()}</div>
-                            <script>window.print(); window.close();<\/script>
-                        </body>
-                    </html>
-                `);
-            }
-
-            // --- CORE LOGIC (Exposed to Window) ---
-            
-            toggleShop(isOpen) { 
-                this.configRef.update({ isShopOpen: isOpen }).then(() => {
-                    const msg = isOpen ? 'เปิดร้านรับคิวแล้ว' : 'ปิดร้านแล้ว (หยุดรับคิว)';
-                    const icon = isOpen ? 'success' : 'warning';
-                    Swal.fire({toast: true, position: 'top-end', icon: icon, title: msg, timer: 2000, showConfirmButton: false});
-                });
-            }
-
-            call(id, num, name, isRecall) {
-                // Prepare Voice Message
-                const msg = this.voiceTemp.replace('{queue}', num.split('').join(' ')).replace('{name}', name);
-                
-                this.qRef.doc(id).update({
-                    status: 'called', 
-                    lastCallTime: Date.now(), 
-                    voiceMessage: msg
-                });
-                
-                if(!isRecall) this.configRef.update({ current: num });
-                
-                this.speak(msg);
-                
-                // Toast Feedback
-                Swal.fire({toast: true, position: 'top-end', icon: 'success', title: isRecall ? `เรียกซ้ำ ${num}` : `เรียกคิว ${num}`, timer: 1500, showConfirmButton: false});
-            }
-
-            serve(id) { 
-                this.qRef.doc(id).update({ status: 'served' }); 
-            }
-
-            cancel(id) { 
-                Swal.fire({
-                    title: 'ยืนยันยกเลิก?', 
-                    text: "คิวนี้จะถูกยกเลิกทันที", 
-                    icon: 'warning', 
-                    showCancelButton: true, 
-                    confirmButtonColor: '#ef4444', 
-                    confirmButtonText: 'ใช่, ยกเลิก'
-                }).then(r => {
-                    if(r.isConfirmed) this.qRef.doc(id).update({ status: 'cancelled' });
-                });
-            }
-
-            moveToEnd(id, num) { 
-                Swal.fire({
-                    title: `ย้าย ${num} ไปท้ายแถว?`, 
-                    text: "สถานะจะเปลี่ยนเป็น รอเรียก (Waiting)", 
-                    icon: 'question', 
-                    showCancelButton: true,
-                    confirmButtonText: 'ย้ายเลย'
-                }).then(r => {
-                    if(r.isConfirmed) this.qRef.doc(id).update({ 
-                        status: 'waiting', 
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-                    });
-                });
-            }
-
-            updateCustomStatus(id, val) { 
-                this.qRef.doc(id).update({ customStatus: val }); 
             }
 
             saveSet() {
-                const st = document.getElementById('set-status-list').value.split(',').map(s=>s.trim()).filter(s=>s!=='');
                 this.configRef.update({
                     shopName: document.getElementById('set-name').value,
                     queuePrefix: document.getElementById('set-prefix').value,
                     announceText: document.getElementById('set-ann').value,
-                    statusList: st,
-                    voicePattern: document.getElementById('set-voice').value
-                }).then(()=> Swal.fire('บันทึกสำเร็จ', 'การตั้งค่าถูกอัปเดตแล้ว', 'success'));
+                    voicePattern: document.getElementById('set-voice').value,
+                    statusList: this.tempStatusList // Save array directly
+                }).then(()=>Swal.fire('บันทึกสำเร็จ','','success'));
             }
 
             resetSystem() {
-                Swal.fire({
-                    title: 'รีเซ็ตระบบรายวัน?', 
-                    text: "คิวทั้งหมดจะถูกลบ! ไม่สามารถกู้คืนได้", 
-                    icon: 'error', 
-                    showCancelButton: true, 
-                    confirmButtonColor: '#dc2626', 
-                    confirmButtonText: 'ยืนยัน รีเซ็ต!'
-                }).then(async r => {
+                Swal.fire({title:'รีเซ็ตระบบ?', text:'ลบข้อมูลทั้งหมด', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'}).then(async r=>{
                     if(r.isConfirmed) {
-                        await this.configRef.update({ current: '---', last: 0 });
+                        await this.configRef.update({current:'---', last:0});
                         const s = await this.qRef.get();
-                        const b = db.batch(); 
-                        s.docs.forEach(d => b.delete(d.ref)); 
-                        await b.commit();
-                        Swal.fire('รีเซ็ตเรียบร้อย', 'ระบบพร้อมสำหรับวันใหม่', 'success');
+                        const b = db.batch(); s.docs.forEach(d=>b.delete(d.ref)); await b.commit();
+                        Swal.fire('รีเซ็ตแล้ว','','success');
                     }
                 });
             }
@@ -573,13 +421,10 @@
             }
         }
 
-        // --- 3. Global Router & Init ---
-        
-        // Define Router in Window Scope
+        // --- Router ---
         window.Router = function(p) {
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             document.getElementById(`nav-${p}`).classList.add('active');
-            
             const el = document.getElementById('content-area');
             if(window.Admin) {
                 if(p==='live') window.Admin.renderLive(el);
@@ -588,13 +433,7 @@
             }
         };
 
-        // Initialize App & Expose to Window
-        window.onload = function() {
-            window.Admin = new AdminApp();
-            // Default Page
-            window.Router('live');
-        };
-
+        window.onload = function() { window.Admin = new AdminApp(); window.Router('live'); };
     </script>
 </body>
 </html>
