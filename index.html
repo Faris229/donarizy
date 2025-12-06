@@ -2,761 +2,221 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HubFu Admin - Enterprise Console</title>
-    
+    <title>FF Queue - Admin Controller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Kanit:wght@300;400;500;600&display=swap');
-        
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background-color: #f8fafc; /* พื้นหลังสีขาวเทา */
-            color: #1e293b; /* ตัวหนังสือสีเข้ม */
-            overflow: hidden; 
-        }
-
-        /* Smooth Scrollbar */
-        .smooth-scroll { overflow-y: auto; scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* UI Components */
-        .sidebar-link {
-            transition: all 0.2s ease;
-            border-right: 3px solid transparent;
-            color: #64748b;
-        }
-        .sidebar-link:hover, .sidebar-link.active {
-            background: #f1f5f9;
-            color: #0f172a;
-            border-right-color: #0f172a;
-            font-weight: 600;
-        }
-        
-        .card-white {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border-radius: 1rem;
-        }
-
-        .btn-primary {
-            background-color: #0f172a; /* สีดำด้าน */
-            color: white;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .btn-primary:hover {
-            background-color: #1e293b;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-success { background-color: #10b981; color: white; }
-        .btn-success:hover { background-color: #059669; }
-
-        .btn-danger { background-color: #ef4444; color: white; }
-        .btn-danger:hover { background-color: #dc2626; }
-
-        /* Animation */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-    </style>
 </head>
-<body class="flex h-screen">
+<body class="bg-gray-900 text-white h-screen flex">
 
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20 shadow-sm">
-        <div class="h-20 flex items-center px-8 border-b border-gray-100">
-            <div class="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center text-xl font-bold mr-3 shadow-lg">HF</div>
-            <div>
-                <h1 class="font-bold text-lg tracking-tight text-slate-800">HubFu <span class="text-blue-600 text-xs uppercase">Admin</span></h1>
-            </div>
-        </div>
-
-        <nav class="flex-1 py-6 space-y-1 overflow-y-auto px-4">
-            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Main</p>
-            <button onclick="router('dashboard')" id="nav-dashboard" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1 active">
-                <i class="fa-solid fa-chart-pie w-5 mr-3"></i> ภาพรวมระบบ
-            </button>
-
-            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Store</p>
-            <button onclick="router('products')" id="nav-products" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1">
-                <i class="fa-solid fa-box-open w-5 mr-3"></i> จัดการสินค้า
-            </button>
-            <button onclick="router('rentals')" id="nav-rentals" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1 justify-between">
-                <div class="flex items-center"><i class="fa-solid fa-list-check w-5 mr-3"></i> รายการเช่า</div>
-                <span id="badge-rentals" class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
-
-            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Users & Finance</p>
-            <button onclick="router('users')" id="nav-users" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1">
-                <i class="fa-solid fa-users w-5 mr-3"></i> ผู้ใช้งาน
-            </button>
-            <button onclick="router('finance')" id="nav-finance" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1 justify-between">
-                <div class="flex items-center"><i class="fa-solid fa-wallet w-5 mr-3"></i> อนุมัติเติมเงิน</div>
-                <span id="badge-topup" class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
-            <button onclick="router('chat')" id="nav-chat" class="sidebar-link w-full flex items-center px-4 py-3 text-sm rounded-lg mb-1">
-                <i class="fa-solid fa-comments w-5 mr-3"></i> แชทซัพพอร์ต
-            </button>
-        </nav>
-
-        <div class="p-4 border-t border-gray-100 bg-slate-50">
-            <div class="flex items-center">
-                <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-user-shield"></i></div>
-                <div class="ml-3 overflow-hidden">
-                    <p class="text-sm font-bold text-slate-700 truncate">Administrator</p>
-                    <p class="text-[10px] text-slate-500 truncate" id="admin-email-display">Connecting...</p>
-                </div>
-                <button onclick="auth.signOut()" class="ml-auto text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-right-from-bracket"></i></button>
-            </div>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-screen relative bg-[#f8fafc]">
+    <div class="w-96 bg-gray-800 p-6 border-r border-gray-700 flex flex-col">
+        <h1 class="text-2xl font-bold mb-6 text-yellow-400">ADMIN CONTROL</h1>
         
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-200 flex justify-between items-center px-8 sticky top-0 z-10">
-            <div>
-                <h2 id="page-title" class="text-2xl font-bold text-slate-800">Dashboard</h2>
-                <p id="page-desc" class="text-xs text-slate-400">ภาพรวมและสถิติระบบ</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-100">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    System Online
-                </div>
-            </div>
-        </header>
+        <div class="bg-gray-700 p-4 rounded-xl mb-6">
+            <h3 class="font-bold mb-3"><i class="fa-solid fa-user-plus"></i> เพิ่มผู้เล่นใหม่</h3>
+            <input id="p-name" type="text" placeholder="ชื่อในเกม" class="w-full bg-gray-900 border border-gray-600 rounded p-2 mb-2 text-white">
+            <input id="p-donate" type="number" placeholder="ยอดโดเนท (บาท)" class="w-full bg-gray-900 border border-gray-600 rounded p-2 mb-3 text-white">
+            <button onclick="addPlayer()" class="w-full bg-green-600 hover:bg-green-500 py-2 rounded font-bold">ลงทะเบียน</button>
+        </div>
 
-        <div id="app-content" class="flex-1 smooth-scroll p-8 relative">
+        <div class="bg-gray-700 p-4 rounded-xl flex-1">
+            <h3 class="font-bold mb-3 border-b border-gray-600 pb-2">🎮 ควบคุมการแข่ง</h3>
+            
+            <div class="mb-4">
+                <div class="text-xs text-gray-400">KING (แชมป์)</div>
+                <div id="ctrl-king" class="text-xl font-bold text-red-400 mb-2">Wait...</div>
+                
+                <div class="text-xs text-gray-400">CHALLENGER (ผู้ท้าชิง)</div>
+                <div id="ctrl-challenger" class="text-xl font-bold text-blue-400">Wait...</div>
             </div>
 
-    </main>
-
-    <div id="modal-login" class="fixed inset-0 z-50 bg-white flex items-center justify-center hidden">
-        <div class="bg-white p-10 rounded-3xl w-full max-w-md shadow-2xl border border-gray-100 text-center">
-            <div class="w-16 h-16 bg-black text-white rounded-2xl mx-auto mb-6 flex items-center justify-center text-3xl font-bold shadow-lg">HF</div>
-            <h2 class="text-3xl font-bold text-slate-800 mb-2">Admin Portal</h2>
-            <p class="text-slate-400 mb-8">กรุณายืนยันตัวตนเพื่อเข้าสู่ระบบจัดการ</p>
-            <button onclick="handleAdminLogin()" class="w-full btn-primary py-4 rounded-xl font-bold text-lg">
-                เข้าสู่ระบบ (Secure Login)
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <button onclick="setWinner('king')" class="bg-red-600 hover:bg-red-500 py-4 rounded-lg font-bold">
+                    👑 King Win
+                </button>
+                <button onclick="setWinner('challenger')" class="bg-blue-600 hover:bg-blue-500 py-4 rounded-lg font-bold">
+                    ⚔️ Challenger Win
+                </button>
+            </div>
+            
+            <button onclick="forceNextMatch()" class="w-full bg-gray-600 hover:bg-gray-500 py-2 rounded mt-4 text-sm">
+                <i class="fa-solid fa-forward"></i> บังคับเริ่มคู่ถัดไป (ถ้าว่าง)
             </button>
         </div>
     </div>
 
-    <div id="modal-product" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-slate-800 text-lg">เพิ่มสินค้าใหม่</h3>
-                <button onclick="closeModal('modal-product')" class="text-slate-400 hover:text-black"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อสินค้า / เกม</label>
-                    <input id="prod-name" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 focus:outline-none focus:border-black transition">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">ราคา (บาท/ชม.)</label>
-                        <input id="prod-price" type="number" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 focus:outline-none focus:border-black transition">
-                    </div>
-                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">สถานะ</label>
-                        <select id="prod-status" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3">
-                            <option value="available">พร้อมเช่า (Available)</option>
-                            <option value="busy">ไม่ว่าง (Busy)</option>
-                            <option value="maintenance">ปิดปรับปรุง</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ลิงก์รูปภาพ (URL)</label>
-                    <input id="prod-img" type="text" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 focus:outline-none focus:border-black transition">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รายละเอียด</label>
-                    <textarea id="prod-desc" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 h-24 focus:outline-none focus:border-black transition"></textarea>
-                </div>
-                <div class="pt-2 flex gap-3">
-                    <button onclick="saveProduct()" class="flex-1 btn-primary py-3 rounded-xl font-bold">บันทึกสินค้า</button>
-                    <button onclick="closeModal('modal-product')" class="flex-1 bg-white border border-gray-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-gray-50">ยกเลิก</button>
-                </div>
-            </div>
+    <div class="flex-1 p-6 overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">รายการคิวรอเล่น (Waiting List)</h2>
+        <div class="overflow-hidden rounded-xl border border-gray-700">
+            <table class="w-full text-left bg-gray-800">
+                <thead class="bg-gray-900 text-gray-400">
+                    <tr>
+                        <th class="p-3">#</th>
+                        <th class="p-3">ชื่อ</th>
+                        <th class="p-3">โดเนท</th>
+                        <th class="p-3 text-right">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-queue-list" class="divide-y divide-gray-700">
+                    </tbody>
+            </table>
         </div>
-    </div>
-
-    <div id="modal-user" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl animate-fade-in">
-            <div class="p-6 text-center">
-                <div class="w-20 h-20 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                    <i class="fa-solid fa-user text-3xl text-slate-400"></i>
-                </div>
-                <h3 id="edit-user-email-display" class="text-xl font-bold text-slate-800">user@example.com</h3>
-                <p class="text-sm text-slate-400 mb-6">UID: <span id="edit-user-id-display">...</span></p>
-                
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Current Balance</p>
-                    <p id="edit-user-balance-display" class="text-3xl font-bold text-green-600 my-2">฿0.00</p>
-                    <div class="flex gap-2 justify-center mt-3">
-                        <button onclick="adjustBalance('add')" class="bg-green-100 text-green-700 px-4 py-1 rounded-lg text-xs font-bold hover:bg-green-200"><i class="fa-solid fa-plus"></i> เพิ่มเงิน</button>
-                        <button onclick="adjustBalance('remove')" class="bg-red-100 text-red-700 px-4 py-1 rounded-lg text-xs font-bold hover:bg-red-200"><i class="fa-solid fa-minus"></i> ลดเงิน</button>
-                    </div>
-                </div>
-
-                <input type="hidden" id="edit-user-id">
-                <button onclick="closeModal('modal-user')" class="w-full bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200">ปิดหน้าต่าง</button>
-            </div>
-        </div>
+        
+        <h2 class="text-2xl font-bold mt-8 mb-4">ประวัติการเล่น (History)</h2>
+        <div id="history-list" class="space-y-2 text-gray-400 text-sm"></div>
     </div>
 
     <script>
-        // 1. CONFIGURATION (ใช้ Config เดียวกับหน้าลูกค้า)
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
             projectId: "hubfu-c4296",
             storageBucket: "hubfu-c4296.firebasestorage.app",
             messagingSenderId: "864674622740",
-            appId: "1:864674622740:web:3131798892e0e63e12a601",
-            measurementId: "G-PDB6KGDJYB"
+            appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
-        const rtdb = firebase.database();
-        
-        const ADMIN_EMAIL = 'farisxuma1@gmail.com';
-        let activeChatId = null;
 
-        // 2. AUTHENTICATION
-        auth.onAuthStateChanged(user => {
-            if(user && user.email === ADMIN_EMAIL) {
-                document.getElementById('modal-login').classList.add('hidden');
-                document.getElementById('admin-email-display').innerText = user.email;
-                initApp();
-            } else {
-                document.getElementById('modal-login').classList.remove('hidden');
-                if(user) {
-                    Swal.fire('Access Denied', 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้', 'error').then(() => auth.signOut());
-                }
-            }
+        // --- Data Listeners ---
+        
+        // Load Queue
+        db.collection('arena_queue').where('status', '==', 'waiting')
+          .orderBy('donate', 'desc').orderBy('timestamp', 'asc')
+          .onSnapshot(snap => {
+              const tb = document.getElementById('admin-queue-list');
+              tb.innerHTML = '';
+              snap.docs.forEach((doc, idx) => {
+                  const d = doc.data();
+                  tb.innerHTML += `
+                    <tr class="hover:bg-gray-700">
+                        <td class="p-3 font-bold text-yellow-500">${idx+1}</td>
+                        <td class="p-3 font-bold">${d.name}</td>
+                        <td class="p-3 text-green-400">฿${d.donate}</td>
+                        <td class="p-3 text-right">
+                            <button onclick="addMoney('${doc.id}', ${d.donate})" class="bg-blue-600 px-2 py-1 rounded text-xs mr-2">+เติมเงิน</button>
+                            <button onclick="deletePlayer('${doc.id}')" class="bg-red-600 px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                  `;
+              });
+          });
+
+        // Load Current Match Info for Admin
+        let kingDoc = null;
+        let chalDoc = null;
+
+        db.collection('arena_queue').where('status', '==', 'king').onSnapshot(s => {
+            if(!s.empty) { kingDoc = s.docs[0]; document.getElementById('ctrl-king').innerText = kingDoc.data().name + ` (Wins: ${kingDoc.data().wins})`; }
+            else { kingDoc = null; document.getElementById('ctrl-king').innerText = "-"; }
         });
 
-        function handleAdminLogin() {
-            Swal.fire({
-                title: 'Admin Login',
-                html: '<input id="swal-email" class="swal2-input" placeholder="Email"><input id="swal-pass" type="password" class="swal2-input" placeholder="Password">',
-                showCancelButton: true,
-                confirmButtonColor: '#0f172a',
-                preConfirm: () => {
-                    return [document.getElementById('swal-email').value, document.getElementById('swal-pass').value]
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    auth.signInWithEmailAndPassword(result.value[0], result.value[1])
-                        .catch(err => Swal.fire('Error', err.message, 'error'));
-                }
-            });
-        }
+        db.collection('arena_queue').where('status', '==', 'challenger').onSnapshot(s => {
+            if(!s.empty) { chalDoc = s.docs[0]; document.getElementById('ctrl-challenger').innerText = chalDoc.data().name; }
+            else { chalDoc = null; document.getElementById('ctrl-challenger').innerText = "-"; }
+        });
 
-        // 3. ROUTING & INIT
-        function initApp() {
-            router('dashboard');
-            listenBadges();
-        }
+        // Load History
+        db.collection('arena_queue').where('status', '==', 'history').orderBy('timestamp', 'desc').limit(10).onSnapshot(s => {
+            const div = document.getElementById('history-list');
+            div.innerHTML = s.docs.map(d => `<div>• ${d.data().name} (จบการแข่ง)</div>`).join('');
+        });
 
-        function router(page) {
-            // Update Sidebar UI
-            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active', 'bg-slate-100', 'text-slate-800', 'font-bold'));
-            const navBtn = document.getElementById(`nav-${page}`);
-            if(navBtn) navBtn.classList.add('active');
+        // --- Functions ---
 
-            const content = document.getElementById('app-content');
-            const title = document.getElementById('page-title');
-            const desc = document.getElementById('page-desc');
+        function addPlayer() {
+            const name = document.getElementById('p-name').value;
+            const donate = Number(document.getElementById('p-donate').value);
+            if(!name) return;
 
-            // Loading State
-            content.innerHTML = '<div class="text-center pt-20 text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i><br>Loading data...</div>';
-
-            setTimeout(() => {
-                switch(page) {
-                    case 'dashboard':
-                        title.innerText = 'Dashboard Overview';
-                        desc.innerText = 'ภาพรวมสถิติและสถานะระบบ';
-                        renderDashboard(content);
-                        break;
-                    case 'products':
-                        title.innerText = 'Product Management';
-                        desc.innerText = 'จัดการสินค้า ลงของใหม่ แก้ไขราคา';
-                        renderProducts(content);
-                        break;
-                    case 'rentals':
-                        title.innerText = 'Rental Orders';
-                        desc.innerText = 'รายการเช่าที่รออนุมัติและกำลังใช้งาน';
-                        renderRentals(content);
-                        break;
-                    case 'users':
-                        title.innerText = 'User Database';
-                        desc.innerText = 'รายชื่อผู้ใช้และจัดการยอดเงิน';
-                        renderUsers(content);
-                        break;
-                    case 'finance':
-                        title.innerText = 'Topup Requests';
-                        desc.innerText = 'รายการแจ้งโอนเงินที่รอตรวจสอบ';
-                        renderFinance(content);
-                        break;
-                    case 'chat':
-                        title.innerText = 'Support Center';
-                        desc.innerText = 'แชทสดกับลูกค้า';
-                        renderChat(content);
-                        break;
-                }
-            }, 200);
-        }
-
-        // --- MODULE 1: DASHBOARD (Fix Graph) ---
-        function renderDashboard(container) {
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
-                    <div class="card-white p-6 border-l-4 border-black">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Total Users</p>
-                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="dash-users">...</h3>
-                    </div>
-                    <div class="card-white p-6 border-l-4 border-blue-600">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Active Rentals</p>
-                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="dash-rentals">...</h3>
-                    </div>
-                    <div class="card-white p-6 border-l-4 border-red-500">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Pending Topups</p>
-                        <h3 class="text-3xl font-bold text-slate-800 mt-1" id="dash-topups">...</h3>
-                    </div>
-                    <div class="card-white p-6 border-l-4 border-green-500">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Est. Revenue</p>
-                        <h3 class="text-3xl font-bold text-slate-800 mt-1">฿12,450</h3>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-                    <div class="card-white p-6 lg:col-span-2">
-                        <h4 class="font-bold text-slate-700 mb-4">Traffic & Revenue</h4>
-                        <div class="h-64 relative w-full">
-                            <canvas id="mainChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="card-white p-6">
-                        <h4 class="font-bold text-slate-700 mb-4">Recent Activity</h4>
-                        <div class="space-y-4 text-sm" id="activity-log">
-                            <div class="flex items-center gap-3 text-slate-500"><div class="w-2 h-2 bg-green-500 rounded-full"></div> System Ready</div>
-                            </div>
-                    </div>
-                </div>
-            `;
-
-            // Load Counters
-            db.collection('users').onSnapshot(s => document.getElementById('dash-users').innerText = s.size);
-            db.collection('rentals').where('status','==','active').onSnapshot(s => document.getElementById('dash-rentals').innerText = s.size);
-            db.collection('topups').where('status','==','pending').onSnapshot(s => document.getElementById('dash-topups').innerText = s.size);
-
-            // Fix Graph Loading: Delay slightly to ensure DOM is ready
-            setTimeout(() => {
-                const ctx = document.getElementById('mainChart');
-                if(ctx) {
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                            datasets: [{
-                                label: 'Income',
-                                data: [1500, 2300, 1800, 3200, 4500, 6000, 5200],
-                                borderColor: '#0f172a',
-                                backgroundColor: 'rgba(15, 23, 42, 0.05)',
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
-                        }
-                    });
-                }
-            }, 100);
-        }
-
-        // --- MODULE 2: PRODUCTS ---
-        function renderProducts(container) {
-            container.innerHTML = `
-                <div class="flex justify-between items-center mb-6 animate-fade-in">
-                    <input type="text" placeholder="ค้นหาสินค้า..." class="bg-white border border-gray-200 rounded-lg px-4 py-2 w-64 focus:outline-none focus:border-black">
-                    <button onclick="document.getElementById('modal-product').classList.remove('hidden')" class="btn-primary px-6 py-2 rounded-lg font-bold flex items-center">
-                        <i class="fa-solid fa-plus mr-2"></i> เพิ่มสินค้า
-                    </button>
-                </div>
-                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in"></div>
-            `;
-            
-            db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snap => {
-                const grid = document.getElementById('product-grid');
-                if(!grid) return;
-                if(snap.empty) { grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">ยังไม่มีสินค้าในระบบ</div>'; return; }
-                
-                grid.innerHTML = snap.docs.map(doc => {
-                    const p = doc.data();
-                    const statusColor = p.status === 'available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-                    return `
-                        <div class="card-white overflow-hidden group hover:shadow-lg transition">
-                            <div class="h-40 overflow-hidden relative">
-                                <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                                <span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-1 rounded ${statusColor}">${p.status || 'Available'}</span>
-                            </div>
-                            <div class="p-4">
-                                <h4 class="font-bold text-slate-800 truncate">${p.name}</h4>
-                                <div class="flex justify-between items-end mt-2">
-                                    <span class="text-lg font-bold text-blue-600">฿${p.price}</span>
-                                    <button onclick="deleteProduct('${doc.id}')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            });
-        }
-
-        function saveProduct() {
-            const name = document.getElementById('prod-name').value;
-            const price = Number(document.getElementById('prod-price').value);
-            const image = document.getElementById('prod-img').value;
-            const desc = document.getElementById('prod-desc').value;
-            const status = document.getElementById('prod-status').value;
-
-            if(!name || !price) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและราคา', 'warning');
-
-            db.collection('products').add({
-                name, price, image, desc, status,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            db.collection('arena_queue').add({
+                name: name,
+                donate: donate,
+                status: 'waiting',
+                wins: 0,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                closeModal('modal-product');
-                Swal.fire('สำเร็จ', 'เพิ่มสินค้าเรียบร้อย', 'success');
-                document.getElementById('prod-name').value = ''; // Clear form
-            });
-        }
-
-        function deleteProduct(id) {
-            Swal.fire({
-                title: 'ยืนยันลบสินค้า?',
-                text: "การกระทำนี้ไม่สามารถย้อนกลับได้",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'ลบทันที'
-            }).then((res) => {
-                if(res.isConfirmed) db.collection('products').doc(id).delete();
-            });
-        }
-
-        // --- MODULE 3: RENTALS ---
-        function renderRentals(container) {
-            container.innerHTML = `
-                <div class="card-white overflow-hidden animate-fade-in">
-                    <div class="p-4 border-b border-gray-100 bg-slate-50 font-bold text-slate-700">รายการเช่า (Orders)</div>
-                    <div id="rental-list" class="divide-y divide-gray-100"></div>
-                </div>
-            `;
-            
-            db.collection('rentals').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                const list = document.getElementById('rental-list');
-                if(!list) return;
-                if(snap.empty) { list.innerHTML = '<div class="p-8 text-center text-slate-400">ไม่มีรายการเช่า</div>'; return; }
-
-                list.innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
-                    const isPending = d.status === 'pending';
-                    return `
-                        <div class="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-slate-50 transition">
-                            <div class="flex items-center gap-4 mb-2 md:mb-0 w-full md:w-auto">
-                                <div class="w-10 h-10 rounded-full ${isPending ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'} flex items-center justify-center">
-                                    <i class="fa-solid ${isPending ? 'fa-clock' : 'fa-check'}"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-slate-800">${d.productName} (${d.hours} ชม.)</div>
-                                    <div class="text-xs text-slate-500">User: ${d.userId} • <span class="font-bold text-blue-600">฿${d.cost}</span></div>
-                                </div>
-                            </div>
-                            ${isPending ? `
-                                <button onclick="sendCredentials('${doc.id}', '${d.userId}')" class="btn-primary px-4 py-2 rounded-lg text-sm font-bold shadow-md">
-                                    ส่ง ID/Pass
-                                </button>
-                            ` : `
-                                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">ส่งแล้ว</span>
-                            `}
-                        </div>
-                    `;
-                }).join('');
-            });
-        }
-
-        function sendCredentials(rentalId, userId) {
-            Swal.fire({
-                title: 'ส่งมอบสินค้า',
-                html: `
-                    <input id="swal-id" class="swal2-input" placeholder="ID / Username">
-                    <input id="swal-pass" class="swal2-input" placeholder="Password / Code">
-                `,
-                confirmButtonText: 'ส่งข้อมูลให้ลูกค้า',
-                confirmButtonColor: '#0f172a',
-                preConfirm: () => {
-                    const u = document.getElementById('swal-id').value;
-                    const p = document.getElementById('swal-pass').value;
-                    if(!u || !p) Swal.showValidationMessage('กรุณากรอกให้ครบ');
-                    return { u, p };
-                }
-            }).then((res) => {
-                if(res.isConfirmed) {
-                    // 1. ส่งเข้า Chat
-                    rtdb.ref('chats/' + userId).push({
-                        text: `[SYSTEM] จัดส่งสินค้าเรียบร้อย! \nID: ${res.value.u} \nPASS: ${res.value.p}`,
-                        sender: 'admin',
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                    });
-                    // 2. อัปเดตสถานะ
-                    db.collection('rentals').doc(rentalId).update({ status: 'active' });
-                    Swal.fire('เรียบร้อย', 'ข้อมูลถูกส่งไปทางแชทแล้ว', 'success');
-                }
-            });
-        }
-
-        // --- MODULE 4: FINANCE (Topups) ---
-        function renderFinance(container) {
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-                    <div class="card-white overflow-hidden">
-                        <div class="p-4 bg-slate-800 text-white font-bold flex justify-between">
-                            <span>รายการรอดำเนินการ (Pending)</span>
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div id="topup-list" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto"></div>
-                    </div>
-                     <div class="card-white p-6 flex flex-col items-center justify-center text-center text-slate-400">
-                        <i class="fa-solid fa-receipt text-6xl mb-4 opacity-20"></i>
-                        <h3 class="font-bold text-slate-600">Topup Center</h3>
-                        <p class="text-sm">กดที่รูปตาเพื่อดูสลิป<br>กดอนุมัติเพื่อเพิ่มเงินให้ลูกค้าอัตโนมัติ</p>
-                    </div>
-                </div>
-            `;
-            
-            db.collection('topups').where('status', '==', 'pending').onSnapshot(snap => {
-                const list = document.getElementById('topup-list');
-                if(!list) return;
-                if(snap.empty) { list.innerHTML = '<div class="p-6 text-center text-slate-400">ไม่มีรายการค้าง</div>'; return; }
+                document.getElementById('p-name').value = '';
+                document.getElementById('p-donate').value = '';
                 
-                list.innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
-                    return `
-                        <div class="p-4 hover:bg-slate-50 transition">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <span class="text-lg font-bold text-green-600">฿${d.amount}</span>
-                                    <div class="text-xs text-slate-500 truncate w-32">${d.email}</div>
-                                </div>
-                                <button onclick="Swal.fire({imageUrl: '${d.ref || "https://via.placeholder.com/300?text=No+Slip"}', showConfirmButton:false})" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-eye"></i></button>
-                            </div>
-                            <div class="text-xs text-slate-400 mb-2">Ref: ${d.ref || '-'}</div>
-                            <div class="flex gap-2">
-                                <button onclick="processTopup('${doc.id}', '${d.userId}', ${d.amount}, 'approve')" class="flex-1 btn-success py-1.5 rounded text-xs font-bold">อนุมัติ</button>
-                                <button onclick="processTopup('${doc.id}', null, 0, 'reject')" class="flex-1 btn-danger py-1.5 rounded text-xs font-bold">ปฏิเสธ</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                // Auto fill slots if empty
+                checkAndFillSlots();
             });
         }
 
-        function processTopup(docId, userId, amount, action) {
+        function addMoney(id, current) {
+            Swal.fire({
+                title: 'เพิ่มยอดโดเนท',
+                input: 'number',
+                inputLabel: 'จำนวนเงินที่เพิ่ม (บาท)',
+                inputValue: 0
+            }).then(res => {
+                if(res.isConfirmed && res.value > 0) {
+                    const add = Number(res.value);
+                    db.collection('arena_queue').doc(id).update({
+                        donate: current + add
+                    });
+                }
+            });
+        }
+
+        function deletePlayer(id) {
+            if(confirm('ลบผู้เล่นคนนี้?')) db.collection('arena_queue').doc(id).delete();
+        }
+
+        async function checkAndFillSlots() {
+            // Logic: ถ้า King ว่าง หรือ Challenger ว่าง ให้ดึง Waiting มาใส่
+            if(!kingDoc) {
+                const next = await getNextWaiting();
+                if(next) await db.collection('arena_queue').doc(next.id).update({ status: 'king', wins: 0 });
+            }
+            // Re-check challenger after slight delay (firestore sync)
+            setTimeout(async () => {
+                if(!chalDoc) {
+                    const next = await getNextWaiting();
+                    if(next) await db.collection('arena_queue').doc(next.id).update({ status: 'challenger' });
+                }
+            }, 500);
+        }
+
+        async function getNextWaiting() {
+            const snap = await db.collection('arena_queue').where('status', '==', 'waiting').orderBy('donate', 'desc').orderBy('timestamp', 'asc').limit(1).get();
+            return snap.empty ? null : snap.docs[0];
+        }
+
+        async function setWinner(who) {
+            if(!kingDoc || !chalDoc) return Swal.fire('Error', 'ผู้เล่นไม่ครบ', 'error');
+
             const batch = db.batch();
-            const topupRef = db.collection('topups').doc(docId);
-            
-            if(action === 'approve') {
-                const userRef = db.collection('users').doc(userId);
-                batch.update(topupRef, { status: 'approved' });
-                batch.update(userRef, { balance: firebase.firestore.FieldValue.increment(amount) });
-                batch.commit().then(() => Swal.fire('Success', `เพิ่มเงิน ฿${amount} ให้ลูกค้าแล้ว`, 'success'));
+
+            if(who === 'king') {
+                // King ชนะ: King อยู่ที่เดิม (wins+1), Challenger ไป History
+                batch.update(kingDoc.ref, { wins: (kingDoc.data().wins || 0) + 1 });
+                batch.update(chalDoc.ref, { status: 'history' });
             } else {
-                batch.update(topupRef, { status: 'rejected' });
-                batch.commit().then(() => Swal.fire('Rejected', 'ปฏิเสธรายการแล้ว', 'info'));
+                // Challenger ชนะ: King ไป History, Challenger เป็น King (wins=1)
+                batch.update(kingDoc.ref, { status: 'history' });
+                batch.update(chalDoc.ref, { status: 'king', wins: 1 });
+            }
+
+            await batch.commit();
+            
+            // ดึงคนต่อไปมาเป็น Challenger
+            const next = await getNextWaiting();
+            if(next) {
+                await db.collection('arena_queue').doc(next.id).update({ status: 'challenger' });
+            } else {
+                Swal.fire('Info', 'ไม่มีคนรอคิวแล้ว', 'info');
             }
         }
 
-        // --- MODULE 5: USERS ---
-        function renderUsers(container) {
-            container.innerHTML = `
-                <div class="card-white overflow-hidden animate-fade-in">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-400">
-                            <tr>
-                                <th class="p-4">User</th>
-                                <th class="p-4">Balance</th>
-                                <th class="p-4 text-right">Manage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
-            `;
-            
-            db.collection('users').limit(20).onSnapshot(snap => {
-                const tbody = document.getElementById('user-table-body');
-                if(!tbody) return;
-                tbody.innerHTML = snap.docs.map(doc => {
-                    const u = doc.data();
-                    return `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4">
-                                <div class="font-bold text-slate-800">${u.email}</div>
-                                <div class="text-xs text-slate-400">UID: ${doc.id.substring(0,8)}...</div>
-                            </td>
-                            <td class="p-4 font-bold text-green-600">฿${(u.balance || 0).toLocaleString()}</td>
-                            <td class="p-4 text-right">
-                                <button onclick="openUserEdit('${doc.id}', '${u.email}', ${u.balance || 0})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">
-                                    แก้ไข
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            });
+        function forceNextMatch() {
+            checkAndFillSlots();
         }
 
-        function openUserEdit(id, email, balance) {
-            document.getElementById('edit-user-email-display').innerText = email;
-            document.getElementById('edit-user-id-display').innerText = id;
-            document.getElementById('edit-user-balance-display').innerText = `฿${balance.toLocaleString()}`;
-            document.getElementById('edit-user-id').value = id;
-            document.getElementById('modal-user').classList.remove('hidden');
-        }
-
-        function adjustBalance(type) {
-            const uid = document.getElementById('edit-user-id').value;
-            Swal.fire({
-                title: type === 'add' ? 'เติมเงินพิเศษ' : 'หักเงิน',
-                input: 'number',
-                inputLabel: 'จำนวนเงิน (บาท)',
-                confirmButtonText: 'ยืนยัน',
-                confirmButtonColor: type === 'add' ? '#10b981' : '#ef4444'
-            }).then((res) => {
-                if(res.isConfirmed) {
-                    const amount = Number(res.value);
-                    const val = type === 'add' ? amount : -amount;
-                    db.collection('users').doc(uid).update({
-                        balance: firebase.firestore.FieldValue.increment(val)
-                    }).then(() => {
-                        Swal.fire('Success', 'ปรับยอดเงินเรียบร้อย', 'success');
-                        closeModal('modal-user');
-                    });
-                }
-            });
-        }
-
-        // --- MODULE 6: CHAT ---
-        function renderChat(container) {
-            container.innerHTML = `
-                <div class="flex h-[calc(100vh-160px)] gap-4 animate-fade-in">
-                    <div class="w-1/3 card-white flex flex-col overflow-hidden">
-                        <div class="p-3 bg-slate-50 border-b border-gray-100 font-bold text-slate-600 text-sm">Inbox</div>
-                        <div id="chat-user-list" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
-                    </div>
-                    <div class="w-2/3 card-white flex flex-col overflow-hidden">
-                        <div id="chat-box-display" class="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-50">
-                            <div class="text-center text-slate-400 mt-20">เลือกผู้ใช้งานเพื่อเริ่มแชท</div>
-                        </div>
-                        <div class="p-3 bg-white border-t border-gray-100 flex gap-2">
-                            <input id="admin-chat-input" type="text" class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 focus:outline-none focus:border-black" placeholder="พิมพ์ข้อความตอบกลับ...">
-                            <button onclick="sendAdminMessage()" class="btn-primary w-10 h-10 rounded-lg flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            rtdb.ref('chats').on('value', snap => {
-                const list = document.getElementById('chat-user-list');
-                if(!list) return;
-                list.innerHTML = '';
-                snap.forEach(child => {
-                    const uid = child.key;
-                    const isActive = uid === activeChatId;
-                    list.innerHTML += `
-                        <div onclick="openChat('${uid}')" class="p-3 rounded-lg cursor-pointer flex items-center gap-3 transition ${isActive ? 'bg-slate-800 text-white' : 'hover:bg-slate-100 text-slate-600'}">
-                            <div class="w-8 h-8 rounded-full ${isActive ? 'bg-slate-600' : 'bg-slate-200'} flex items-center justify-center text-xs"><i class="fa-solid fa-user"></i></div>
-                            <div class="truncate text-sm font-medium">User: ${uid.substring(0,6)}...</div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        window.openChat = (uid) => {
-            activeChatId = uid;
-            const display = document.getElementById('chat-box-display');
-            display.innerHTML = '<div class="text-center text-slate-400">Loading history...</div>';
-            
-            // Re-render user list to update highlight
-            
-            rtdb.ref('chats/' + uid).limitToLast(50).on('value', snap => {
-                if(activeChatId !== uid) return;
-                display.innerHTML = '';
-                snap.forEach(msgSnap => {
-                    const m = msgSnap.val();
-                    const isAdmin = m.sender === 'admin';
-                    display.innerHTML += `
-                        <div class="flex ${isAdmin ? 'justify-end' : 'justify-start'}">
-                            <div class="${isAdmin ? 'bg-slate-800 text-white' : 'bg-white border border-gray-200 text-slate-800'} px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow-sm">
-                                ${m.text}
-                            </div>
-                        </div>
-                    `;
-                });
-                display.scrollTop = display.scrollHeight;
-            });
-        }
-
-        window.sendAdminMessage = () => {
-            const input = document.getElementById('admin-chat-input');
-            if(!input.value || !activeChatId) return;
-            rtdb.ref('chats/' + activeChatId).push({
-                text: input.value, sender: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-            input.value = '';
-        }
-
-        // UTILS
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function listenBadges() {
-            db.collection('rentals').where('status','==','pending').onSnapshot(s => {
-                const b = document.getElementById('badge-rentals');
-                if(b) { b.innerText = s.size; b.classList.toggle('hidden', s.size===0); }
-            });
-            db.collection('topups').where('status','==','pending').onSnapshot(s => {
-                const b = document.getElementById('badge-topup');
-                if(b) { b.innerText = s.size; b.classList.toggle('hidden', s.size===0); }
-            });
-        }
     </script>
 </body>
 </html>
