@@ -133,9 +133,8 @@
 
         </div>
     </main>
-
-    <script>
-        // CONFIG
+<script>
+        // --- 1. CONFIGURATION (ใส่ค่าของท่าน) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -144,77 +143,91 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         class AdminApp {
             constructor() {
+                // อ้างอิง Collection หลัก
                 this.qRef = db.collection('q_system').doc('config').collection('queues');
                 this.initListeners();
             }
 
             initListeners() {
-                // Monitor Stats
-                this.qRef.onSnapshot(snap => {
-                    let w=0, c=0, s=0, x=0;
-                    snap.forEach(doc => {
-                        const st = doc.data().status;
-                        if(st==='waiting') w++;
-                        if(st==='called') c++;
-                        if(st==='served') s++;
-                        if(st==='cancelled') x++;
-                    });
-                    document.getElementById('stat-waiting').innerText = w;
-                    document.getElementById('stat-called').innerText = c;
-                    document.getElementById('stat-served').innerText = s;
-                    document.getElementById('stat-cancel').innerText = x;
+                // 1. ฟังข้อมูลคิวทั้งหมด (แก้ไข: ดึงมาทั้งหมดแล้วค่อยกรอง เพื่อแก้ปัญหา Index Error)
+                this.qRef.orderBy('timestamp', 'asc').onSnapshot(snap => {
+                    
+                    const allDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    // แยกประเภทข้อมูล
+                    const waiting = allDocs.filter(d => d.status === 'waiting');
+                    const called = allDocs.filter(d => d.status === 'called');
+                    const served = allDocs.filter(d => d.status === 'served');
+                    const cancelled = allDocs.filter(d => d.status === 'cancelled');
+
+                    // อัปเดตตัวเลข Dashboard
+                    document.getElementById('stat-waiting').innerText = waiting.length;
+                    document.getElementById('stat-called').innerText = called.length;
+                    document.getElementById('stat-served').innerText = served.length;
+                    document.getElementById('stat-cancel').innerText = cancelled.length;
+
+                    // ส่งข้อมูลไปวาดตาราง (รวม Waiting และ Called ไว้หน้า Live)
+                    this.renderLiveTable([...called, ...waiting]); // เอา Called ขึ้นก่อน
+                    
+                    // ส่งข้อมูลไปหน้าประวัติ (Served + Cancelled)
+                    // กลับด้าน array ให้ประวัติล่าสุดอยู่บน
+                    this.renderHistoryTable([...served, ...cancelled].reverse());
+                }, error => {
+                    console.error("Error loading queues:", error);
+                    Swal.fire("Connection Error", "ไม่สามารถดึงข้อมูลได้: " + error.message, "error");
                 });
 
-                // Monitor Current Serving
+                // 2. ฟังคิวปัจจุบัน (Header)
                 db.collection('q_system').doc('config').onSnapshot(doc => {
                     if(doc.exists) document.getElementById('header-current').innerText = doc.data().current || 'A-000';
                 });
-
-                // Load Live Table
-                this.qRef.where('status', 'in', ['waiting', 'called'])
-                    .orderBy('timestamp', 'asc')
-                    .onSnapshot(snap => this.renderLiveTable(snap));
-
-                // Load History Table
-                this.qRef.where('status', 'in', ['served', 'cancelled'])
-                    .orderBy('timestamp', 'desc').limit(50)
-                    .onSnapshot(snap => this.renderHistoryTable(snap));
             }
 
-            renderLiveTable(snap) {
+            renderLiveTable(data) {
                 const tbody = document.getElementById('table-live');
                 const empty = document.getElementById('empty-live');
                 tbody.innerHTML = '';
                 
-                if(snap.empty) { empty.classList.remove('hidden'); return; }
-                else empty.classList.add('hidden');
+                if(data.length === 0) { 
+                    empty.classList.remove('hidden'); 
+                    return; 
+                } else {
+                    empty.classList.add('hidden');
+                }
 
-                snap.forEach(doc => {
-                    const d = doc.data();
+                data.forEach(d => {
                     const isCalled = d.status === 'called';
+                    // แปลง Timestamp เป็นเวลา
                     const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '-';
                     
-                    const rowClass = isCalled ? 'bg-blue-50 border-l-4 border-blue-500' : '';
-                    
+                    const rowClass = isCalled ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-gray-50';
+                    const statusBadge = isCalled 
+                        ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold animate-pulse">กำลังเรียก</span>` 
+                        : `<span class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-xs">รอคิว</span>`;
+
                     tbody.innerHTML += `
-                        <tr class="${rowClass}">
-                            <td><span class="font-bold text-lg ${isCalled ? 'text-blue-600' : 'text-slate-700'}">${d.number}</span></td>
-                            <td>
-                                <div class="font-bold text-slate-700">${d.name}</div>
-                                <div class="text-xs text-gray-400">${d.phone || '-'}</div>
+                        <tr class="${rowClass} transition-colors duration-200">
+                            <td class="p-4">
+                                <span class="font-bold text-xl ${isCalled ? 'text-blue-600' : 'text-slate-700'}">${d.number}</span>
+                                <div class="mt-1">${statusBadge}</div>
                             </td>
-                            <td><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold">${d.pax} ท่าน</span></td>
-                            <td class="text-sm text-gray-500">${time}</td>
-                            <td class="text-right">
+                            <td class="p-4">
+                                <div class="font-bold text-slate-700">${d.name}</div>
+                                <div class="text-xs text-gray-400"><i class="fa-solid fa-phone mr-1"></i>${d.phone || '-'}</div>
+                            </td>
+                            <td class="p-4"><span class="bg-white border border-gray-200 text-gray-600 px-3 py-1 rounded-lg text-sm font-bold shadow-sm">${d.pax} ท่าน</span></td>
+                            <td class="p-4 text-sm text-gray-500 font-mono">${time}</td>
+                            <td class="p-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <button onclick="Admin.call('${doc.id}', '${d.number}')" class="btn-icon btn-call" title="เรียกคิว"><i class="fa-solid fa-bullhorn"></i></button>
-                                    <button onclick="Admin.serve('${doc.id}')" class="btn-icon btn-check" title="เสร็จสิ้น"><i class="fa-solid fa-check"></i></button>
-                                    <button onclick="Admin.cancel('${doc.id}')" class="btn-icon btn-del" title="ยกเลิก"><i class="fa-solid fa-xmark"></i></button>
+                                    <button onclick="Admin.call('${d.id}', '${d.number}')" class="btn-icon btn-call shadow-sm" title="เรียกคิว"><i class="fa-solid fa-bullhorn"></i></button>
+                                    <button onclick="Admin.serve('${d.id}')" class="btn-icon btn-check shadow-sm" title="เสร็จสิ้น"><i class="fa-solid fa-check"></i></button>
+                                    <button onclick="Admin.cancel('${d.id}')" class="btn-icon btn-del shadow-sm" title="ยกเลิก"><i class="fa-solid fa-xmark"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -222,30 +235,39 @@
                 });
             }
 
-            renderHistoryTable(snap) {
+            renderHistoryTable(data) {
                 const tbody = document.getElementById('table-history');
                 tbody.innerHTML = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const color = d.status === 'served' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+                
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400">ยังไม่มีประวัติวันนี้</td></tr>';
+                    return;
+                }
+
+                data.forEach(d => {
+                    const isServed = d.status === 'served';
+                    const color = isServed ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+                    const label = isServed ? 'เสร็จสิ้น' : 'ยกเลิก';
+                    const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleTimeString('th-TH') : '-';
+
                     tbody.innerHTML += `
-                        <tr>
-                            <td class="font-bold">${d.number}</td>
-                            <td>${d.name}</td>
-                            <td><span class="px-2 py-1 rounded text-xs font-bold uppercase ${color}">${d.status}</span></td>
-                            <td class="text-sm text-gray-400">${new Date(d.timestamp.seconds*1000).toLocaleTimeString()}</td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-4 font-bold text-slate-600">${d.number}</td>
+                            <td class="p-4 text-slate-600">${d.name}</td>
+                            <td class="p-4"><span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${color}">${label}</span></td>
+                            <td class="p-4 text-sm text-gray-400 font-mono">${time}</td>
                         </tr>
                     `;
                 });
             }
 
-            // ACTIONS
+            // --- ACTIONS ---
             call(id, num) {
-                // 1. Update Status
+                // อัปเดตสถานะคิวเป็น 'called'
                 this.qRef.doc(id).update({ status: 'called' });
-                // 2. Update Global Display
+                // อัปเดตเลขปัจจุบันที่ Config หลัก (เพื่อให้หน้าลูกค้าเห็น)
                 db.collection('q_system').doc('config').update({ current: num });
-                // 3. Speech
+                // พูดชื่อ
                 this.speak(`ขอเชิญหมายเลข ${num} ค่ะ`);
             }
 
@@ -254,39 +276,48 @@
             }
 
             cancel(id) {
-                if(confirm('ยกเลิกคิวนี้?')) this.qRef.doc(id).update({ status: 'cancelled' });
+                Swal.fire({
+                    title: 'ยกเลิกคิวนี้?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'ยืนยัน'
+                }).then((r) => {
+                    if(r.isConfirmed) this.qRef.doc(id).update({ status: 'cancelled' });
+                });
             }
 
             resetSystem() {
                 Swal.fire({
-                    title: 'รีเซ็ตระบบ?',
+                    title: 'รีเซ็ตระบบ (วันใหม่)?',
                     text: "คิวทั้งหมดจะถูกลบและเริ่มนับ 1 ใหม่",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     confirmButtonText: 'ยืนยันรีเซ็ต'
-                }).then((result) => {
+                }).then(async (result) => {
                     if (result.isConfirmed) {
-                        // Reset Config
-                        db.collection('q_system').doc('config').set({ current: 'A-000', last: 0 });
+                        // 1. Reset Config
+                        await db.collection('q_system').doc('config').set({ current: 'A-000', last: 0 });
                         
-                        // Delete All Queues (Batch)
-                        this.qRef.get().then(snap => {
-                            const batch = db.batch();
-                            snap.docs.forEach(doc => batch.delete(doc.ref));
-                            return batch.commit();
-                        }).then(() => {
-                            Swal.fire('เรียบร้อย', 'ระบบพร้อมสำหรับวันใหม่', 'success');
-                        });
+                        // 2. Delete All Queues (Client-side Batch Delete)
+                        const snap = await this.qRef.get();
+                        const batch = db.batch();
+                        snap.docs.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+
+                        Swal.fire('เรียบร้อย', 'ระบบพร้อมสำหรับวันใหม่', 'success');
                     }
                 });
             }
 
             speak(text) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'th-TH';
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.9;
+                    speechSynthesis.speak(utterance);
+                }
             }
 
             switchTab(tab) {
@@ -299,7 +330,9 @@
             }
         }
 
+        // Start Admin App
         const Admin = new AdminApp();
     </script>
 </body>
 </html>
+
