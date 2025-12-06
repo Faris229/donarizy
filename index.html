@@ -2,72 +2,50 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Wheel Admin</title>
+    <title>HubFu Admin - Enterprise Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-</head>
-<body class="flex h-screen bg-gray-100 font-sans">
 
-    <aside class="w-64 bg-white border-r flex flex-col">
-        <div class="p-6 font-bold text-xl text-purple-600 border-b">Admin Panel</div>
-        <nav class="p-4 space-y-1">
-            <button onclick="show('prizes')" class="w-full text-left p-3 rounded hover:bg-purple-50 text-gray-700 font-bold"><i class="fa-solid fa-gift w-6"></i> ของรางวัล</button>
-            <button onclick="show('codes')" class="w-full text-left p-3 rounded hover:bg-purple-50 text-gray-700 font-bold"><i class="fa-solid fa-ticket w-6"></i> โค้ด</button>
-            <button onclick="show('chat')" class="w-full text-left p-3 rounded hover:bg-purple-50 text-gray-700 font-bold"><i class="fa-solid fa-comments w-6"></i> แชท</button>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; }
+        .input-std { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem; }
+        .btn-std { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; font-size: 0.875rem; transition: all 0.1s; }
+        .btn-std:active { transform: scale(0.98); }
+        .nav-item.active { background: #e2e8f0; color: #0f172a; font-weight: bold; border-right: 4px solid #2563eb; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-slate-700">
+
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20">
+        <div class="h-16 flex items-center px-6 border-b border-slate-100 font-bold text-lg text-slate-800">
+            ADMIN PANEL
+        </div>
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <button onclick="Router('prizes-wheel')" id="nav-prizes-wheel" class="nav-item w-full text-left px-4 py-3 rounded hover:bg-slate-50 flex items-center gap-3"><i class="fa-solid fa-dharmachakra w-5"></i> รางวัลวงล้อ</button>
+            <button onclick="Router('prizes-box')" id="nav-prizes-box" class="nav-item w-full text-left px-4 py-3 rounded hover:bg-slate-50 flex items-center gap-3"><i class="fa-solid fa-box w-5"></i> รางวัลกล่องสุ่ม</button>
+            <button onclick="Router('codes')" id="nav-codes" class="nav-item w-full text-left px-4 py-3 rounded hover:bg-slate-50 flex items-center gap-3"><i class="fa-solid fa-ticket w-5"></i> จัดการโค้ด</button>
+            <button onclick="Router('chat')" id="nav-chat" class="nav-item w-full text-left px-4 py-3 rounded hover:bg-slate-50 flex items-center gap-3"><i class="fa-solid fa-comments w-5"></i> แชทซัพพอร์ต</button>
         </nav>
+        <div class="p-4 border-t border-slate-100">
+            <div class="text-xs text-slate-400 mb-1">Signed in as Admin</div>
+            <button onclick="auth.signOut()" class="text-red-500 font-bold text-sm hover:underline">Logout</button>
+        </div>
     </aside>
 
-    <main class="flex-1 p-8 overflow-y-auto">
-        
-        <div id="prizes" class="section">
-            <h2 class="text-2xl font-bold mb-6">จัดการของรางวัล (Weighted Probability)</h2>
-            
-            <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border">
-                <h3 class="font-bold mb-4 text-sm uppercase text-gray-400">เพิ่ม/แก้ไข รางวัล</h3>
-                <div class="grid grid-cols-4 gap-4 mb-4">
-                    <input id="p-name" placeholder="ชื่อรางวัล (เช่น บัตรทรู)" class="border p-2 rounded col-span-2">
-                    <input id="p-color" type="color" class="h-10 w-full cursor-pointer">
-                    <input id="p-chance" type="number" placeholder="โอกาส (%)" class="border p-2 rounded">
-                </div>
-                <textarea id="p-items" placeholder="สินค้าข้างใน (Nested Items) - ใส่บรรทัดละ 1 อัน&#10;เช่น:&#10;TRUE-001&#10;TRUE-002" class="w-full border p-2 rounded h-24 mb-4 font-mono text-sm"></textarea>
-                <button onclick="addPrize()" class="bg-purple-600 text-white px-6 py-2 rounded font-bold hover:bg-purple-700">บันทึกรางวัล</button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4" id="prize-list"></div>
-        </div>
-
-        <div id="chat" class="section hidden h-full flex flex-col">
-            <h2 class="text-2xl font-bold mb-4">Live Chat</h2>
-            <div class="flex flex-1 gap-4 overflow-hidden h-[500px]">
-                <div id="user-list" class="w-1/3 bg-white border rounded overflow-y-auto"></div>
-                <div class="w-2/3 bg-white border rounded flex flex-col">
-                    <div id="msg-box" class="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-2">Select User</div>
-                    <form onsubmit="sendAdminChat(event)" class="p-3 border-t flex gap-2">
-                        <input id="admin-in" class="flex-1 border p-2 rounded" placeholder="Type...">
-                        <button class="bg-purple-600 text-white px-4 rounded">Send</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div id="codes" class="section hidden">
-            <h2 class="text-2xl font-bold mb-4">สร้างโค้ด</h2>
-            <div class="flex gap-2 mb-4">
-                <input id="new-code" class="border p-2 rounded flex-1" placeholder="CODE">
-                <button onclick="createCode()" class="bg-green-600 text-white px-4 rounded">Create</button>
-            </div>
-            <div id="code-list" class="bg-white rounded border p-4"></div>
-        </div>
-
+    <main class="flex-1 flex flex-col h-full bg-slate-50">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center px-8 font-bold text-xl shadow-sm" id="page-title">Dashboard</header>
+        <div id="content-area" class="flex-1 p-8 overflow-y-auto"></div>
     </main>
 
     <script>
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -77,91 +55,236 @@
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
         const rtdb = firebase.database();
+        const ADMIN_EMAIL = 'farisxuma1@gmail.com'; // อีเมลคุณ
 
-        // 1. PRIZES
-        function addPrize() {
-            const name = document.getElementById('p-name').value;
-            const color = document.getElementById('p-color').value;
-            const chance = Number(document.getElementById('p-chance').value);
-            const itemsRaw = document.getElementById('p-items').value;
-            const items = itemsRaw.split('\n').filter(x => x.trim() !== '');
-
-            db.collection('wheel_prizes').add({
-                name, color, chance, items, 
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById('p-name').value = '';
-                document.getElementById('p-items').value = '';
-                Swal.fire('Success', 'เพิ่มรางวัลแล้ว', 'success');
-            });
-        }
-
-        db.collection('wheel_prizes').orderBy('createdAt').onSnapshot(snap => {
-            const div = document.getElementById('prize-list');
-            div.innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
-                const stock = d.items ? d.items.length : 0;
-                return `
-                    <div class="bg-white p-4 rounded border shadow-sm relative">
-                        <button onclick="db.collection('wheel_prizes').doc('${doc.id}').delete()" class="absolute top-2 right-2 text-red-400"><i class="fa-solid fa-trash"></i></button>
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="w-4 h-4 rounded-full" style="background:${d.color}"></div>
-                            <span class="font-bold">${d.name}</span>
-                        </div>
-                        <div class="text-sm text-gray-500">โอกาส: ${d.chance}% | สต็อกของ: ${stock} ชิ้น</div>
-                    </div>
-                `;
-            }).join('');
+        // AUTH CHECK
+        auth.onAuthStateChanged(u => {
+            if(u && u.email === ADMIN_EMAIL) {
+                Router('prizes-wheel');
+            } else {
+                Swal.fire({
+                    title: 'Admin Login',
+                    html: '<input id="swal-em" class="swal2-input" placeholder="Email"><input id="swal-pw" type="password" class="swal2-input" placeholder="Password">',
+                    allowOutsideClick: false,
+                    preConfirm: () => [document.getElementById('swal-em').value, document.getElementById('swal-pw').value]
+                }).then(res => {
+                    auth.signInWithEmailAndPassword(res.value[0], res.value[1]).catch(e => location.reload());
+                });
+            }
         });
 
-        // 2. CHAT
-        let activeChat = null;
-        rtdb.ref('chats').on('value', snap => {
-            const div = document.getElementById('user-list');
-            div.innerHTML = '';
-            snap.forEach(c => {
-                div.innerHTML += `<div onclick="loadChat('${c.key}')" class="p-3 border-b hover:bg-gray-100 cursor-pointer ${activeChat===c.key?'bg-purple-100':''}">User: ${c.key.substr(0,5)}</div>`;
-            });
-        });
+        // ROUTER
+        function Router(page) {
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById(`nav-${page}`).classList.add('active');
+            
+            const content = document.getElementById('content-area');
+            const title = document.getElementById('page-title');
+            content.innerHTML = '<div class="text-center mt-10"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-slate-400"></i></div>';
 
-        function loadChat(uid) {
-            activeChat = uid;
-            const div = document.getElementById('msg-box');
-            div.innerHTML = '';
-            rtdb.ref('chats/'+uid).limitToLast(20).on('child_added', s => {
-                const m = s.val();
-                const align = m.sender==='admin'?'text-right':'text-left';
-                const color = m.sender==='admin'?'bg-purple-600 text-white':'bg-white border';
-                div.innerHTML += `<div class="${align} mb-1"><span class="inline-block px-3 py-1 rounded ${color}">${m.text}</span></div>`;
-                div.scrollTop = div.scrollHeight;
-            });
-        }
-
-        function sendAdminChat(e) {
-            e.preventDefault();
-            const val = document.getElementById('admin-in').value;
-            if(val && activeChat) {
-                rtdb.ref('chats/'+activeChat).push({text:val, sender:'admin', timestamp: Date.now()});
-                document.getElementById('admin-in').value = '';
+            if(page === 'prizes-wheel') {
+                title.innerText = 'จัดการรางวัล (วงล้อ)';
+                Management.renderPrizes(content, 'wheel_prizes');
+            }
+            if(page === 'prizes-box') {
+                title.innerText = 'จัดการรางวัล (กล่องสุ่ม)';
+                Management.renderPrizes(content, 'box_prizes');
+            }
+            if(page === 'codes') {
+                title.innerText = 'จัดการโค้ด (Redeem Code)';
+                Management.renderCodes(content);
+            }
+            if(page === 'chat') {
+                title.innerText = 'แชทซัพพอร์ต';
+                ChatSystem.render(content);
             }
         }
 
-        // 3. CODES
-        function createCode() {
-            const c = document.getElementById('new-code').value;
-            if(c) db.collection('wheel_codes').add({code:c, status:'unused', createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-        }
-        db.collection('wheel_codes').orderBy('createdAt', 'desc').limit(20).onSnapshot(s => {
-            document.getElementById('code-list').innerHTML = s.docs.map(d => `<div class="p-2 border-b flex justify-between"><span>${d.data().code}</span><span class="text-xs uppercase">${d.data().status}</span></div>`).join('');
-        });
+        // MANAGEMENT LOGIC
+        const Management = {
+            renderPrizes: (el, collection) => {
+                el.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+                        <h3 class="font-bold mb-4 text-sm uppercase text-slate-400">เพิ่มรางวัลใหม่</h3>
+                        <div class="grid grid-cols-4 gap-4 mb-4">
+                            <input id="p-name" placeholder="ชื่อรางวัล" class="input-std col-span-2">
+                            <input id="p-chance" type="number" placeholder="โอกาส (%)" class="input-std">
+                            <input id="p-color" type="color" class="h-10 w-full cursor-pointer bg-white border rounded">
+                        </div>
+                        <textarea id="p-items" placeholder="ของสต็อกด้านใน (Nested Items) - ใส่บรรทัดละ 1 อัน (เช่น Code บัตรเติมเงิน)" class="input-std h-24 mb-4"></textarea>
+                        <button onclick="Management.addPrize('${collection}')" class="btn-std bg-slate-900 text-white w-full hover:bg-slate-800">บันทึกรางวัล</button>
+                    </div>
+                    <div id="prize-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                `;
+                
+                db.collection(collection).orderBy('chance', 'desc').onSnapshot(snap => {
+                    const list = document.getElementById('prize-list');
+                    list.innerHTML = snap.docs.map(doc => {
+                        const d = doc.data();
+                        const stock = d.items ? d.items.length : 0;
+                        return `
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative group">
+                                <button onclick="db.collection('${collection}').doc('${doc.id}').delete()" class="absolute top-2 right-2 text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-4 h-4 rounded-full shadow-sm" style="background:${d.color}"></div>
+                                    <span class="font-bold text-slate-700">${d.name}</span>
+                                </div>
+                                <div class="text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-100">
+                                    <div>โอกาส: <span class="font-bold text-blue-600">${d.chance}%</span></div>
+                                    <div>สต็อก: <span class="font-bold ${stock>0?'text-green-600':'text-red-600'}">${stock} ชิ้น</span></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                });
+            },
 
-        function show(id) {
-            document.querySelectorAll('.section').forEach(e => e.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-        show('prizes');
+            addPrize: (collection) => {
+                const name = document.getElementById('p-name').value;
+                const chance = Number(document.getElementById('p-chance').value);
+                const color = document.getElementById('p-color').value;
+                const itemsRaw = document.getElementById('p-items').value;
+                const items = itemsRaw.split('\n').filter(x => x.trim() !== '');
+
+                if(!name) return Swal.fire('Error', 'ใส่ชื่อด้วย', 'error');
+
+                db.collection(collection).add({
+                    name, chance, color, items, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    document.getElementById('p-name').value = '';
+                    document.getElementById('p-items').value = '';
+                    Swal.fire({toast:true, icon:'success', title:'เพิ่มแล้ว', position:'top-end', showConfirmButton:false, timer:1500});
+                });
+            },
+
+            renderCodes: (el) => {
+                el.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex gap-4">
+                        <input id="c-code" placeholder="CODE (หรือกดสุ่ม)" class="input-std font-mono uppercase font-bold text-lg">
+                        <button onclick="Management.genRandom()" class="btn-std bg-slate-100 text-slate-600 border border-slate-200">สุ่ม</button>
+                        <button onclick="Management.addCode()" class="btn-std bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200">สร้างโค้ด</button>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b">
+                                <tr><th class="p-4">Code</th><th class="p-4">Status</th><th class="p-4 text-right">Action</th></tr>
+                            </thead>
+                            <tbody id="code-list" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                `;
+                
+                db.collection('codes').orderBy('createdAt', 'desc').limit(50).onSnapshot(snap => {
+                    document.getElementById('code-list').innerHTML = snap.docs.map(doc => {
+                        const d = doc.data();
+                        const stClass = d.status==='unused' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400 line-through';
+                        return `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 font-mono font-bold">${d.code}</td>
+                                <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold uppercase ${stClass}">${d.status}</span></td>
+                                <td class="p-4 text-right"><button onclick="db.collection('codes').doc('${doc.id}').delete()" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td>
+                            </tr>
+                        `;
+                    }).join('');
+                });
+            },
+
+            genRandom: () => {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                let res = '';
+                for(let i=0; i<8; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+                document.getElementById('c-code').value = res;
+            },
+
+            addCode: () => {
+                const c = document.getElementById('c-code').value.toUpperCase().trim();
+                if(!c) return;
+                db.collection('codes').add({code:c, status:'unused', createdAt: firebase.firestore.FieldValue.serverTimestamp()})
+                .then(() => {
+                    document.getElementById('c-code').value = '';
+                    Swal.fire({toast:true, icon:'success', title:'Code Created', position:'top-end', showConfirmButton:false, timer:1000});
+                });
+            }
+        };
+
+        // CHAT SYSTEM (BUG FIXED)
+        const ChatSystem = {
+            activeListener: null,
+            activeUid: null,
+
+            render: (el) => {
+                el.innerHTML = `
+                    <div class="flex h-[calc(100vh-160px)] gap-4">
+                        <div class="w-1/3 bg-white border rounded-xl overflow-hidden flex flex-col">
+                            <div class="p-3 bg-slate-50 border-b font-bold text-slate-500 text-sm">Inbox</div>
+                            <div id="user-list" class="flex-1 overflow-y-auto p-2"></div>
+                        </div>
+                        <div class="w-2/3 bg-white border rounded-xl overflow-hidden flex flex-col">
+                            <div id="msg-box" class="flex-1 bg-slate-50 p-4 overflow-y-auto space-y-2">
+                                <div class="text-center text-slate-400 mt-20">Select a user to chat</div>
+                            </div>
+                            <form onsubmit="ChatSystem.send(event)" class="p-3 bg-white border-t flex gap-2">
+                                <input id="chat-in" class="input-std" placeholder="Reply..." disabled>
+                                <button id="chat-btn" class="btn-std bg-blue-600 text-white disabled:opacity-50" disabled>Send</button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                
+                rtdb.ref('chats').on('value', snap => {
+                    const list = document.getElementById('user-list');
+                    list.innerHTML = '';
+                    snap.forEach(child => {
+                        const uid = child.key;
+                        list.innerHTML += `
+                            <div onclick="ChatSystem.load('${uid}')" class="p-3 rounded-lg hover:bg-slate-50 cursor-pointer border-b border-slate-100 flex items-center gap-3 ${ChatSystem.activeUid===uid ? 'bg-blue-50 border-blue-200':''}">
+                                <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 text-xs"><i class="fa-solid fa-user"></i></div>
+                                <span class="font-bold text-sm text-slate-700 truncate w-32">${uid}</span>
+                            </div>
+                        `;
+                    });
+                });
+            },
+
+            load: (uid) => {
+                if(ChatSystem.activeListener) ChatSystem.activeListener.off(); // Prevent duplicate
+                ChatSystem.activeUid = uid;
+                
+                document.getElementById('chat-in').disabled = false;
+                document.getElementById('chat-btn').disabled = false;
+                
+                const box = document.getElementById('msg-box');
+                box.innerHTML = ''; // Clear old
+
+                ChatSystem.activeListener = rtdb.ref('chats/'+uid);
+                ChatSystem.activeListener.limitToLast(50).on('child_added', snap => {
+                    const m = snap.val();
+                    const isAdmin = m.sender === 'admin';
+                    box.innerHTML += `
+                        <div class="flex ${isAdmin ? 'justify-end' : 'justify-start'}">
+                            <div class="px-4 py-2 text-sm rounded-2xl max-w-[70%] ${isAdmin ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white border rounded-bl-none shadow-sm'}">
+                                ${m.text}
+                            </div>
+                        </div>
+                    `;
+                    box.scrollTop = box.scrollHeight;
+                });
+            },
+
+            send: (e) => {
+                e.preventDefault();
+                const inp = document.getElementById('chat-in');
+                if(inp.value && ChatSystem.activeUid) {
+                    rtdb.ref('chats/'+ChatSystem.activeUid).push({
+                        text: inp.value, sender: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    inp.value = '';
+                }
+            }
+        };
     </script>
 </body>
 </html>
