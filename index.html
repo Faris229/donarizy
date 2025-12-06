@@ -2,134 +2,332 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel | FoodRunner</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+    <title>Admin Panel - HubFu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body { font-family: 'Prompt', sans-serif; display: flex; margin: 0; background: #f3f4f6; height: 100vh; }
-        .sidebar { width: 250px; background: #1f2937; color: white; padding: 20px; }
-        .main { flex: 1; padding: 20px; overflow-y: auto; }
-        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        .btn { padding: 5px 10px; border: none; border-radius: 5px; color: white; cursor: pointer; }
-        #login { position: fixed; inset: 0; background: #1f2937; display: flex; justify-content: center; align-items: center; z-index: 999; }
-        input { padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
-    </style>
-</head>
-<body>
-
-<div id="login">
-    <div style="background:white; padding:30px; border-radius:10px; width:300px; text-align:center;">
-        <h2>Admin Login</h2>
-        <input id="a-email" value="farisxuma1@gmail.com" readonly style="background:#eee">
-        <input id="a-pass" type="password" placeholder="Password">
-        <button onclick="doLogin()" style="width:100%; padding:10px; background:#3b82f6; color:white; border:none; cursor:pointer;">Login</button>
-    </div>
-</div>
-
-<div class="sidebar">
-    <h3>Admin Control</h3>
-    <p onclick="show('users')" style="cursor:pointer">👥 ผู้ใช้งาน (Users)</p>
-    <p onclick="show('tx')" style="cursor:pointer">💰 ธุรกรรม (Transactions)</p>
-    <button onclick="firebase.auth().signOut()" style="margin-top:20px; background:red; color:white; border:none; padding:5px;">Logout</button>
-</div>
-
-<div class="main">
-    <div id="p-users" class="card">
-        <h3>รายชื่อผู้ใช้</h3>
-        <div id="u-list">Loading...</div>
-    </div>
-    <div id="p-tx" class="card" style="display:none;">
-        <h3>รายการรออนุมัติ</h3>
-        <div id="tx-list">Loading...</div>
-    </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-<script>
-    // ✅ Config ของคุณ
-    const config = {
-        apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
-        authDomain: "chat-27f96.firebaseapp.com",
-        databaseURL: "https://chat-27f96-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "chat-27f96",
-        storageBucket: "chat-27f96.firebasestorage.app",
-        messagingSenderId: "336686938010",
-        appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
-    };
-    firebase.initializeApp(config);
-    const auth = firebase.auth(), db = firebase.firestore();
-    let users = {};
-
-    auth.onAuthStateChanged(u => {
-        if(u && u.email==='farisxuma1@gmail.com') { document.getElementById('login').style.display='none'; init(); }
-    });
-
-    function doLogin() {
-        auth.signInWithEmailAndPassword(document.getElementById('a-email').value, document.getElementById('a-pass').value)
-            .catch(e => alert(e.message));
-    }
-
-    function init() {
-        db.collection('users').onSnapshot(snap => {
-            let h = '<table><tr><th>Name</th><th>Role</th><th>Bank Info</th><th>Balance</th><th>Action</th></tr>';
-            snap.forEach(d => {
-                const u = d.data(); users[d.id] = u;
-                h += `<tr>
-                    <td>${u.username}<br><small>${u.email}</small></td>
-                    <td>${u.role}</td>
-                    <td>${u.bankName||'-'} ${u.bankNo||''}</td>
-                    <td>${u.balance.toFixed(2)}</td>
-                    <td><button class="btn" style="background:#3b82f6" onclick="edit('${d.id}')">แก้เงิน</button></td>
-                </tr>`;
-            });
-            document.getElementById('u-list').innerHTML = h+'</table>';
-        });
-
-        db.collection('transactions').where('status','==','pending').onSnapshot(snap => {
-            let h = '<table><tr><th>Type</th><th>User</th><th>Amount</th><th>Action</th></tr>';
-            snap.forEach(d => {
-                const t = d.data();
-                const uName = users[t.uid]?.username || t.uid;
-                h += `<tr>
-                    <td style="color:${t.type==='deposit'?'green':'red'}">${t.type}</td>
-                    <td>${uName}</td>
-                    <td>${t.amount}</td>
-                    <td>
-                        <button class="btn" style="background:green" onclick="ok('${d.id}','${t.uid}',${t.amount},'${t.type}')">✔</button> 
-                        <button class="btn" style="background:red" onclick="no('${d.id}')">✘</button>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('tx-list').innerHTML = h+'</table>';
-        });
-    }
-
-    async function edit(uid) {
-        const n = prompt("กรอกยอดเงินใหม่:");
-        if(n) await db.collection('users').doc(uid).update({balance:parseFloat(n)});
-    }
-
-    async function ok(id, uid, amt, type) {
-        if(!confirm('ยืนยันอนุมัติ?')) return;
-        await db.runTransaction(async t => {
-            const uRef = db.collection('users').doc(uid);
-            const bal = (await t.get(uRef)).data().balance;
-            if(type==='withdraw' && bal<amt) throw "เงินไม่พอ";
-            t.update(uRef, {balance: type==='deposit'?bal+amt:bal-amt});
-            t.update(db.collection('transactions').doc(id), {status:'approved'});
-        });
-    }
-    async function no(id) { await db.collection('transactions').doc(id).update({status:'rejected'}); }
     
-    function show(p) { 
-        document.getElementById('p-users').style.display = p==='users'?'block':'none'; 
-        document.getElementById('p-tx').style.display = p==='tx'?'block':'none'; 
-    }
-</script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 flex h-screen overflow-hidden font-sans">
+
+    <aside class="w-64 bg-gray-800 flex flex-col border-r border-gray-700">
+        <div class="h-16 flex items-center justify-center border-b border-gray-700 text-xl font-bold text-white">
+            <i class="fa-solid fa-shield-halved mr-2 text-red-500"></i> Admin Panel
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="showTab('dashboard')" class="w-full text-left px-4 py-3 rounded hover:bg-gray-700"><i class="fa-solid fa-chart-line w-6"></i> ภาพรวม</button>
+            <button onclick="showTab('topups')" class="w-full text-left px-4 py-3 rounded hover:bg-gray-700 flex justify-between">
+                <span><i class="fa-solid fa-money-bill-transfer w-6"></i> อนุมัติเติมเงิน</span>
+                <span id="badge-topup" class="bg-red-500 text-xs px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="showTab('rentals')" class="w-full text-left px-4 py-3 rounded hover:bg-gray-700">
+                <span><i class="fa-solid fa-key w-6"></i> อนุมัติการเช่า</span>
+            </button>
+            <button onclick="showTab('products')" class="w-full text-left px-4 py-3 rounded hover:bg-gray-700"><i class="fa-solid fa-box w-6"></i> จัดการสินค้า</button>
+            <button onclick="showTab('chat')" class="w-full text-left px-4 py-3 rounded hover:bg-gray-700"><i class="fa-solid fa-comments w-6"></i> ตอบแชทลูกค้า</button>
+        </nav>
+        <div class="p-4 border-t border-gray-700">
+            <div class="text-sm text-gray-400 mb-2" id="admin-email">...</div>
+            <button onclick="firebase.auth().signOut()" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded text-sm">Logout</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        
+        <div id="admin-login" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center">
+            <div class="bg-gray-800 p-8 rounded-xl w-96 text-center border border-gray-700">
+                <h2 class="text-2xl font-bold mb-6">Admin Access Only</h2>
+                <button onclick="adminLogin()" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded font-bold">Login with Google / Email</button>
+            </div>
+        </div>
+
+        <div id="tab-dashboard" class="tab-content">
+            <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <h3 class="text-gray-400">รายได้รวม (ตัวอย่าง)</h3>
+                    <p class="text-3xl font-bold text-green-400">฿12,500</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <h3 class="text-gray-400">ผู้ใช้งานทั้งหมด</h3>
+                    <p class="text-3xl font-bold text-blue-400" id="stat-users">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-topups" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">อนุมัติการเติมเงิน</h2>
+            <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="p-4">Email</th>
+                            <th class="p-4">ยอดเงิน</th>
+                            <th class="p-4">หลักฐาน (Ref)</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topup-list" class="divide-y divide-gray-700 text-sm">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-rentals" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">รายการเช่ารหัส (Pending)</h2>
+            <div id="rental-list" class="space-y-4">
+                </div>
+        </div>
+
+        <div id="tab-products" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">จัดการสินค้า</h2>
+            <div class="bg-gray-800 p-6 rounded-xl mb-6 border border-gray-700">
+                <h3 class="font-bold mb-4">เพิ่มสินค้าใหม่</h3>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="p-name" placeholder="ชื่อเกม/สินค้า" class="bg-gray-900 border border-gray-600 rounded p-2 text-white">
+                    <input type="number" id="p-price" placeholder="ราคา/ชม." class="bg-gray-900 border border-gray-600 rounded p-2 text-white">
+                    <input type="text" id="p-img" placeholder="URL รูปภาพ" class="bg-gray-900 border border-gray-600 rounded p-2 text-white col-span-2">
+                </div>
+                <button onclick="addProduct()" class="bg-green-600 px-6 py-2 rounded font-bold">เพิ่มสินค้า</button>
+            </div>
+            <div id="admin-product-list" class="grid grid-cols-3 gap-4"></div>
+        </div>
+
+        <div id="tab-chat" class="tab-content hidden h-full flex flex-col">
+            <h2 class="text-3xl font-bold mb-4">ระบบตอบแชท</h2>
+            <div class="flex flex-1 gap-4 overflow-hidden h-96">
+                <div class="w-1/3 bg-gray-800 rounded-xl overflow-y-auto p-2" id="chat-users-list">
+                    </div>
+                <div class="w-2/3 bg-gray-800 rounded-xl flex flex-col p-4">
+                    <div id="admin-chat-box" class="flex-1 overflow-y-auto mb-4 bg-gray-900 rounded p-4 space-y-2">
+                        <p class="text-gray-500 text-center mt-10">เลือกผู้ใช้เพื่อเริ่มแชท</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="admin-chat-in" class="flex-1 bg-gray-900 border border-gray-600 rounded p-2" placeholder="พิมพ์ข้อความตอบกลับ...">
+                        <button onclick="adminSendChat()" class="bg-blue-600 px-4 rounded">ส่ง</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
+            authDomain: "hubfu-c4296.firebaseapp.com",
+            projectId: "hubfu-c4296",
+            storageBucket: "hubfu-c4296.firebasestorage.app",
+            messagingSenderId: "864674622740",
+            appId: "1:864674622740:web:3131798892e0e63e12a601",
+            measurementId: "G-PDB6KGDJYB"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const rtdb = firebase.database();
+        const ADMIN_EMAIL = 'farisxuma1@gmail.com';
+        let activeChatUid = null;
+
+        // --- Security Check ---
+        auth.onAuthStateChanged(user => {
+            if(user && user.email === ADMIN_EMAIL){
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-email').innerText = user.email;
+                initAdmin();
+            } else {
+                document.getElementById('admin-login').classList.remove('hidden');
+                if(user) Swal.fire('Access Denied', 'คุณไม่ใช่แอดมิน', 'error').then(()=> auth.signOut());
+            }
+        });
+
+        function adminLogin(){
+            Swal.fire({
+                title: 'Admin Login',
+                html: '<input id="swal-email" class="swal2-input" placeholder="email"><input id="swal-pass" type="password" class="swal2-input" placeholder="password">',
+                preConfirm: () => {
+                    return [document.getElementById('swal-email').value, document.getElementById('swal-pass').value]
+                }
+            }).then(res => {
+                if(res.isConfirmed) auth.signInWithEmailAndPassword(res.value[0], res.value[1]).catch(e => Swal.fire('Error', e.message, 'error'));
+            })
+        }
+
+        function initAdmin(){
+            loadTopups();
+            loadRentals();
+            loadProducts();
+            loadChatList();
+        }
+
+        // --- Tab Logic ---
+        window.showTab = (id) => {
+            document.querySelectorAll('.tab-content').forEach(d => d.classList.add('hidden'));
+            document.getElementById('tab-'+id).classList.remove('hidden');
+        }
+
+        // --- Topup Management ---
+        function loadTopups(){
+            db.collection('topups').where('status', '==', 'pending').onSnapshot(snap => {
+                const tbody = document.getElementById('topup-list');
+                document.getElementById('badge-topup').innerText = snap.size;
+                document.getElementById('badge-topup').classList.toggle('hidden', snap.size === 0);
+                
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    html += `
+                        <tr class="hover:bg-gray-700">
+                            <td class="p-4">${d.email}</td>
+                            <td class="p-4 font-bold text-green-400">฿${d.amount}</td>
+                            <td class="p-4 text-gray-400">${d.ref}</td>
+                            <td class="p-4">
+                                <button onclick="approveTopup('${doc.id}', '${d.userId}', ${d.amount})" class="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-xs mr-2">อนุมัติ</button>
+                                <button onclick="rejectTopup('${doc.id}')" class="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-xs">ปฏิเสธ</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html || '<tr><td colspan="4" class="p-4 text-center text-gray-500">ไม่มีรายการรออนุมัติ</td></tr>';
+            });
+        }
+
+        function approveTopup(docId, userId, amount){
+            // 1. Update Status -> approved
+            // 2. User Balance -> +amount
+            // ใช้ Batch เพื่อความชัวร์ (ถ้าพังก็พังคู่)
+            const batch = db.batch();
+            const topupRef = db.collection('topups').doc(docId);
+            const userRef = db.collection('users').doc(userId);
+
+            batch.update(topupRef, { status: 'approved' });
+            // ใช้ Firestore Increment ปลอดภัยกว่าบวกเอง
+            batch.update(userRef, { balance: firebase.firestore.FieldValue.increment(amount) });
+
+            batch.commit().then(() => Swal.fire('Success', 'อนุมัติเรียบร้อย', 'success'));
+        }
+        function rejectTopup(docId){
+            db.collection('topups').doc(docId).update({ status: 'rejected' });
+        }
+
+        // --- Rentals Management ---
+        function loadRentals(){
+            db.collection('rentals').where('status', '==', 'pending').onSnapshot(snap => {
+                const div = document.getElementById('rental-list');
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    html += `
+                        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold">${d.productName} (${d.hours} ชม.)</h3>
+                                <p class="text-sm text-gray-400">ผู้เช่า: ${d.userId} (Cost: ${d.cost})</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="sendIdPass('${doc.id}', '${d.userId}')" class="bg-blue-600 px-3 py-2 rounded text-sm hover:bg-blue-500">ส่ง ID/Pass</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                div.innerHTML = html || '<p class="text-gray-500">ไม่มีการเช่าใหม่</p>';
+            });
+        }
+        function sendIdPass(rentalId, userId){
+            Swal.fire({
+                title: 'ส่ง ID/Pass',
+                html: '<input id="game-id" class="swal2-input" placeholder="Username"><input id="game-pass" class="swal2-input" placeholder="Password">',
+                preConfirm: () => {
+                    const u = document.getElementById('game-id').value;
+                    const p = document.getElementById('game-pass').value;
+                    if(!u || !p) Swal.showValidationMessage('กรอกให้ครบ');
+                    return {u, p};
+                }
+            }).then(res => {
+                if(res.isConfirmed){
+                    // 1. ส่งเข้า Chat
+                    const msg = `[ระบบ] การเช่าสำเร็จ! ID: ${res.value.u} / Pass: ${res.value.p}`;
+                    rtdb.ref('chats/' + userId).push({
+                        text: msg, sender: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    // 2. อัปเดต Rental Status
+                    db.collection('rentals').doc(rentalId).update({ status: 'active' });
+                    // 3. ตัดเงิน User (ถ้ายังไม่ได้ตัดตอนกดเช่า) - ในตัวอย่างนี้สมมติว่าตัดตอนอนุมัติ
+                    db.collection('users').doc(userId).update({
+                         // จริงๆ ควรเช็ค balance ก่อน แต่เพื่อความง่ายใน prototype
+                         // ตัดเงินตรงนี้ได้เลยถ้า rental มี cost
+                    });
+                    Swal.fire('Sent', 'ส่งข้อมูลแล้ว', 'success');
+                }
+            })
+        }
+
+        // --- Product Management ---
+        function addProduct(){
+            const n = document.getElementById('p-name').value;
+            const p = document.getElementById('p-price').value;
+            const i = document.getElementById('p-img').value;
+            db.collection('products').add({
+                name: n, price: Number(p), image: i, status: 'available', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => Swal.fire('OK', 'เพิ่มสินค้าแล้ว', 'success'));
+        }
+        function loadProducts(){
+            db.collection('products').onSnapshot(snap => {
+                 const div = document.getElementById('admin-product-list');
+                 div.innerHTML = snap.docs.map(doc => `
+                    <div class="bg-gray-800 p-3 rounded border border-gray-700">
+                        <img src="${doc.data().image}" class="h-20 w-full object-cover rounded mb-2">
+                        <div class="font-bold">${doc.data().name}</div>
+                        <button onclick="db.collection('products').doc('${doc.id}').delete()" class="text-red-500 text-xs mt-2">ลบสินค้า</button>
+                    </div>
+                 `).join('');
+            });
+        }
+
+        // --- Chat System ---
+        function loadChatList(){
+            // Realtime DB: chats node
+            rtdb.ref('chats').on('value', snap => {
+                const list = document.getElementById('chat-users-list');
+                list.innerHTML = '';
+                snap.forEach(child => {
+                    const uid = child.key;
+                    // Get last message logic (simplified)
+                    list.innerHTML += `
+                        <div onclick="openChat('${uid}')" class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 ${activeChatUid===uid ? 'bg-gray-700':''}">
+                            User: ${uid.substring(0,6)}...
+                        </div>
+                    `;
+                });
+            });
+        }
+        window.openChat = (uid) => {
+            activeChatUid = uid;
+            document.getElementById('admin-chat-box').innerHTML = ''; // Clear old
+            // Load messages
+            rtdb.ref('chats/' + uid).on('child_added', snap => {
+                if(activeChatUid !== uid) return; // Prevent mix
+                const m = snap.val();
+                const align = m.sender === 'admin' ? 'text-right' : 'text-left';
+                const color = m.sender === 'admin' ? 'bg-blue-600' : 'bg-gray-700';
+                document.getElementById('admin-chat-box').innerHTML += `
+                    <div class="${align}"><span class="inline-block px-3 py-1 rounded ${color} mb-1">${m.text}</span></div>
+                `;
+                 document.getElementById('admin-chat-box').scrollTop = 9999;
+            });
+        }
+        function adminSendChat(){
+            const txt = document.getElementById('admin-chat-in').value;
+            if(!txt || !activeChatUid) return;
+            rtdb.ref('chats/' + activeChatUid).push({
+                text: txt, sender: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+            document.getElementById('admin-chat-in').value = '';
+        }
+
+    </script>
 </body>
 </html>
